@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+body {
+  font-family: "Figtree", sans-serif;
+}
+
+@keyframes custom-enter {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes custom-exit {
+  0% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+
+.hide-scrollbar {
+  overflow: auto !important;
+}
+
+/* Chrome, Safari */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+
+/* Firefox */
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+
+/* IE / Edge old */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+}
