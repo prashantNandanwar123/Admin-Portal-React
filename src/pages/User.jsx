@@ -230,7 +230,7 @@ export default function User() {
           className="bg-blue-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm shadow transition self-start md:self-auto"
         >
           <FaPlus />
-          Add User
+          Add User table name
         </button>
       </div>
       {/* ── Table ── */}
