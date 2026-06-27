@@ -171,12 +171,6 @@ export default function User() {
   const indexOfFirst = indexOfLast - entriesPerPage;
   const currentData = filteredData.slice(indexOfFirst, indexOfLast);
 
-
-  console.log("currentPage =", currentPage);
-  console.log("indexOfFirst =", indexOfFirst);
-  console.log("indexOfLast =", indexOfLast);
-  console.log("currentData Length =", currentData.length);
-
   // ─── Table columns ───────────────────────────────────────────────────────────
   const TABLE_COLS = [
     "ID",
@@ -271,10 +265,10 @@ export default function User() {
               className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[65vh]">
           <table className="w-full text-xs whitespace-nowrap">
             <thead>
-              <tr className="bg-orange-600 text-white">
+              <tr className="sticky top-0 z-10 bg-orange-600 text-white">
                 {TABLE_COLS.map((col) => (
                   <th key={col} className="px-3 py-3 text-left font-semibold tracking-wide">
                     {col}
