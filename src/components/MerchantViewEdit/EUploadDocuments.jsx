@@ -25,6 +25,19 @@ export default function EUploadDocument({
     "Identity proof - PAN Card, Passport, Driving License etc.",
   ];
 
+  const filePaths = [
+    "validLicense1FileName",
+    "panCardpathFileName",
+    "addressProofTelephoneElectricityBillpathFileName",
+    "incomeTaxPathFileName",
+    "statementAccountPathFileName",
+    "existingPOSPathFileName",
+    "mEstablishmentPOSPathFileName",
+    "copyOfLicensePathFileName",
+    "identityProofPathFileName",
+  ];
+
+
   const fileRefs = useRef([]);
   const [documents, setDocuments] = useState(
 
@@ -34,12 +47,12 @@ export default function EUploadDocument({
       remarks: "",
       date: "",
       file: null,
+      fileName: "",
     }))
 
   );
 
   // ================= HANDLE CHANGE =================
-
   const handleChange = (
     index,
     field,
@@ -47,19 +60,17 @@ export default function EUploadDocument({
   ) => {
 
     const updated = [...documents];
-
     updated[index][field] = value;
-
     setDocuments(updated);
   };
 
   // ================= REMOVE FILE =================
-
   const removeFile = (index) => {
     const updated = [...documents];
     updated[index] = {
       ...updated[index],
       file: null,
+      fileName: "",
     };
     setDocuments(updated);
     if (fileRefs.current[index]) {
@@ -76,7 +87,6 @@ export default function EUploadDocument({
       const formData = new FormData();
       formData.append(
         "ref_id", refId
-
       );
 
       // ================= VALID LICENSE 1 =================
@@ -253,7 +263,6 @@ export default function EUploadDocument({
       }
 
       // ================= COPY OF LICENSE =================
-
       formData.append(
         "copyOfLicenseStatus",
         documents[7].status
@@ -278,7 +287,6 @@ export default function EUploadDocument({
       }
 
       // ================= IDENTITY PROOF =================
-
       formData.append(
         "identityProofStatus",
         documents[8].status
@@ -302,31 +310,19 @@ export default function EUploadDocument({
         );
       }
 
-      console.log(
-        "UPLOAD FORM DATA =>",
-        [...formData.entries()]
-      );
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
       const response =
         await axiosInstance.post(
           "/saveEditUploadMeDocuments",
-          formData,
-          {
-            headers: {
-              "Content-Type":
-                "multipart/form-data",
-            },
-          }
+          formData
         );
 
-      console.log(
-        "PAYMENT RESPONSE =>",
-        response
-      );
-
+      console.log("Updated Docus : ", response)
       const resData = response;
       if (resData?.respCode === 0) {
-
         toast.success(
           resData?.respMsg
         );
@@ -338,6 +334,8 @@ export default function EUploadDocument({
             prev.refId,
         }));
 
+        fetchData();
+
       } else {
         toast.error(
           resData?.respMsg
@@ -345,108 +343,112 @@ export default function EUploadDocument({
       }
 
     } catch (error) {
-      console.error(
-        "UPLOAD ERROR =>",
-        error
-      );
-      toast.error(
-        error?.response?.data?.respMsg
-      );
+      toast.error(error);
     }
   };
 
   // ================= Fetch API ================
   useEffect(() => {
-    if (!refId) return;
-
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.post(
-          `rMerchantUploadDocument/${refId}`
-        );
-        if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
-
-          const updatedDocs = [
-            {
-              item: checklistItems[0],
-              status: res?.validLicense1Status || "",
-              remarks: res?.validLicense1Result || "",
-              date: formatInputDate(res?.validLicense1Date),
-              file: null,
-            },
-            {
-              item: checklistItems[1],
-              status: res?.panCardStatus || "",
-              remarks: res?.panCardResult || "",
-              date: formatInputDate(res?.panCardDate),
-              file: null,
-            },
-            {
-              item: checklistItems[2],
-              status:
-                res?.addressProofTelephoneElectricityBillStatus || "",
-              remarks:
-                res?.addressProofTelephoneElectricityBillResult || "",
-              date: formatInputDate(res?.addressProofTelephoneElectricityBillDate),
-              file: null,
-            },
-            {
-              item: checklistItems[3],
-              status: res?.incomeTaxStatus || "",
-              remarks: res?.incomeTaxResult || "",
-              date: formatInputDate(res?.incomeTaxDate),
-              file: null,
-            },
-            {
-              item: checklistItems[4],
-              status: res?.statementAccountStatus || "",
-              remarks: res?.statementAccountResult || "",
-              date: formatInputDate(res?.statementAccountDate),
-              file: null,
-            },
-            {
-              item: checklistItems[5],
-              status: res?.existingPOSStatus || "",
-              remarks: res?.existingPOSResult || "",
-              date: formatInputDate(res?.existingPOSDate),
-              file: null,
-            },
-            {
-              item: checklistItems[6],
-              status: res?.mEstablishmentPOSStatus || "",
-              remarks: res?.mEstablishmentPOSResult || "",
-              date: formatInputDate(res?.mEstablishmentPOSDate),
-              file: null,
-            },
-            {
-              item: checklistItems[7],
-              status: res?.copyOfLicenseStatus || "",
-              remarks: res?.copyOfLicenseResult || "",
-              date: formatInputDate(res?.copyOfLicenseDate),
-              file: null,
-            },
-            {
-              item: checklistItems[8],
-              status: res?.identityProofStatus || "",
-              remarks: res?.identityProofResult || "",
-              date: formatInputDate(res?.identityProofDate),
-              file: null,
-            },
-          ];
-          setDocuments(updatedDocs);
-        }
-      } catch (err) {
-        toast.error(error);
-      }
-    };
-
     fetchData();
   }, [refId]);
 
-  // Date Function Add
+  const fetchData = async () => {
+    if (!refId) return;
 
+    try {
+      const response = await axiosInstance.post(
+        `viewMerchantUploadDocument/${refId}`
+      );
+      if (response?.respCode === 0) {
+        const res = response?.respData;
+        setApiData(res || {});
+
+        const updatedDocs = [
+          {
+            item: checklistItems[0],
+            status: res?.validLicense1Status || "",
+            remarks: res?.validLicense1Result || "",
+            date: formatInputDate(res?.validLicense1Date),
+            file: null,
+            fileName: res?.validLicense1FileName || "",
+          },
+          {
+            item: checklistItems[1],
+            status: res?.panCardStatus || "",
+            remarks: res?.panCardResult || "",
+            date: formatInputDate(res?.panCardDate),
+            file: null,
+            fileName: res?.panCardpathFileName || "",
+          },
+          {
+            item: checklistItems[2],
+            status:
+              res?.addressProofTelephoneElectricityBillStatus || "",
+            remarks:
+              res?.addressProofTelephoneElectricityBillResult || "",
+            date: formatInputDate(res?.addressProofTelephoneElectricityBillDate),
+            file: null,
+            fileName: res?.addressProofTelephoneElectricityBillpathFileName || "",
+          },
+          {
+            item: checklistItems[3],
+            status: res?.incomeTaxStatus || "",
+            remarks: res?.incomeTaxResult || "",
+            date: formatInputDate(res?.incomeTaxDate),
+            file: null,
+            fileName: res?.incomeTaxPathFileName || "",
+          },
+          {
+            item: checklistItems[4],
+            status: res?.statementAccountStatus || "",
+            remarks: res?.statementAccountResult || "",
+            date: formatInputDate(res?.statementAccountDate),
+            file: null,
+            fileName: res?.statementAccountPathFileName || "",
+          },
+          {
+            item: checklistItems[5],
+            status: res?.existingPOSStatus || "",
+            remarks: res?.existingPOSResult || "",
+            date: formatInputDate(res?.existingPOSDate),
+            file: null,
+            fileName: res?.existingPOSPathFileName || "",
+          },
+          {
+            item: checklistItems[6],
+            status: res?.mEstablishmentPOSStatus || "",
+            remarks: res?.mEstablishmentPOSResult || "",
+            date: formatInputDate(res?.mEstablishmentPOSDate),
+            file: null,
+            fileName: res?.mEstablishmentPOSPathFileName || "",
+          },
+          {
+            item: checklistItems[7],
+            status: res?.copyOfLicenseStatus || "",
+            remarks: res?.copyOfLicenseResult || "",
+            date: formatInputDate(res?.copyOfLicenseDate),
+            file: null,
+            fileName: res?.copyOfLicensePathFileName || "",
+          },
+          {
+            item: checklistItems[8],
+            status: res?.identityProofStatus || "",
+            remarks: res?.identityProofResult || "",
+            date: formatInputDate(res?.identityProofDate),
+            file: null,
+            fileName: res?.identityProofPathFileName || "",
+          },
+        ];
+        setDocuments(updatedDocs);
+        console.log("valid license Name-->>>", res?.validLicense1FileName);
+        console.log("valid license Name-->>>", res?.panCardpathFileName);
+      }
+    } catch (err) {
+      toast.error(err);
+    }
+  };
+
+  // Date Function Add
   const formatInputDate = (dateStr) => {
     if (!dateStr) return "";
 
@@ -476,11 +478,11 @@ export default function EUploadDocument({
         return false;
       }
 
-      // 🚨 FILE ONLY REQUIRED WHEN YES
+      // FILE ONLY REQUIRED WHEN YES
       if (
         doc.status === "Yes" &&
         !doc.file &&
-        !apiData?.existingFile
+        !doc.fileName
       ) {
         toast.error(`Please upload file for: ${doc.item}`);
         return false;
@@ -496,8 +498,36 @@ export default function EUploadDocument({
     return `${dd}/${mm}/${yyyy}`;
   };
 
-  return (
+  // Document File Api Call
+  const viewFile = async (fileName) => {
+    try {
+      const formData = new FormData();
+      formData.append("refId", refId);
+      formData.append("fileName", fileName);
 
+      const response = await axiosInstance.post(
+        "/meDownloadDocs",
+        formData,
+        {
+          responseType: "blob",
+        }
+      );
+      console.log("Blob size:", blob.size);
+      console.log("Blob type:", blob.type);
+      const blobUrl = URL.createObjectURL(response);
+      window.open(blobUrl, "_blank");
+
+      // Optional: free memory after some time
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 5000);
+
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  return (
     <form onSubmit={(e) => {
       e.preventDefault();
       uploadMeDocuments();
@@ -521,14 +551,17 @@ export default function EUploadDocument({
               <th className="px-4 py-3 text-center whitespace-nowrap">
                 Status
               </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                Result / Remarks
+              <th className="px-2 py-3 whitespace-nowrap">
+                Remarks
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
                 Date
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
                 Upload
+              </th>
+              <th className="px-4 py-3 whitespace-nowrap">
+                Action
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
                 Remove
@@ -566,7 +599,8 @@ export default function EUploadDocument({
                         required
                         onChange={() => {
                           handleChange(index, "status", "No");
-                          handleChange(index, "file", null); // 👈 ADD HERE
+                          handleChange(index, "file", null);
+                          handleChange(index, "fileName", "");
                         }}
                       />
                       No
@@ -605,18 +639,43 @@ export default function EUploadDocument({
                     required
                     disabled={doc.status !== "Yes"}
                     onChange={(e) => {
-                      const file = e.target.files[0];
-                      handleChange(index, "file", file);
+                      const selectedFile = e.target.files[0];
+                      console.log("Selected File:", selectedFile);
+                      console.log("File Size KB:", selectedFile.size / 1024);
+                      handleChange(index, "file", selectedFile);
+                      handleChange(index, "fileName", "");
                     }}
                     className={`
-    block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
-    file:mr-3 file:px-3 file:py-1 file:border-0 file:border-r file:border-gray-300
-    file:bg-gray-100 file:text-black file:text-sm hover:file:bg-gray-200
-    ${doc.status !== "Yes" ? "opacity-50 cursor-not-allowed" : ""}
-  `}
+                      block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
+                      file:mr-3 file:px-3 file:py-1 file:border-0 file:border-r file:border-gray-300
+                      file:bg-gray-100 file:text-black file:text-sm hover:file:bg-gray-200
+                      ${doc.status !== "Yes" ? "opacity-50 cursor-not-allowed" : ""}
+                    `}
                   />
                 </td>
-
+                <td className="px-4 py-4 text-center">
+                  {documents[index].file ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-xs text-green-600 break-all">
+                        {documents[index].file.name}
+                      </span>
+                    </div>
+                  ) : documents[index].fileName ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => viewFile(documents[index].fileName)}
+                        className="text-blue-600 underline"
+                      >
+                        View
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">
+                      No File
+                    </span>
+                  )}
+                </td>
                 <td className="px-4 py-4 text-center">
                   <button
                     type="button"

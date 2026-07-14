@@ -401,7 +401,7 @@ export default function UploadDocument({
                 Status
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
-                Result / Remarks
+                Remarks
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
                 Date

@@ -3,18 +3,19 @@ import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { lazy, Suspense } from "react";
 
-/* Layout (NOT lazy - kept same as you had structure dependent) */
+/* Layout */
 import Layout from "./components/Layout";
 import RiskApproval from "./components/RiskApproval/RiskApproval";
 import MerchantsViewedit from "./components/MerchantViewEdit/MerchantsViewedit";
-import Reseller from "./pages/Reseller";
+import Reseller from "./components/Reseller/Reseller";
+import ResellerBasicDetails from "./components/Reseller/ResellerBasicDetails";
+import ResellesViewDetails from "./components/Reseller/ResellesViewDetails";
+import ResellesEditDetails from "./components/Reseller/ResellesEditDetails";
+
 
 /* Lazy Loaded Pages */
 const Login = lazy(() => import("./pages/Login"));
 const Forgot = lazy(() => import("./pages/ForgotPassword"));
-// const OtpVerify = lazy(() => import("./pages/OtpVerify"));
-// const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const MerchantRegistration = lazy(() => import("./pages/MerchantRegistration"));
 const MerchantCredential = lazy(() => import("./pages/MerchantCredential"));
@@ -23,7 +24,7 @@ const MerchantWebhook = lazy(() => import("./pages/MerchantWebhook"));
 const UpiPaymentProcessor = lazy(() => import("./pages/UpiPaymentProcessor"));
 const User = lazy(() => import("./pages/User"));
 const Role = lazy(() => import("./pages/Role"));
-const Rseller = lazy(() => import("./pages/Reseller"));
+const Rseller = lazy(() => import("./components/Reseller/Reseller"));
 
 
 /* Protected Route */
@@ -65,13 +66,10 @@ function App() {
       />
 
       {/* Suspense Wrapper for Lazy Loading */}
-      <Suspense fallback={<div>Loading...</div>}>
+      {/* <Suspense fallback={<div>Loading...</div>}> */}
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/forgot" element={<Forgot />} />
-          {/* <Route path="/otpVerify" element={<OtpVerify />} /> */}
-          {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
-
+          <Route path="/forgot" element={<Forgot />} />       
 
           <Route
             path="/app"
@@ -91,12 +89,15 @@ function App() {
             <Route path="upi-payment-processor" element={<UpiPaymentProcessor />} />
             <Route path="users" element={<User />} />
             <Route path="roles" element={<Role />} />
-            <Route path="reseller" element={<Reseller />}/>
+            <Route path="reseller" element={<Reseller />} />
+            <Route path="reseller-basic-details" element={<ResellerBasicDetails />} />
+            <Route path="reseller-view-details" element={<ResellesViewDetails />} />
+            <Route path="reseller-edit-details" element={<ResellesEditDetails />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </Suspense>
+      {/* </Suspense> */}
     </>
   );
 }

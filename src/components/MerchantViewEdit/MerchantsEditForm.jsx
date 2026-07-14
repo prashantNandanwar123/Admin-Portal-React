@@ -31,31 +31,31 @@ export default function MerchantsEditForm({
 
   //  STEP CONFIG
   const steps = [
-    {
-      title: "Basic Details",
-      component: EBasicDetails,
-      icon: User,
-    },
-    {
-      title: "Acquiring Bank",
-      component: EAcquiringBank,
-      icon: Landmark,
-    },
-    {
-      title: "Payment Type",
-      component: EPaymentType,
-      icon: CreditCard,
-    },
-    {
-      title: "MSF Fee",
-      component: EMSFFee,
-      icon: IndianRupee,
-    },
-    {
-      title: "Checklist",
-      component: EChecklist,
-      icon: ClipboardCheck,
-    },
+    // {
+    //   title: "Basic Details",
+    //   component: EBasicDetails,
+    //   icon: User,
+    // },
+    // {
+    //   title: "Acquiring Bank",
+    //   component: EAcquiringBank,
+    //   icon: Landmark,
+    // },
+    // {
+    //   title: "Payment Type",
+    //   component: EPaymentType,
+    //   icon: CreditCard,
+    // },
+    // {
+    //   title: "MSF Fee",
+    //   component: EMSFFee,
+    //   icon: IndianRupee,
+    // },
+    // {
+    //   title: "Checklist",
+    //   component: EChecklist,
+    //   icon: ClipboardCheck,
+    // },
     {
       title: "Upload Documents",
       component: EUploadDocuments,
@@ -67,7 +67,6 @@ export default function MerchantsEditForm({
       icon: Settings,
     },
   ];
-
 
   const CurrentComponent = steps[currentStep].component;
 
@@ -91,7 +90,7 @@ export default function MerchantsEditForm({
   />
 
   return (
-    <div className="max-h-[calc(100vh-180px)] overflow-y-auto hide-scrollbar p-5">
+    <div className="max-h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar p-5">
       {/*  STEP PROGRESS BAR */}
       <div
         className="sticky top-0 z-20 flex items-center bg-[#dde3ab] rounded-full justify-between mb-10 overflow-x-auto py-4">
@@ -104,7 +103,7 @@ export default function MerchantsEditForm({
           return (
             <div
               key={index}
-              className="flex items-center w-full"            >
+              className="flex items-center w-full">
               {/* STEP CIRCLE */}
               <div className="flex flex-col items-center min-w-[120px]">
                 <div
@@ -159,7 +158,7 @@ export default function MerchantsEditForm({
       </div>
 
       {/* CURRENT STEP COMPONENT */}
-      <CurrentComponent
+      <CurrentComponent   // Dynamic Component Rendering With Props
         data={formData}
         setData={setFormData}
         errors={errors}
@@ -167,7 +166,6 @@ export default function MerchantsEditForm({
         handleBack={handleBack}
         refId={merchantData}
       />
-
     </div>
   );
 }

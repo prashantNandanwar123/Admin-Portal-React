@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { FaSearch } from "react-icons/fa";
 
 
-
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ROWS_PER_PAGE = 10;
 
@@ -541,6 +540,7 @@ export default function UpiPaymentProcessor() {
     "Currency", "Txn Limit", "Bank URL", "Bank Code",
     "GST (%)", "Creation Date", "Status", "Action",
   ];
+  
 
   return (
     <div className="min-h-screen  p-4 md:p-6">
@@ -655,6 +655,8 @@ export default function UpiPaymentProcessor() {
               )}
             </tbody>
           </table>
+
+          
         </div>
 
         {/* Pagination */}

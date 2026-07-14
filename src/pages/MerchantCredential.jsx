@@ -14,44 +14,19 @@ export default function MerchantCredential() {
   const [mid, setMid] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-
   const [data, setData] = useState([]);
-
-  // Search
-  const filteredData = data.filter((item) => {
-    const search = searchTerm.trim().toLowerCase();
-
-    return Object.values(item).some((field) =>
-      String(field ?? "")
-        .trim()
-        .toLowerCase()
-        .includes(search)
-    );
-  })
-
-  console.log("searchTerm =", searchTerm);
-  console.log("filteredData =", filteredData);
-  console.log("data =", data);
-
 
   // ================= SEARCH API =================
   const handleSearch = async () => {
     if (!mid) {
-      alert("Please Enter MID");
       return;
     }
 
     try {
       setLoading(true);
-
-      // ✅ response IS the data directly (interceptor unwraps it)
       const resData = await axiosInstance.post(
         `/getMerchantCrediential/${mid}`
       );
-
-      // ❌ Before: const resData = response?.data;  → undefined
-
       if (resData?.respCode === 0) {
         const formattedData = (resData?.respData || []).map((item) => ({
           merchantName: item[0],
@@ -62,13 +37,15 @@ export default function MerchantCredential() {
           ipCheck: item[5],
           mid: item[6],
         }));
-
         setData(formattedData);
+        setMid("");
+
       } else {
         setData([]);
+        toast.error(resData?.respMsg);
+        setMid("");
       }
     } catch (error) {
-      console.error("SEARCH ERROR :", error);
       setData([]);
     } finally {
       setLoading(false);
@@ -93,6 +70,7 @@ export default function MerchantCredential() {
       if (resData?.respCode === 0) {
         toast.success(resData?.respMsg);
         handleSearch();
+
       } else {
         toast.error(resData?.respMsg);
       }
@@ -106,7 +84,6 @@ export default function MerchantCredential() {
   // ================= COPY FUNCTION =================
   const copyText = (text) => {
     navigator.clipboard.writeText(text);
-    alert("Copied");
   };
 
 
@@ -133,9 +110,11 @@ export default function MerchantCredential() {
             <input
               type="text"
               value={mid}
-              onChange={(e) => setMid(e.target.value)}
+              onChange={(e) => setMid(e.target.value.replace(/\D/g, ""))}
               placeholder="Enter MID"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              inputMode="numeric"
+              maxLength={15} // Optional
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -143,7 +122,7 @@ export default function MerchantCredential() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow"
+            className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center gap-2 shadow"
           >
             <FaSearch />
             {loading ? "Searching..." : "Search"}
@@ -152,20 +131,7 @@ export default function MerchantCredential() {
       </div>
 
       {/* ================= TABLE ================= */}
-      <div className="">
-        {/* Search in Table */}
-        <div className="flex justify-end mb-4 w-full">
-          <div className="relative w-full md:w-80">
-            <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
-            <input
-              type="text"
-              placeholder="Search merchant..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
+      <div className="mt-10">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -177,7 +143,7 @@ export default function MerchantCredential() {
                   MID
                 </th>
                 <th className="px-4 py-4 text-left">
-                  Salt Key
+                  Access Key
                 </th>
                 <th className="px-4 py-4 text-left">
                   Secret Key
@@ -210,8 +176,8 @@ export default function MerchantCredential() {
                     </p>
                   </td>
                 </tr>
-              ) : filteredData.length > 0 ? (
-                filteredData.map((item, index) => (
+              ) : data.length > 0 ? (
+                data.map((item, index) => (
                   <tr
                     key={index}
                     className="border-b hover:bg-blue-50 transition"
@@ -267,13 +233,23 @@ export default function MerchantCredential() {
                         type="text"
                         value={item.ip || ""}
                         onChange={(e) => {
+                          let value = e.target.value;
+
+                          // Sirf digits aur dots allow
+                          if (!/^[0-9.]*$/.test(value)) return;
+
+                          // Ek octet me max 3 digits
+                          const parts = value.split(".");
+                          if (parts.some((part) => part.length > 3)) return;
+
+                          // Max 4 octets allow
+                          if (parts.length > 4) return;
+
                           const updated = [...data];
-                          updated[index].ip =
-                            e.target.value;
+                          updated[index].ip = value;
                           setData(updated);
                         }}
-                        placeholder="Enter IP"
-                        className="border rounded-lg px-3 py-2 w-full outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </td>
 

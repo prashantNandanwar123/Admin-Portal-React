@@ -91,7 +91,7 @@ export default function MerchantsViewEditForm({
   />
 
   return (
-    <div className="h-full overflow-y-auto hide-scrollbar">
+    <div className="h-full overflow-y-auto hide-scrollbar mx-10 mt-5">
       {/*  STEP PROGRESS BAR */}
       <div
         className="sticky top-0 z-20 flex items-center bg-[#dde3ab] rounded-full justify-between mb-10 overflow-x-auto hide-scrollbar py-4">
@@ -105,7 +105,6 @@ export default function MerchantsViewEditForm({
               key={index}
               className="flex items-center w-full"
             >
-
               {/* STEP CIRCLE */}
               <div className="flex flex-col items-center min-w-[120px]">
                 <div

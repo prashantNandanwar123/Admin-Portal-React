@@ -50,8 +50,7 @@ export default function Layout() {
       >
         {/*  Navbar (no toggle needed now) */}
         <Navbar />
-
-        <main className="flex-1 overflow-y-auto hide-scrollbar p-6">
+        <main className="flex-1 overflow-hidden">
           <Outlet />
         </main>
       </div>

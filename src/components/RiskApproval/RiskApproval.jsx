@@ -28,7 +28,6 @@ export default function RiskApproval() {
 
   const [view, setView] = useState("list");
   const [currentStep, setCurrentStep] = useState(0);
-
   const [selectedMerchant, setSelectedMerchant] = useState(null);
 
   useEffect(() => {
@@ -83,7 +82,6 @@ export default function RiskApproval() {
   const indexOfFirst = indexOfLast - entriesPerPage;
 
   const currentData = filteredData.slice(indexOfFirst, indexOfLast);
-
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   if (loading) {
@@ -98,7 +96,7 @@ export default function RiskApproval() {
       />
     );
   }
- 
+
   return (
     <>
       <div className="min-h-screen p-6">
@@ -219,7 +217,7 @@ export default function RiskApproval() {
                     <td className="px-4 py-3 text-center">
                       <button
                         type="button"
-                        onClick={() => handleAddClick(item[5])}
+                        onClick={() => handleAddClick("1000011")}
                         className="inline-flex items-center justify-center"
                       >
                         <LiaEyeSolid className="text-3xl text-green-500" />

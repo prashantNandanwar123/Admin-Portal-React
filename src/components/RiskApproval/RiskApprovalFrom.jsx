@@ -27,7 +27,7 @@ export default function RiskApprovalFrom({
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
-  // ✅ STEP CONFIG
+  //  STEP CONFIG
   const steps = [
     {
       title: "Basic Details",

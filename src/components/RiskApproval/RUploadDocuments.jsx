@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
+import toast from "react-hot-toast";
 
 export default function RUploadDocuments({
   refId,
@@ -19,14 +20,14 @@ export default function RUploadDocuments({
       status: "validLicense1Status",
       remarks: "validLicense1Result",
       date: "validLicense1Date",
-      file: "validLicense1path",
+      file: "validLicense1FileName",
     },
     {
       label: "Pan Card",
       status: "panCardStatus",
       remarks: "panCardResult",
       date: "panCardDate",
-      file: "panCardpath",
+      file: "panCardpathFileName",
     },
 
     {
@@ -39,7 +40,7 @@ export default function RUploadDocuments({
       date:
         "addressProofTelephoneElectricityBillDate",
       file:
-        "addressProofTelephoneElectricityBillpath",
+        "addressProofTelephoneElectricityBillpathFileName",
     },
     {
       label:
@@ -47,7 +48,7 @@ export default function RUploadDocuments({
       status: "incomeTaxStatus",
       remarks: "incomeTaxResult",
       date: "incomeTaxDate",
-      file: "incomeTaxpath",
+      file: "incomeTaxPathFileName",
     },
     {
       label:
@@ -55,7 +56,7 @@ export default function RUploadDocuments({
       status: "statementAccountStatus",
       remarks: "statementAccountResult",
       date: "statementAccountDate",
-      file: "statementAccountPath",
+      file: "statementAccountPathFileName",
     },
     {
       label:
@@ -63,7 +64,7 @@ export default function RUploadDocuments({
       status: "existingPOSStatus",
       remarks: "existingPOSResult",
       date: "existingPOSDate",
-      file: "existingPOSPath",
+      file: "existingPOSPathFileName",
     },
     {
       label:
@@ -71,7 +72,7 @@ export default function RUploadDocuments({
       status: "mEstablishmentPOSStatus",
       remarks: "mEstablishmentPOSResult",
       date: "mEstablishmentPOSDate",
-      file: "mEstablishmentPOSPath",
+      file: "mEstablishmentPOSPathFileName",
     },
     {
       label:
@@ -79,7 +80,7 @@ export default function RUploadDocuments({
       status: "copyOfLicenseStatus",
       remarks: "copyOfLicenseResult",
       date: "copyOfLicenseDate",
-      file: "copyOfLicensePath",
+      file: "copyOfLicensePathFileName",
     },
     {
       label:
@@ -87,9 +88,10 @@ export default function RUploadDocuments({
       status: "identityProofStatus",
       remarks: "identityProofResult",
       date: "identityProofDate",
-      file: "identityProofPath",
+      file: "identityProofPathFileName",
     },
   ];
+
 
   useEffect(() => {
     if (!refId) return;
@@ -115,10 +117,34 @@ export default function RUploadDocuments({
     fetchData();
   }, [refId]);
 
+  // Document File Api
+  const viewFile = async (fileName) => {
+    try {
+      const formData = new FormData();
+      formData.append("refId", refId);
+      formData.append("fileName", fileName);
 
- const handleViewFile = (url) => {
-  window.open(url, "_blank");
-};
+      const response = await axiosInstance.post(
+        "/meDownloadDocs",
+        formData,
+        {
+          responseType: "blob",
+        }
+      );
+      console.log("blob file", response);
+      const blobUrl = URL.createObjectURL(response);
+      window.open(blobUrl, "_blank");
+
+      // Optional: free memory after some time
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 5000);
+
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
 
   return (
     <div>
@@ -179,8 +205,9 @@ export default function RUploadDocuments({
                 <td className="border px-4 py-3">
                   {apiData?.[item.file] ? (
                     <button
-                      type="button"
-                      onClick={() => handleViewFile(apiData?.[item.file])}
+                      onClick={() => viewFile(apiData[item.file])}
+
+                      rel="noreferrer"
                       className="text-blue-600 underline"
                     >
                       View File

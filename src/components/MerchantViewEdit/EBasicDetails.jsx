@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
+import statecity from "../../utils/statecity.json";
+import Select from "react-select";
 
 export default function EBasicDetails({
   refId,
@@ -9,47 +11,110 @@ export default function EBasicDetails({
   errors,
   handleNext,
 }) {
-
-
-  const [stateList, setStateList] = useState([]);
-  const [cityList, setCityList] = useState([]);
   const [mccList, setMccList] = useState([]);
-  // const [partnerLogo, setPartnerLogo] = useState(null);
-  const userData = JSON.parse(localStorage.getItem("user"));
+  const [legalVehicalNameList, setlegalVehicalNameList] = useState([]);
+  const [userData, setUserData] = useState(null);
 
+
+  const countryList = statecity.map((item) => item.country);
+
+  // Selected Country
+  const selectedCountry = statecity.find(
+    (item) => item.country === data?.addCountry
+  );
+
+  // States of selected country
+  const stateList = selectedCountry?.states || [];
+
+  // Selected State
+  const selectedState = stateList.find(
+    (item) => item.state === data?.addState
+  );
+  // Cities of selected state
+  const cityList = selectedState?.cities || [];
+
+  // Billing Country
+  const selectedBillingCountry = statecity.find(
+    (item) => item.country === data?.billingCountry
+  );
+
+  // Billing States
+  const billingStateList = selectedBillingCountry?.states || [];
+
+  // Billing State
+  const selectedBillingState = billingStateList.find(
+    (item) => item.state === data?.billingState
+  );
+
+  // Billing Cities
+  const billingCityList = selectedBillingState?.cities || [];
+
+  const disabledSelectStyles = {
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: state.isDisabled ? "#f3f4f6" : "#fff",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+      opacity: 1,
+    }),
+
+    valueContainer: (base) => ({
+      ...base,
+      cursor: "inherit",
+    }),
+
+    singleValue: (base) => ({
+      ...base,
+      color: "#111827",
+      opacity: 1,
+    }),
+
+    indicatorsContainer: (base, state) => ({
+      ...base,
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+    }),
+
+    dropdownIndicator: (base, state) => ({
+      ...base,
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+    }),
+  };
+
+  //---- USeEffect API Call
   useEffect(() => {
+    fetchDetailsCollection();
+    fetchData(refId)
+  }, []);
+
+  const fetchData = async (refId) => {
     if (!refId) return;
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.post(
-          `/viewMerchantBasicDetails/${refId}`
-        );
-        console.log("API RESPONSE:", response);
-        if (response?.respCode === 0) {
-          const res = response?.respData || {};
-          setData((prev) => ({
-            ...prev,
-            ...res,
+    try {
+      const response = await axiosInstance.post(
+        `/viewMerchantBasicDetails/${refId}`
+      );
+      console.log("reference Iddddd----->>>>", refId);
+      if (response?.respCode === 0) {
+        const res = response?.respData || {};
 
-            refId:
-              res?.ref_id ||
-              res?.refId ||
-              refId,
-          }));
+        setData((prev) => ({
+          ...prev,
+          ...res,
 
-          console.log(
-            "FINAL REF ID =====>",
-            res?.ref_id || res?.refId || refId
-          );
+          billingAddress1: res?.baAddress1 || "",
+          billingAddress2: res?.baAddress2 || "",
+          billingAddress3: res?.baAddress3 || "",
 
-        }
-      } catch (err) {
-        console.error("API ERROR:", err);
+          billingCountry: res?.baCountry || "",
+          billingState: res?.baState || "",
+          billingCity: res?.baCity || "",
+          billingZipcode: res?.baZipcode || "",
+
+          refId: res?.ref_id || res?.refId || refId,
+        }));
       }
-    };
-
-    fetchData();
-  }, [refId]);
+    } catch (err) {
+      toast.error(err);
+    }
+  };
 
 
   const documentOptions = [
@@ -71,21 +136,13 @@ export default function EBasicDetails({
   };
 
 
-  //---- stateList-cityList-mccList API Call
-  useEffect(() => {
-    fetchDetailsCollection();
-  }, []);
-
   const fetchDetailsCollection = async () => {
     try {
       const response = await axiosInstance.post("/getDetailsCollection");
 
       const apiData =
         response?.respData || response?.respData || {};
-
-      setStateList(apiData?.stateList || []);
-      setCityList(apiData?.cityList || []);
-
+      setlegalVehicalNameList(apiData?.legalVehicalNameList || []);
       const formattedMcc = Object.entries(apiData?.mccList || {}).map(
         ([code, name]) => ({
           code,
@@ -94,29 +151,19 @@ export default function EBasicDetails({
       );
 
       setMccList(formattedMcc);
-      setRefId(apiData?.ref_id);
-
-      // store refId in parent state
-      if (apiData?.ref_id) {
-        handleChange("refId", apiData?.ref_id);
-      }
-
     } catch (error) {
-      console.error(
-        "[BasicDetails] fetchDetailsCollection → API Error:",
-        error
-      );
+      console.error(error);
     }
   };
   // Save Edit BasicDetails  API Call
   const handleSaveAndNext = async () => {
     try {
-
       const payload = {
         ref_id: data?.refId || refId,
 
         partnerLogoCheck: data?.partnerLogoCheck,
-        basicSrcChannel: data?.storeChannel,
+        storeChannel: data?.storeChannel,
+        basicSrcChannel: data?.basicSrcChannel,
         storeType: data?.storeType,
         storeTurnoverCategory: data?.storeTurnoverCategory,
         storeDbaName: data?.storeDbaName,
@@ -184,22 +231,17 @@ export default function EBasicDetails({
           data?.cpdSecondaryEmailId,
 
         // BILLING
-        baAddress1: data?.baAddress1,
-        baAddress2: data?.baAddress2,
-        baAddress3: data?.baAddress3,
+        baAddress1: data?.billingAddress1,
+        baAddress2: data?.billingAddress2,
+        baAddress3: data?.billingAddress3,
 
-        baCity: data?.baCity,
-        baState: data?.baState,
-        baCountry: data?.baCountry,
-        baZipcode: data?.baZipcode,
+        baCountry: data?.billingCountry,
+        baState: data?.billingState,
+        baCity: data?.billingCity,
+        baZipcode: data?.billingZipcode,
       };
 
-      console.log("REF ID PROP =====>", refId);
-      console.log("DATA REF ID =====>", data?.refId);
-      console.log("FINAL PAYLOAD =====>", payload);
-
       const multipartData = new FormData();
-
       multipartData.append(
         "data",
         new Blob([JSON.stringify(payload)], {
@@ -224,16 +266,12 @@ export default function EBasicDetails({
         }
       );
 
-      console.log("SAVE RESPONSE =====>", response);
-
       if (response?.respCode === 0) {
-
         toast.success(response?.respMsg);
         setData((prev) => ({
           ...prev,
           refId: response?.respData?.ref_id,
         }));
-
 
       } else {
         toast.error(
@@ -241,19 +279,17 @@ export default function EBasicDetails({
         );
       }
     } catch (error) {
-      console.error("SAVE ERROR =====>", error);
       toast.error(error);
     }
   };
-
 
   return (
     <>
       <div>
         <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-2">
-          Edited Basic Details
+          Edit Basic Details
         </h2>
-        <p className="pb-3 text-lg text-blue-900">Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
+        <p className="pb-3 text-lg text-blue-900">Edit Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
 
         <div className="pt-4 border-t border-gray-300">
           {/* STORE STATUS */}
@@ -277,8 +313,28 @@ export default function EBasicDetails({
                 </span>
               </label>
             </div>
+
+            {/* Sourcing Channel */}
+            <div className="flex items-center gap-2">
+              <label className="w-44 whitespace-nowrap text-gray-700 font-medium">
+                Sourcing Channel<span className="text-red-500">*</span>
+              </label>
+              <select
+                className="flex-1 border border-gray-300 rounded px-3 py-2 bg-white"
+                value={data?.basicSrcChannel || ""}
+                onChange={(e) => handleChange("basicSrcChannel", e.target.value)}
+              >
+                <option value="">-- Select --</option>
+
+                {legalVehicalNameList?.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          {/* STORE INFO */}
+          {/* Store Information */}
           <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
             Store Information
           </h2>
@@ -330,7 +386,6 @@ export default function EBasicDetails({
                         )
                       }
                     />
-
                     {ch}
                   </label>
                 ))}
@@ -1005,73 +1060,85 @@ export default function EBasicDetails({
             {/* Country */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Country
+                Country<span className="text-red-500">*</span>
               </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addCountry || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addCountry",
-                    e.target.value
-                  )
+              <Select
+                options={countryList.map((country) => ({
+                  value: country,
+                  label: country,
+                }))}
+                value={
+                  data?.addCountry
+                    ? { value: data.addCountry, label: data.addCountry }
+                    : null
                 }
-              >
-                <option value="">-- Select --</option>
-                <option value="India">India</option>
-              </select>
+                onChange={(selected) =>
+                  setData((prev) => ({
+                    ...prev,
+                    addCountry: selected?.value || "",
+                    addState: "",
+                    addCity: "",
+                  }))
+                }
+                placeholder="Select Country"
+                isSearchable
+              />
             </div>
 
             {/* State */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                State
+                State<span className="text-red-500">*</span>
               </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addState || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addState",
-                    e.target.value
-                  )
+              <Select
+                options={stateList.map((item) => ({
+                  value: item.state,
+                  label: item.state,
+                }))}
+                value={
+                  data?.addState
+                    ? {
+                      value: data.addState,
+                      label: data.addState,
+                    }
+                    : null
                 }
-              >
-
-                <option value="">-- Select --</option>
-                {stateList.map((item, index) => (
-                  <option key={index} value={item}>{item}</option>
-                ))}
-              </select>
+                onChange={(selected) =>
+                  setData((prev) => ({
+                    ...prev,
+                    addState: selected?.value || "",
+                    addCity: "",
+                  }))
+                }
+                placeholder="Select State"
+                isSearchable
+              />
             </div>
 
             {/* City */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                City
+                City<span className="text-red-500">*</span>
               </label>
 
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addCity || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addCity",
-                    e.target.value
-                  )
+              <Select
+                options={cityList.map((city) => ({
+                  value: city,
+                  label: city,
+                }))}
+                value={
+                  data?.addCity
+                    ? { value: data.addCity, label: data.addCity }
+                    : null
                 }
-              >
-
-                <option value="">-- Select --</option>
-                {cityList.map((item, index) => (
-                  <option key={index} value={item}>{item}</option>
-                ))}
-              </select>
+                onChange={(selected) =>
+                  setData((prev) => ({
+                    ...prev,
+                    addCity: selected?.value || "",
+                  }))
+                }
+                isSearchable
+              />
             </div>
 
             {/* Zip Code */}
@@ -1255,164 +1322,170 @@ export default function EBasicDetails({
           <h2 className="text-[20px] text-gray-700 mb-2 border-b border-gray-300 pb-3">
             Billing Address
           </h2>
+
+          {/* Checkbox */}
+          <div className="mb-5">
+            <label className="flex items-center gap-2 text-sm text-gray-600 italic">
+              <input
+                type="checkbox"
+                checked={data?.billingSameAsShipping || false}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+
+                  handleChange("billingSameAsShipping", checked);
+
+                  if (checked) {
+                    setData((prev) => ({
+                      ...prev,
+
+                      billingAddress1: prev.addStoreAddress1 || "",
+                      billingAddress2: prev.addStoreAddress2 || "",
+                      billingAddress3: prev.addStoreAddress3 || "",
+
+                      billingCountry: prev.addCountry || "",
+                      billingState: prev.addState || "",
+                      billingCity: prev.addCity || "",
+                      billingZipcode: prev.addZipcode || "",
+                    }));
+                  }
+                }}
+              />
+              Same as Shipping Address
+            </label>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-            {/* Address 1 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 1
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baAddress1 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baAddress1",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+            {/* Address Fields */}
+            {[
+              { label: "Address 1", field: "billingAddress1", required: true },
+              { label: "Address 2", field: "billingAddress2" },
+              { label: "Address 3", field: "billingAddress3" },
+            ].map(({ label, field, required }) => (
+              <div key={field}>
+                <label className="block text-gray-700 font-medium mb-2">
+                  {label}
+                  {required && <span className="text-red-500">*</span>}
+                </label>
 
-            {/* Address 2 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 2
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baAddress2 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baAddress2",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Address 3 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 3
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baAddress3 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baAddress3",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+                <input
+                  type="text"
+                  disabled={data?.billingSameAsShipping}
+                  className="w-full border border-gray-300 rounded px-3 py-2 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  value={data?.[field] || ""}
+                  onChange={(e) =>
+                    handleChange(field, e.target.value)
+                  }
+                />
+              </div>
+            ))}
 
             {/* Country */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Country
+                Country<span className="text-red-500">*</span>
               </label>
+              <Select
+                styles={disabledSelectStyles}
+                isDisabled={data?.billingSameAsShipping}
+                options={countryList.map((country) => ({
+                  value: country,
+                  label: country,
+                }))}
 
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baCountry || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baCountry",
-                    e.target.value
-                  )
+                value={
+                  data?.billingCountry
+                    ? { value: data.billingCountry, label: data.billingCountry }
+                    : null
                 }
-              >
-                <option value="">-- Select --</option>
-                <option value="India">India</option>
-              </select>
+                onChange={(selected) =>
+                  setData((prev) => ({
+                    ...prev,
+                    billingCountry: selected?.value || "",
+                    billingState: "",
+                    billingCity: "",
+                  }))
+                }
+              />
             </div>
-
             {/* State */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                State
+                State<span className="text-red-500">*</span>
               </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baState || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baState",
-                    e.target.value
-                  )
+              <Select
+                styles={disabledSelectStyles}
+                isDisabled={data?.billingSameAsShipping}
+                options={billingStateList.map((item) => ({
+                  value: item.state,
+                  label: item.state,
+                }))}
+                value={
+                  data?.billingState
+                    ? { value: data.billingState, label: data.billingState }
+                    : null
                 }
-              >
-                <option value="">-- Select --</option>
-                {stateList.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+                onChange={(selected) =>
+                  setData((prev) => ({
+                    ...prev,
+                    billingState: selected?.value || "",
+                    billingCity: "",
+                  }))
+                }
+              />
             </div>
 
             {/* City */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                City
+                City<span className="text-red-500">*</span>
               </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baCity || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baCity",
-                    e.target.value
-                  )
+              <Select
+                styles={disabledSelectStyles}
+                isDisabled={data?.billingSameAsShipping}
+                options={billingCityList.map((city) => ({
+                  value: city,
+                  label: city,
+                }))}
+                value={
+                  data?.billingCity
+                    ? { value: data.billingCity, label: data.billingCity }
+                    : null
                 }
-              >
-                <option value="">-- Select --</option>
-
-                {cityList.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-
-              </select>
+                onChange={(selected) =>
+                  setData((prev) => ({
+                    ...prev,
+                    billingCity: selected?.value || "",
+                  }))
+                }
+              />
             </div>
 
             {/* Zip Code */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Zip Code
+                Zip Code<span className="text-red-500">*</span>
               </label>
-
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baZipcode || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baZipcode",
-                    e.target.value
-                  )
-                }
+                maxLength={6}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                disabled={data?.billingSameAsShipping}
+                className="w-full border border-gray-300 rounded px-3 py-2 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                value={data?.billingZipcode || ""}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  handleChange("billingZipcode", value);
+                }}
               />
             </div>
           </div>
         </div>
-      </div >
+      </div>
+
       {/* SAVE BUTTON */}
       < div className="grid grid-cols-3 items-center mt-10" >
-        {/* Empty Left Side */}
-        < div ></div >
+        <div ></div >
         {/* Center Button */}
         < div className="flex justify-center" >
           <button
@@ -1433,9 +1506,8 @@ export default function EBasicDetails({
           >
             Next
           </button>
-        </div >
-      </div >
-
+        </div>
+      </div>
     </>
   );
 }

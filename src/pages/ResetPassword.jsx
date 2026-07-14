@@ -8,10 +8,6 @@ export default function ResetPassword() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    console.log("Reset password l;oactin-->>>", location)
-    console.log("Reset password l;oactin-->>>", location.state)
-
-
     const userName = location.state?.userName;
 
     const [password, setPassword] = useState("");

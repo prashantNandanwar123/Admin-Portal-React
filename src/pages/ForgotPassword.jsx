@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import OtpVerify from "./OtpVerify";
 import axiosInstance from "../api/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -15,9 +14,11 @@ export default function ForgotPassword() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
-  //----- sendForgotPasswordOtp APi CAll ----
+  //----- Send Forgot Password APi CAll ----
   const sendOtp = async (e) => {
     e.preventDefault();
     if (!userName) {
@@ -36,8 +37,6 @@ export default function ForgotPassword() {
       if (response?.respCode === 0) {
         console.log(response);
         toast.success(response.respMsg);
-        console.log("send otp response-->>>", response.respMsg);
-
         setOtpSent(true);   // OTP field show hoga
       } else {
         toast.error(response.respMsg);
@@ -47,19 +46,16 @@ export default function ForgotPassword() {
     } finally {
       setLoading(false);
     }
-
   };
 
-  //----- verifyForgotPasswordOtp APi CAll ----
+  //----- Verify Forgot Password APi CAll ----
   const verifyOtp = async () => {
     if (!otp) {
       toast.error("Please enter OTP");
       return;
     }
-
     try {
       setLoading(true);
-
       const response = await axiosInstance.post(
         "/verifyForgotPasswordOtp",
         {
@@ -70,20 +66,18 @@ export default function ForgotPassword() {
 
       if (response?.respCode === 0) {
         toast.success(response.respMsg);
-
         setOtpVerified(true); // Password fields show honge
       } else {
         toast.error(response.respMsg);
       }
     } catch (error) {
-      toast.error("OTP Verification Failed");
+      toast.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-
-  //---- password validation---
+  //---- Password Validation ----
   const passwordValidation = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
@@ -92,20 +86,8 @@ export default function ForgotPassword() {
     special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
 
-  const isPasswordValid =
-    passwordValidation.length &&
-    passwordValidation.uppercase &&
-    passwordValidation.lowercase &&
-    passwordValidation.number &&
-    passwordValidation.special;
-
-
-  const passwordMatched =
-    password &&
-    confirmPassword &&
-    password === confirmPassword;
-
-  //----- HandlePAssword-----
+ 
+  //----- Handle Password-----
   const handleResetPassword = async (e) => {
     e.preventDefault();
     if (
@@ -134,7 +116,7 @@ export default function ForgotPassword() {
 
     try {
       setLoading(true);
-      const response = await axiosInstance.post("/auth/resetPassword", {
+      const response = await axiosInstance.post("/submitForgotPassword", {
         userName,
         password,
         confPassword: confirmPassword,
@@ -222,9 +204,6 @@ export default function ForgotPassword() {
 
             {/* Form */}
             <form className="space-y-5">
-
-
-
               {/* Username */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -235,15 +214,11 @@ export default function ForgotPassword() {
                   type="text"
                   value={userName}
                   maxLength={20}
+                  readOnly={otpVerified}
                   onChange={(e) => setUserName(e.target.value)}
                   placeholder="Enter username"
-                  className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                pr-12
-              "
+                  className={`w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 ${otpVerified ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
                 />
 
                 {otpSent && (
@@ -254,55 +229,33 @@ export default function ForgotPassword() {
               </div>
 
               {/* Send OTP Button */}
-              {!otpSent && (
+              {!otpSent && !otpVerified && (
                 <button
                   type="button"
                   onClick={sendOtp}
                   disabled={loading}
-                  className="
-                w-full
-                bg-orange-500
-                hover:bg-orange-600
-                text-white
-                py-3
-                rounded-xl
-                font-semibold
-      "
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold"
                 >
                   {loading ? "Sending..." : "Send OTP"}
                 </button>
               )}
 
               {/* OTP */}
-              {otpSent && (
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  OTP {req}
-                </label>
+              {otpSent && !otpVerified && (
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    OTP {req}
+                  </label>
 
-                <input
-                  type="text"
-                  value={otp}
-                  maxLength={6}
-                  disabled={!otpSent}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter OTP"
-                  className={`
-                  w-full
-                  border border-gray-300
-                  rounded-xl
-                  px-4 py-3
-                  pr-12
-                  ${!otpSent ? "bg-gray-100 cursor-not-allowed" : ""}
-                `}
-                />
-
-                {otpVerified && (
-                  <span className="absolute right-4 top-[42px] text-green-600 text-xl font-bold">
-                    ✓
-                  </span>
-                )}
-              </div>
+                  <input
+                    type="text"
+                    value={otp}
+                    maxLength={6}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter OTP"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12"
+                  />
+                </div>
               )}
 
               {/* Verify OTP Button */}
@@ -311,15 +264,7 @@ export default function ForgotPassword() {
                   type="button"
                   onClick={verifyOtp}
                   disabled={loading}
-                  className="
-                  w-full
-                  bg-blue-500
-                  hover:bg-blue-600
-                  text-white
-                  py-3
-                  rounded-xl
-                  font-semibold
-      "
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold"
                 >
                   {loading ? "Verifying..." : "Verify OTP"}
                 </button>
@@ -328,31 +273,32 @@ export default function ForgotPassword() {
               {/* New Password */}
               {otpVerified && (
                 <>
-                  {/* New Password */}
                   <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       New Password {req}
                     </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter new password"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
 
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter new password"
-                      className="
-          w-full
-          border border-gray-300
-          rounded-xl
-          px-4 py-3
-          pr-12
-        "
-                    />
-
-                    {password.length > 0 && (
-                      <span className="absolute right-4 top-[42px] text-green-600 text-xl font-bold">
-                        ✓
-                      </span>
-                    )}
+                      {password.length > 0 && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
+                          ✓
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Confirm Password */}
@@ -361,63 +307,47 @@ export default function ForgotPassword() {
                       Confirm Password {req}
                     </label>
 
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm Password"
-                      className="
-          w-full
-          border border-gray-300
-          rounded-xl
-          px-4 py-3
-          pr-12
-        "
-                    />
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm Password"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
+                      />
 
-                    {confirmPassword &&
-                      password === confirmPassword && (
-                        <span className="absolute right-4 top-[42px] text-green-600 text-xl font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
+                      >
+                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+
+                      {confirmPassword && password === confirmPassword && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
                           ✓
                         </span>
                       )}
+                    </div>
                   </div>
-                </>
-              )}
 
-              {/* Reset Password Button */}
-              {otpVerified && (
-                <button
-                  type="button"
-                  onClick={handleResetPassword}
-                  disabled={loading}
-                  className="
-                  w-full
-                  bg-green-600
-                  hover:bg-green-700
-                  text-white
-                  py-3
-                  rounded-xl
-                  font-semibold
-                "
-                >
-                  {loading ? "Processing..." : "Reset Password"}
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleResetPassword}
+                    disabled={loading}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold"
+                  >
+                    {loading ? "Processing..." : "Reset Password"}
+                  </button>
+                </>
               )}
 
               {/* Back Button */}
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                className="
-                w-full
-                border border-gray-300
-                hover:bg-gray-100
-                text-gray-700
-                py-3
-                rounded-xl
-                font-medium
-              "
+                className="w-full border border-gray-300 hover:bg-gray-100 text-gray-700 py-3 rounded-xl font-medium"
               >
                 Back to Login
               </button>

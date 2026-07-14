@@ -97,7 +97,7 @@ export default function MerchantRegistrationForm({
 
 
   return (
-    <div className="max-h-[calc(100vh-180px)] overflow-y-auto hide-scrollbar p-5">
+    <div className="max-h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar p-5">
       {/* STEP PROGRESS BAR */}
       <div
         className="sticky top-0 z-20 flex items-center bg-[#dde3ab] rounded-full justify-between mb-10 overflow-x-auto py-4"

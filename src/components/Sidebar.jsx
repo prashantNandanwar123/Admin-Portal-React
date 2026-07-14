@@ -148,7 +148,6 @@ export default function Sidebar({ open, onClose }) {
     }
   }, [darkMode]);
 
-
   const showMainSection = menuConfig.some((menu) =>
     roleFunctions.includes(menu.title)
   );
@@ -176,7 +175,6 @@ export default function Sidebar({ open, onClose }) {
     : "text-white/60 hover:text-white hover:bg-white/10"
     }`;
 
-
   const activeMenuStyle = {
     backgroundColor: activeBgColor,
     color: activeTextColor,
@@ -185,7 +183,6 @@ export default function Sidebar({ open, onClose }) {
   const handleLogout = async () => {
     try {
       const response = await axiosInstance.post("/auth/logout");
-
       if (response.respCode === 0) {
 
         localStorage.removeItem("isLogin");
@@ -254,19 +251,18 @@ export default function Sidebar({ open, onClose }) {
         {/* MAIN MENU */}
         {open && showMainSection && (
           <div
-            className={`px-3 mb-2 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white/40"
+            className={`px-3 mb-2 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
               }`}
           >
             <Home size={12} />
             MAIN MENU
           </div>
         )}
-        <div className="space-y-1 mb-5">
+        <div className="space-y-1 mb-5 ml-3">
           {menuConfig
             .filter((menu) => roleFunctions.includes(menu.title))
             .map((menu) => {
               const Icon = menu.icon;
-
               return (
                 <NavLink
                   key={menu.title}
@@ -293,7 +289,7 @@ export default function Sidebar({ open, onClose }) {
           {/* OTHER */}
           {open && showOtherSection && (
             <div
-              className={`px-3 mb-2 mt-4 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white/40"
+              className={`px-3 mb-2 mt-4 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
                 }`}
             >
               <Folder size={12} />

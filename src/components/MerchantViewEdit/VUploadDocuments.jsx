@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
+import toast from "react-hot-toast";
 
 export default function VUploadDocuments({
   refId,
@@ -19,14 +20,14 @@ export default function VUploadDocuments({
       status: "validLicense1Status",
       remarks: "validLicense1Result",
       date: "validLicense1Date",
-      file: "validLicense1upload",
+      file: "validLicense1FileName",
     },
     {
       label: "Pan Card",
       status: "panCardStatus",
       remarks: "panCardResult",
       date: "panCardDate",
-      file: "panCardupload",
+      file: "panCardpathFileName",
     },
     {
       label:
@@ -38,7 +39,7 @@ export default function VUploadDocuments({
       date:
         "addressProofTelephoneElectricityBillDate",
       file:
-        "addressProofTelephoneElectricityBillupload",
+        "addressProofTelephoneElectricityBillpathFileName",
     },
     {
       label:
@@ -46,7 +47,7 @@ export default function VUploadDocuments({
       status: "incomeTaxStatus",
       remarks: "incomeTaxResult",
       date: "incomeTaxDate",
-      file: "incomeTaxupload",
+      file: "incomeTaxPathFileName",
     },
     {
       label:
@@ -54,7 +55,7 @@ export default function VUploadDocuments({
       status: "statementAccountStatus",
       remarks: "statementAccountResult",
       date: "statementAccountDate",
-      file: "statementAccountUpload",
+      file: "statementAccountPathFileName",
     },
     {
       label:
@@ -62,7 +63,7 @@ export default function VUploadDocuments({
       status: "existingPOSStatus",
       remarks: "existingPOSResult",
       date: "existingPOSDate",
-      file: "existingPOSUpload",
+      file: "existingPOSPathFileName",
     },
     {
       label:
@@ -70,7 +71,7 @@ export default function VUploadDocuments({
       status: "mEstablishmentPOSStatus",
       remarks: "mEstablishmentPOSResult",
       date: "mEstablishmentPOSDate",
-      file: "mEstablishmentPOSUpload",
+      file: "mEstablishmentPOSPathFileName",
     },
     {
       label:
@@ -78,7 +79,7 @@ export default function VUploadDocuments({
       status: "copyOfLicenseStatus",
       remarks: "copyOfLicenseResult",
       date: "copyOfLicenseDate",
-      file: "copyOfLicenseUpload",
+      file: "copyOfLicensePathFileName",
     },
     {
       label:
@@ -86,7 +87,7 @@ export default function VUploadDocuments({
       status: "identityProofStatus",
       remarks: "identityProofResult",
       date: "identityProofDate",
-      file: "identityProofUpload",
+      file: "identityProofPathFileName",
     },
   ];
 
@@ -113,10 +114,38 @@ export default function VUploadDocuments({
     fetchData();
   }, [refId]);
 
+  // Document File Api Call
+  const viewFile = async (fileName) => {
+    try {
+      const formData = new FormData();
+      formData.append("refId", refId);
+      formData.append("fileName", fileName);
+
+      const response = await axiosInstance.post(
+        "/meDownloadDocs",
+        formData,
+        {
+          responseType: "blob",
+        }
+      );
+      console.log("blob file", response);
+      const blobUrl = URL.createObjectURL(response);
+      window.open(blobUrl, "_blank");
+
+      // Optional: free memory after some time
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 5000);
+
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl uppercase text-blue-900 border-b border-gray-300 font-extrabold py-4">
-      View  Uploaded Document
+        View  Uploaded Document
       </h2>
       <p className="text-gray-600 my-6">
         User can only view document data.
@@ -128,25 +157,20 @@ export default function VUploadDocuments({
               <th className="border px-4 py-3 text-left">
                 Item
               </th>
-
               <th className="border px-4 py-3 text-center">
                 Status
               </th>
-
               <th className="border px-4 py-3 text-left">
-                Result / Remarks
+                Remarks
               </th>
-
               <th className="border px-4 py-3 text-left">
                 Date
               </th>
-
               <th className="border px-4 py-3 text-left">
                 File Name
               </th>
             </tr>
           </thead>
-
           <tbody>
             {checklistItems.map((item, index) => (
               <tr
@@ -164,21 +188,18 @@ export default function VUploadDocuments({
                 <td className="border px-4 py-3">
                   {apiData?.[item.remarks] || "-"}
                 </td>
-
                 <td className="border px-4 py-3">
                   {apiData?.[item.date] || "-"}
                 </td>
-
                 <td className="border px-4 py-3">
                   {apiData?.[item.file] ? (
-                    <a
-                      href={apiData?.[item.file]}
-                      target="_blank"
+                    <button
+                      onClick={() => viewFile(apiData[item.file])}
                       rel="noreferrer"
                       className="text-blue-600 underline"
                     >
                       View File
-                    </a>
+                    </button>
                   ) : (
                     "No File"
                   )}

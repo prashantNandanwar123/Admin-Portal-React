@@ -6,18 +6,15 @@ import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaSearch } from "react-icons/fa"
 
-
 export default function MerchantsViewedit() {
 
   const location = useLocation();
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showViewForm, setShowViewForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [view, setView] = useState("list");
 
   // Pagination
@@ -26,7 +23,6 @@ export default function MerchantsViewedit() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedMerchant, setSelectedMerchant] = useState(null);
-
 
   useEffect(() => {
     fetchMerchantData();
@@ -46,32 +42,27 @@ export default function MerchantsViewedit() {
       const resData = await axiosInstance.post(
         `/MerchantViewEdit?page=${page}&size=${size}`
       );
-
       if (resData?.respCode === 0) {
         setData(resData.data || []);
         setTotalPages(resData.totalPages || 0);
         setTotalRecords(resData.totalRecords || 0);
       }
     } catch (error) {
-      console.error("API Error:", error);
       toast.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-
   // Status Change ApI call
   const handleStatusChange = async (mid, currentStatus) => {
     try {
       const updatedStatus =
         currentStatus === "Active" ? "Deactive" : "Active";
-
       const payload = {
         mid: mid,
         status: updatedStatus,
       };
-
       const res = await axiosInstance.post(
         "/updateStatus",
         payload
@@ -84,9 +75,7 @@ export default function MerchantsViewedit() {
       } else {
         toast.error(res?.respMsg);
       }
-
     } catch (error) {
-      console.error(error);
       toast.error(error);
     }
   };
@@ -110,7 +99,7 @@ export default function MerchantsViewedit() {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
     } else {
-      onBack?.(); // ✅ Step 0 pe list page pe wapas
+      onBack?.(); //Step 0 pe list page pe wapas
     }
   };
 
@@ -127,26 +116,20 @@ export default function MerchantsViewedit() {
   // Search
   const filteredData = data.filter((item) => {
     const search = searchTerm.trim().toLowerCase();
-
     return Object.values(item).some((field) =>
       String(field)
         .trim()
         .toLowerCase()
         .includes(search)
     );
-  })
-
-  const startIndex = page * size; // iT wil search the data
-  const endIndex = startIndex + size; // it will apply the pagination
-  const currentData = filteredData.slice(startIndex, endIndex); // and show the data in the table
-
+  });
 
   //  Open Form
   if (showViewForm) {
     return (
       <MerchantsViewEditForm
         merchantData={selectedMerchant}
-        onBack={() => setShowViewForm(false)}  //  sahi state
+        onBack={() => setShowViewForm(false)}  
       />
     );
   }
@@ -172,20 +155,43 @@ export default function MerchantsViewedit() {
 
       {/* Table */}
       <div>
-        {/* Search */}
-        <div className="relative w-full lg:w-80 pb-5 float-end">
-          <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
-          <input
-            type="text"
-            placeholder="Search merchant..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(0);
-            }}
-            className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-b border-slate-300">
+          {/* Entries */}
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-slate-600 font-medium">Show</span>
+            <select
+              value={size}
+              onChange={(e) => {
+                setSize(Number(e.target.value));
+                setPage(0);
+              }}
+              className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <span className="text-slate-600 font-medium">entries</span>
+          </div>
+
+
+          {/* Search */}
+          <div className="relative w-full lg:w-80 pb-5 float-end">
+            <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
+            <input
+              type="text"
+              placeholder="Search merchant..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(0);
+              }}
+              className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
+
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-orange-600 text-white text-left">
@@ -219,8 +225,8 @@ export default function MerchantsViewedit() {
                   Loading...
                 </td>
               </tr>
-            ) : currentData.length > 0 ? (
-              currentData.map((item, index) => (
+            ) : filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
                 <tr
                   key={item.id}
                   className="hover:bg-gray-50"
@@ -286,7 +292,7 @@ export default function MerchantsViewedit() {
                         VIEW
                       </button>
                       <button
-                        onClick={() => handleEditClick(item.ref_id)}
+                        onClick={() => handleEditClick(1000011)}
                         className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs">
                         EDIT
                       </button>
@@ -368,20 +374,6 @@ export default function MerchantsViewedit() {
           >
             Next
           </button>
-
-          {/* Page Size */}
-          <select
-            value={size}
-            onChange={(e) => {
-              setSize(Number(e.target.value));
-              setPage(0);
-            }}
-            className="border px-3 py-2 rounded"
-          >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-          </select>
         </div >
       </div >
     </div >

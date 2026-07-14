@@ -15,9 +15,9 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
+      
       const res = await axiosInstance.post("/auth/login", {
         userName: username,
         password: password,

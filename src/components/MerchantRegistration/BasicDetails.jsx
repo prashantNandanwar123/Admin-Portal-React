@@ -1,23 +1,89 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
-// import { toast } from "react-toastify";
 import { toast } from "react-toastify";
+import statecity from "../../utils/statecity.json";
+import Select from "react-select";
 
 
-export default function BasicDetails({ data, setData, handleNext, errors,
+export default function BasicDetails({
+  data,
+  setData,
+  handleNext,
+  errors,
   setErrors,
   handleBack }) {
-  const [stateList, setStateList] = useState([]);
-  const [cityList, setCityList] = useState([]);
+
   const [mccList, setMccList] = useState([]);
+  const [legalVehicalNameList, setlegalVehicalNameList] = useState([]);
   const [partnerLogo, setPartnerLogo] = useState(null);
   const [refId, setRefId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [userData, setUserData] = useState(null);
 
+  const countryList = statecity.map((item) => item.country);
+
+  const disabledSelectStyles = {
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: state.isDisabled ? "#f3f4f6" : "#fff",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+      opacity: 1,
+    }),
+
+    valueContainer: (base) => ({
+      ...base,
+      cursor: "inherit",
+    }),
+
+    singleValue: (base) => ({
+      ...base,
+      color: "#111827",
+      opacity: 1,
+    }),
+
+    indicatorsContainer: (base, state) => ({
+      ...base,
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+    }),
+
+    dropdownIndicator: (base, state) => ({
+      ...base,
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+    }),
+  };
+
+  // Selected Country
+  const selectedCountry = statecity.find(
+    (item) => item.country === data?.addCountry
+  );
+
+  const stateList = selectedCountry?.states || [];
+  // Selected State
+  const selectedState = stateList.find(
+    (item) => item.state === data?.addState
+  );
+  // Cities of selected state
+  const cityList = selectedState?.cities || [];
+
+  // Billing Country
+  const selectedBillingCountry = statecity.find(
+    (item) => item.country === data?.billingCountry
+  );
+
+  // Billing States
+  const billingStateList = selectedBillingCountry?.states || [];
+
+  // Billing State
+  const selectedBillingState = billingStateList.find(
+    (item) => item.state === data?.billingState
+  );
+
+  // Billing Cities
+  const billingCityList = selectedBillingState?.cities || [];
+
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
     }
@@ -26,7 +92,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
   const handleChange = (field, value) => {
     setData({ ...data, [field]: value });
   };
-
   useEffect(() => {
     fetchDetailsCollection();
   }, []);
@@ -34,12 +99,11 @@ export default function BasicDetails({ data, setData, handleNext, errors,
   const fetchDetailsCollection = async () => {
     try {
       const response = await axiosInstance.post("/getDetailsCollection");
+      const apiData = response?.respData || {};
 
-      const apiData =
-        response?.respData || response?.respData || {};
-
-      setStateList(apiData?.stateList || []);
-      setCityList(apiData?.cityList || []);
+      // setStateList(apiData?.stateList || []);
+      // setCityList(apiData?.cityList || []);
+      setlegalVehicalNameList(apiData?.legalVehicalNameList || []);
 
       const formattedMcc = Object.entries(apiData?.mccList || {}).map(
         ([code, name]) => ({
@@ -78,7 +142,7 @@ export default function BasicDetails({ data, setData, handleNext, errors,
       ref_id: data?.refId || refId,
       createdBy: userData?.userName,
       createdDate: new Date().toLocaleDateString("en-CA"),
-
+      basicSrcChannel: data?.basicSrcChannel,
       partnerLogoCheck: data?.partnerLogoCheck,
       storeChannel: data?.channel,
       storeType: data?.storeType,
@@ -123,13 +187,16 @@ export default function BasicDetails({ data, setData, handleNext, errors,
       cpdFax: data?.cpdFax,
       cpdPrimaryEmailId: data?.cpdPrimaryEmailId,
       cpdSecondaryEmailId: data?.cpdSecondaryEmailId,
+
       baAddress1: data?.billingAddress1,
       baAddress2: data?.billingAddress2,
       baAddress3: data?.billingAddress3,
-      baCity: data?.billingCity,
-      baState: data?.billingState,
+
       baCountry: data?.billingCountry,
+      baState: data?.billingState,
+      baCity: data?.billingCity,
       baZipcode: data?.billingZipcode,
+
     };
     const multipartData = new FormData();
     multipartData.append(
@@ -152,7 +219,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
         }
       );
 
-      console.log("API RESPONSE =======>", res)
       if (res?.respCode === 0) {
         toast.success(res?.respMsg);
         setData((prev) => ({
@@ -171,7 +237,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
 
       }
     } catch (error) {
-      console.error("cath printing =======>", error);
       toast.error(error);
     }
   };
@@ -209,20 +274,39 @@ export default function BasicDetails({ data, setData, handleNext, errors,
               {new Date().toLocaleTimeString()}
             </label>
           </div>
+
+          {/* Sourcing Channel */}
+          <div className="flex items-center gap-2">
+            <label className="w-44 whitespace-nowrap text-gray-700 font-medium">
+              Sourcing Channel<span className="text-red-500">*</span>
+            </label>
+
+            <select
+              className="flex-1 border border-gray-300 rounded px-3 py-2 bg-white"
+              value={data?.basicSrcChannel || ""}
+              onChange={(e) => handleChange("basicSrcChannel", e.target.value)}
+            >
+              <option value="">-- Select --</option>
+
+              {legalVehicalNameList?.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Store Information */}
         <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
           Store Information
         </h2>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Store Type */}
           <div>
             <label className="block text-gray-700 font-medium mb-3">
               Store Type
             </label>
-
             <div className="flex items-center gap-5">
               {["Physical", "Web Store"].map((type) => (
                 <label key={type} className="flex items-center gap-2">
@@ -239,20 +323,17 @@ export default function BasicDetails({ data, setData, handleNext, errors,
                 </label>
               ))}
             </div>
-
             {errors?.storeType && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.storeType}
               </p>
             )}
           </div>
-
           {/* Channel */}
           <div>
             <label className="block text-gray-700 font-medium mb-3">
               Channel
             </label>
-
             <div className="flex items-center gap-5">
               {["IPG", "POS"].map((ch) => (
                 <label key={ch} className="flex items-center gap-2">
@@ -276,7 +357,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
               </p>
             )}
           </div>
-
           {/* Turnover Category */}
           <div>
             <label className="block text-gray-700 font-medium mb-2">
@@ -426,7 +506,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-3">
               Documents
             </label>
-
             <div className="flex items-center gap-5">
               {documentOptions.map((doc) => (
                 <label key={doc.value} className="flex items-center gap-2">
@@ -924,14 +1003,27 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-2">
               Country<span className="text-red-500">*</span>
             </label>
-            <select
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
-              value={data?.addCountry || ""}
-              onChange={(e) => handleChange("addCountry", e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              <option value="India">India</option>
-            </select>
+            <Select
+              options={countryList.map((country) => ({
+                value: country,
+                label: country,
+              }))}
+              value={
+                data?.addCountry
+                  ? { value: data.addCountry, label: data.addCountry }
+                  : null
+              }
+              onChange={(selected) =>
+                setData((prev) => ({
+                  ...prev,
+                  addCountry: selected?.value || "",
+                  addState: "",
+                  addCity: "",
+                }))
+              }
+              placeholder="Select Country"
+              isSearchable
+            />
           </div>
 
           {/* State */}
@@ -939,16 +1031,29 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-2">
               State<span className="text-red-500">*</span>
             </label>
-            <select
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
-              value={data?.addState || ""}
-              onChange={(e) => handleChange("addState", e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              {stateList.map((item, index) => (
-                <option key={index} value={item}>{item}</option>
-              ))}
-            </select>
+            <Select
+              options={stateList.map((item) => ({
+                value: item.state,
+                label: item.state,
+              }))}
+              value={
+                data?.addState
+                  ? {
+                    value: data.addState,
+                    label: data.addState,
+                  }
+                  : null
+              }
+              onChange={(selected) =>
+                setData((prev) => ({
+                  ...prev,
+                  addState: selected?.value || "",
+                  addCity: "",
+                }))
+              }
+              placeholder="Select State"
+              isSearchable
+            />
           </div>
 
           {/* City */}
@@ -956,17 +1061,27 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-2">
               City<span className="text-red-500">*</span>
             </label>
-            <select
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
-              value={data?.addCity || ""}
-              onChange={(e) => handleChange("addCity", e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              {cityList.map((item, index) => (
-                <option key={index} value={item}>{item}</option>
-              ))}
-            </select>
+
+            <Select
+              options={cityList.map((city) => ({
+                value: city,
+                label: city,
+              }))}
+              value={
+                data?.addCity
+                  ? { value: data.addCity, label: data.addCity }
+                  : null
+              }
+              onChange={(selected) =>
+                setData((prev) => ({
+                  ...prev,
+                  addCity: selected?.value || "",
+                }))
+              }
+              isSearchable
+            />
           </div>
+
 
           {/* Zip Code */}
           <div>
@@ -1139,21 +1254,19 @@ export default function BasicDetails({ data, setData, handleNext, errors,
                 handleChange("billingSameAsShipping", checked);
 
                 if (checked) {
-                  setData({
-                    ...data,
-
+                  setData((prev) => ({
+                    ...prev,
                     billingSameAsShipping: true,
 
-                    billingAddress1: data?.addStoreAddress1 || "",
-                    billingAddress2: data?.addStoreAddress2 || "",
-                    billingAddress3: data?.addStoreAddress3 || "",
+                    billingAddress1: prev.addStoreAddress1 || "",
+                    billingAddress2: prev.addStoreAddress2 || "",
+                    billingAddress3: prev.addStoreAddress3 || "",
 
-                    billingCountry: data?.addCountry || "",
-                    billingState: data?.addState || "",
-                    billingCity: data?.addCity || "",
-
-                    billingZipcode: data?.addZipcode || "",
-                  });
+                    billingCountry: prev.addCountry || "",
+                    billingState: prev.addState || "",
+                    billingCity: prev.addCity || "",
+                    billingZipcode: prev.addZipcode || "",
+                  }));
                 }
               }}
             />
@@ -1163,7 +1276,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-
           {/* Address Fields */}
           {[
             { label: "Address 1", field: "billingAddress1", required: true },
@@ -1193,42 +1305,54 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-2">
               Country<span className="text-red-500">*</span>
             </label>
+            <Select
+              styles={disabledSelectStyles}
+              isDisabled={data?.billingSameAsShipping}
+              options={countryList.map((country) => ({
+                value: country,
+                label: country,
+              }))}
 
-            <select
-              disabled={data?.billingSameAsShipping}
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-              value={data?.billingCountry || ""}
-              onChange={(e) =>
-                handleChange("billingCountry", e.target.value)
+              value={
+                data?.billingCountry
+                  ? { value: data.billingCountry, label: data.billingCountry }
+                  : null
               }
-            >
-              <option value="">-- Select --</option>
-              <option value="India">India</option>
-            </select>
+              onChange={(selected) =>
+                setData((prev) => ({
+                  ...prev,
+                  billingCountry: selected?.value || "",
+                  billingState: "",
+                  billingCity: "",
+                }))
+              }
+            />
           </div>
-
           {/* State */}
           <div>
             <label className="block text-gray-700 font-medium mb-2">
               State<span className="text-red-500">*</span>
             </label>
-
-            <select
-              disabled={data?.billingSameAsShipping}
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-              value={data?.billingState || ""}
-              onChange={(e) =>
-                handleChange("billingState", e.target.value)
+            <Select
+              styles={disabledSelectStyles}
+              isDisabled={data?.billingSameAsShipping}
+              options={billingStateList.map((item) => ({
+                value: item.state,
+                label: item.state,
+              }))}
+              value={
+                data?.billingState
+                  ? { value: data.billingState, label: data.billingState }
+                  : null
               }
-            >
-              <option value="">-- Select --</option>
-
-              {stateList.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+              onChange={(selected) =>
+                setData((prev) => ({
+                  ...prev,
+                  billingState: selected?.value || "",
+                  billingCity: "",
+                }))
+              }
+            />
           </div>
 
           {/* City */}
@@ -1236,23 +1360,25 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-2">
               City<span className="text-red-500">*</span>
             </label>
-
-            <select
-              disabled={data?.billingSameAsShipping}
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-              value={data?.billingCity || ""}
-              onChange={(e) =>
-                handleChange("billingCity", e.target.value)
+            <Select
+              styles={disabledSelectStyles}
+              isDisabled={data?.billingSameAsShipping}
+              options={billingCityList.map((city) => ({
+                value: city,
+                label: city,
+              }))}
+              value={
+                data?.billingCity
+                  ? { value: data.billingCity, label: data.billingCity }
+                  : null
               }
-            >
-              <option value="">-- Select --</option>
-
-              {cityList.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+              onChange={(selected) =>
+                setData((prev) => ({
+                  ...prev,
+                  billingCity: selected?.value || "",
+                }))
+              }
+            />
           </div>
 
           {/* Zip Code */}
@@ -1260,7 +1386,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             <label className="block text-gray-700 font-medium mb-2">
               Zip Code<span className="text-red-500">*</span>
             </label>
-
             <input
               type="text"
               maxLength={6}
@@ -1276,7 +1401,6 @@ export default function BasicDetails({ data, setData, handleNext, errors,
             />
           </div>
         </div>
-
         {/* SAVE BUTTON */}
         <div className="flex justify-end mt-10">
           <button
