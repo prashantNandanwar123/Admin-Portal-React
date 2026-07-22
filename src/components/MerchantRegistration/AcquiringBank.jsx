@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-
 export default function AcquiringBank({ data, setData, handleNext,
   handleBack }) {
   const [refid, setRefId] = useState("");
