@@ -85,11 +85,6 @@ export default function MerchantsViewEditForm({
     }
   };
 
-  <MerchantsViewEditForm
-    merchantData={merchantData}
-    onBack={() => setShowForm(false)}
-  />
-
   return (
     <div className="h-full overflow-y-auto hide-scrollbar mx-10 mt-5">
       {/*  STEP PROGRESS BAR */}

@@ -40,7 +40,8 @@ const FORM_FIELDS = [
       "Report",
       "Master",
       "User Management",
-      "Reseller"
+      "Reseller",
+      "Virtual Accounts"
     ],
   },
 
@@ -67,7 +68,7 @@ function ProcessorModal({
   const isEdit = mode === "edit";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4 overflow-hide">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-blue-700 rounded-t-2xl">
@@ -267,7 +268,7 @@ export default function Role() {
         setUserList(response?.respData?.UserName || []);
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     }
   };
 
@@ -307,12 +308,8 @@ export default function Role() {
 
   // ─── Save (Add or Edit) ──────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    try {
-      console.log("1. Before setSaving", saving);
-
+    try {      
       setSaving(true);
-
-      console.log("2. After setSaving");
 
       const payload = {
         userName: form.userName,
@@ -344,7 +341,6 @@ export default function Role() {
       toast.error(error);
     }
     finally {
-      console.log("3. Finally");
       setSaving(false);
     }
   };
@@ -369,7 +365,6 @@ export default function Role() {
         toast.error(response?.respMsg);
       }
     } catch (error) {
-      console.error(error);
       toast.error(error);
     }
   };
@@ -393,7 +388,7 @@ export default function Role() {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   return (
-    <div className="min-h-screen p-4 md:p-6">
+    <div className="p-4 md:p-6">
       {/* ── Header ── */}
       <div className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

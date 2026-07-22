@@ -29,7 +29,7 @@ import {
   Palette,
 } from "lucide-react";
 
-export default function Sidebar({ open, onClose }) {
+export default function Sidebar({ open, onClose, isMobile }) {
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
   const location = useLocation();
@@ -76,6 +76,11 @@ export default function Sidebar({ open, onClose }) {
       title: "Merchant Registration",
       path: "/app/register-merchant",
       icon: UserPlus,
+    },
+    {
+      title: "Virtual Account",
+      path: "/app/virtual-account",
+      icon: UserCog,
     },
     {
       title: "Reseller",
@@ -187,177 +192,139 @@ export default function Sidebar({ open, onClose }) {
 
         localStorage.removeItem("isLogin");
         localStorage.removeItem("user");
-
         toast.success(response.respMsg);
-
         setTimeout(() => {
           navigate("/");
         }, 200);
       } else {
-        toast.error(response.respMsg);
+
+        localStorage.removeItem("isLogin");
+        localStorage.removeItem("user");
+        toast.success(response.respMsg);
+        setTimeout(() => {
+          navigate("/");
+        }, 100);
       }
     } catch (error) {
-      console.error("Logout Error:", error);
       toast.error(error);
-
       localStorage.removeItem("isLogin");
       localStorage.removeItem("user");
-
       window.location.href = "/";
     }
   };
 
   return (
-    <aside
-      ref={sidebarRef}
-      style={{ backgroundColor: sidebarColor }}
-      className={`
-        fixed top-0 left-0 h-full z-30
-        ${open ? "w-64" : "w-20"}
-        ${isLightSidebar ? "text-black" : "text-white"}
-        flex flex-col
-        transition-all duration-300
-        shadow-2xl
-        backdrop-blur-xl
-        border-r
-        ${isLightSidebar ? "border-black/10" : "border-white/10"}
-      `}
-    >
-      {/* Header */}
-      <div
-        className={`px-4 py-5 flex items-center justify-between border-b ${isLightSidebar ? "border-black/10" : "border-white/10"
-          }`}
+    <>
+      <aside
+        ref={sidebarRef}
+        style={{ backgroundColor: sidebarColor }}
+        className={`
+          fixed top-0 left-0 h-full z-50
+          transition-all duration-300
+            ${isMobile
+            ? open
+              ? "translate-x-0 w-64"
+              : "-translate-x-full w-64"
+            : open
+              ? "w-64"
+              : "w-20"
+          }
+              ${isLightSidebar ? "text-black" : "text-white"}
+              flex flex-col
+              shadow-2xl
+              backdrop-blur-xl
+              border-r
+              ${isLightSidebar ? "border-black/10" : "border-white/10"}
+            `}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e]">
-            H
-          </div>
-          {open && (
-            <div>
-              <h2 className="font-bold text-lg block">HelloPe</h2>
-              <p
-                className={`text-xs ${isLightSidebar ? "text-black/80" : "text-white/60"
-                  }`}
-              >
-                Admin Panel
-              </p>
+        {/* Header */}
+        <div
+          className={`px-4 py-5 flex items-center justify-between border-b ${isLightSidebar ? "border-black/10" : "border-white/10"
+            }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e]">
+              H
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto hide-scrollbar px-3 py-4">
-        {/* MAIN MENU */}
-        {open && showMainSection && (
-          <div
-            className={`px-3 mb-2 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
-              }`}
-          >
-            <Home size={12} />
-            MAIN MENU
-          </div>
-        )}
-        <div className="space-y-1 mb-5 ml-3">
-          {menuConfig
-            .filter((menu) => roleFunctions.includes(menu.title))
-            .map((menu) => {
-              const Icon = menu.icon;
-              return (
-                <NavLink
-                  key={menu.title}
-                  to={menu.path}
-                  onClick={() => {
-                    setActiveSection("main");
-                    setActiveMenu(menu.title);
-                    setMasterOpen(false);
-                    setUserMgmtOpen(false);
-                  }}
-                  className={getMenuClass(menu.title)}
-                  style={
-                    activeMenu === menu.title
-                      ? activeMenuStyle
-                      : {}
-                  }
+            {open && (
+              <div>
+                <h2 className="font-bold text-lg block">HelloPe</h2>
+                <p
+                  className={`text-xs ${isLightSidebar ? "text-black/80" : "text-white/60"
+                    }`}
                 >
-                  <Icon size={18} />
-                  {open && <span>{menu.title}</span>}
-                </NavLink>
-              );
-            })}
-         
-          {/* OTHER */}
-          {open && showOtherSection && (
+                  Admin Panel
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto hide-scrollbar px-3 py-4">
+          {/* MAIN MENU */}
+          {open && showMainSection && (
             <div
-              className={`px-3 mb-2 mt-4 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
+              className={`px-3 mb-2 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
                 }`}
             >
-              <Folder size={12} />
-              OTHER
+              <Home size={12} />
+              MAIN MENU
             </div>
           )}
+          <div className="space-y-1 mb-5 ml-3">
+            {menuConfig
+              .filter((menu) => roleFunctions.includes(menu.title))
+              .map((menu) => {
+                const Icon = menu.icon;
+                return (
+                  <NavLink
+                    key={menu.title}
+                    to={menu.path}
+                    onClick={() => {
+                      setActiveSection("main");
+                      setActiveMenu(menu.title);
+                      setMasterOpen(false);
+                      setUserMgmtOpen(false);
+                      if (isMobile) {
+                        onClose();
+                      }
+                    }}
+                    className={getMenuClass(menu.title)}
+                    style={
+                      activeMenu === menu.title
+                        ? activeMenuStyle
+                        : {}
+                    }
+                  >
+                    <Icon size={18} />
+                    {open && <span>{menu.title}</span>}
+                  </NavLink>
+                );
+              })}
 
-          {/* MASTER */}
-          {roleFunctions.includes("Master") && (
-            <div>
-              <button
-                onClick={() => {
-                  setMasterOpen(!masterOpen);
-                  setUserMgmtOpen(false);
-                  setActiveMenu("master");
-                }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition
-                      ${activeMenu === "master"
-                    ? isLightSidebar
-                      ? "bg-yellow-400 text-white"
-                      : "bg-white text-black"
-                    : isLightSidebar
-                      ? "text-black hover:bg-black/10"
-                      : "text-white/60 hover:bg-white/10"
+            {/* OTHER */}
+            {open && showOtherSection && (
+              <div
+                className={`px-3 mb-2 mt-4 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
                   }`}
               >
-                <div className="flex items-center gap-3">
-                  <Shield size={18} />
-                  {open && <span>Master</span>}
-                </div>
+                <Folder size={12} />
+                OTHER
+              </div>
+            )}
 
-                {open &&
-                  (masterOpen ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronRight size={16} />
-                  ))}
-              </button>
-
-              {masterOpen && open && (
-                <div className="ml-8 mt-1 space-y-1">
-                  <NavLink
-                    to="/app/upi-payment-processor"
-                    onClick={() => setActiveMenu("upi")}
-                    className={getMenuClass("upi")}
-                  >
-                    <Cpu size={16} />
-                    <span>UPI Payment Processor</span>
-                  </NavLink>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* USER MANAGEMENT */}
-          {(
-            roleFunctions.includes("User Management") ||
-            roleFunctions.includes("Reseller")
-          ) && (
+            {/* MASTER */}
+            {roleFunctions.includes("Master") && (
               <div>
                 <button
                   onClick={() => {
-                    setUserMgmtOpen(!userMgmtOpen);
-                    setMasterOpen(false);
-                    setActiveMenu("user-management");
+                    setMasterOpen(!masterOpen);
+                    setUserMgmtOpen(false);
+                    setActiveMenu("master");
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition
-                       ${activeMenu === "user-management"
+                      ${activeMenu === "master"
                       ? isLightSidebar
                         ? "bg-yellow-400 text-white"
                         : "bg-white text-black"
@@ -367,137 +334,195 @@ export default function Sidebar({ open, onClose }) {
                     }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Users size={18} />
-                    {open && <span>User Management</span>}
+                    <Shield size={18} />
+                    {open && <span>Master</span>}
                   </div>
 
                   {open &&
-                    (userMgmtOpen ? (
+                    (masterOpen ? (
                       <ChevronDown size={16} />
                     ) : (
                       <ChevronRight size={16} />
                     ))}
                 </button>
 
-                {userMgmtOpen && open && (
+                {masterOpen && open && (
                   <div className="ml-8 mt-1 space-y-1">
-
-                    {roleFunctions.includes("User Management") && (
-                      <>
-                        <NavLink
-                          to="/app/users"
-                          onClick={() => setActiveMenu("all-user")}
-                          className={getMenuClass("all-user")}
-                        >
-                          <User size={16} />
-                          <span>All User</span>
-                        </NavLink>
-
-                        <NavLink
-                          to="/app/roles"
-                          onClick={() => setActiveMenu("role-access")}
-                          className={getMenuClass("role-access")}
-                        >
-                          <UserCog size={16} />
-                          <span>Role & Access</span>
-                        </NavLink>
-                      </>
-                    )}
-
+                    <NavLink
+                      to="/app/upi-payment-processor"
+                      onClick={() => setActiveMenu("upi")}
+                      className={getMenuClass("upi")}
+                    >
+                      <Cpu size={16} />
+                      <span>UPI Payment Processor</span>
+                    </NavLink>
                   </div>
                 )}
               </div>
-            )
-          }
-        </div>
-      </nav>
+            )}
 
-      {/* SETTINGS + LOGOUT SECTION */}
-      <div
-        className={`border-t ${isLightSidebar ? "border-black/10" : "border-white/10"
-          }`}
-      >
-        {/* Buttons Row */}
-        <div className="flex items-center gap-2 p-3">
-          <div>
-            {/* LOGOUT BUTTON */}
-            <button
-              onClick={handleLogout}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition"
-            >
-              <LogOut size={18} />
-              {open && <span>Logout</span>}
-            </button>
+            {/* USER MANAGEMENT */}
+            {(
+              roleFunctions.includes("User Management") ||
+              roleFunctions.includes("Reseller")
+            ) && (
+                <div>
+                  <button
+                    onClick={() => {
+                      setUserMgmtOpen(!userMgmtOpen);
+                      setMasterOpen(false);
+                      setActiveMenu("user-management");
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition
+                       ${activeMenu === "user-management"
+                        ? isLightSidebar
+                          ? "bg-yellow-400 text-white"
+                          : "bg-white text-black"
+                        : isLightSidebar
+                          ? "text-black hover:bg-black/10"
+                          : "text-white/60 hover:bg-white/10"
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Users size={18} />
+                      {open && <span>User Management</span>}
+                    </div>
+
+                    {open &&
+                      (userMgmtOpen ? (
+                        <ChevronDown size={16} />
+                      ) : (
+                        <ChevronRight size={16} />
+                      ))}
+                  </button>
+
+                  {userMgmtOpen && open && (
+                    <div className="ml-8 mt-1 space-y-1">
+                      {roleFunctions.includes("User Management") && (
+                        <>
+                          <NavLink
+                            to="/app/users"
+                            onClick={() => setActiveMenu("all-user")}
+                            className={getMenuClass("all-user")}
+                          >
+                            <User size={16} />
+                            <span>All User</span>
+                          </NavLink>
+
+                          <NavLink
+                            to="/app/roles"
+                            onClick={() => setActiveMenu("role-access")}
+                            className={getMenuClass("role-access")}
+                          >
+                            <UserCog size={16} />
+                            <span>Role & Access</span>
+                          </NavLink>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            }
           </div>
+        </nav>
 
-
-          {/* SETTINGS BUTTON */}
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm transition ${isLightSidebar
-              ? "hover:bg-black/10 text-black"
-              : "hover:bg-white/10 text-white"
-              }`}
-          >
-            <Settings size={18} />
-          </button>
-
-        </div>
-        {/* SETTINGS PANEL */}
-        {showSettings && open && (
-          <div
-            className={`mx-3 mb-3 p-3 rounded-xl space-y-4 ${isLightSidebar ? "bg-black/5" : "bg-white/5"
-              }`}
-          >
-            {/* DARK MODE */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {darkMode ? <Moon size={16} /> : <Sun size={16} />}
-                <span className="text-sm">
-                  {darkMode ? "Dark Mode" : "Light Mode"}
-                </span>
-              </div>
-
+        {/* SETTINGS + LOGOUT SECTION */}
+        <div
+          className={`border-t ${isLightSidebar ? "border-black/10" : "border-white/10"
+            }`}
+        >
+          {/* Buttons Row */}
+          <div className="flex items-center gap-2 p-3">
+            <div>
+              {/* LOGOUT BUTTON */}
               <button
-                onClick={() => setDarkMode(!darkMode)}
-                className="px-3 py-1 rounded-md bg-yellow-400 text-black text-xs font-semibold"
+                onClick={handleLogout}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition"
               >
-                Toggle
+                <LogOut size={18} />
+                {open && <span>Logout</span>}
               </button>
             </div>
 
-            {/* SIDEBAR COLOR */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Palette size={16} />
-                <span className="text-sm">Sidebar Color</span>
+
+            {/* SETTINGS BUTTON */}
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm transition ${isLightSidebar
+                ? "hover:bg-black/10 text-black"
+                : "hover:bg-white/10 text-white"
+                }`}
+            >
+              <Settings size={18} />
+            </button>
+
+          </div>
+          {/* SETTINGS PANEL */}
+          {showSettings && open && (
+            <div
+              className={`mx-3 mb-3 p-3 rounded-xl space-y-4 ${isLightSidebar ? "bg-black/5" : "bg-white/5"
+                }`}
+            >
+              {/* DARK MODE */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {darkMode ? <Moon size={16} /> : <Sun size={16} />}
+                  <span className="text-sm">
+                    {darkMode ? "Dark Mode" : "Light Mode"}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="px-3 py-1 rounded-md bg-yellow-400 text-black text-xs font-semibold"
+                >
+                  Toggle
+                </button>
               </div>
 
-              <div className="flex gap-2 flex-wrap">
-                {[
-                  "#1a1d2e",
-                  "#1e293b",
-                  "#312e81",
-                  "#7c2d12",
-                  "#14532d",
-                  "#831843",
-                  "#ffffff",
-                ].map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSidebarColor(color)}
-                    className={`w-7 h-7 rounded-full border-2 ${isLightSidebar ? "border-black/20" : "border-white"
-                      }`}
-                    style={{
-                      backgroundColor: color,
-                    }}
-                  />
-                ))}
+              {/* SIDEBAR COLOR */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Palette size={16} />
+                  <span className="text-sm">Sidebar Color</span>
+                </div>
+
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    "#1a1d2e",
+                    "#1e293b",
+                    "#312e81",
+                    "#7c2d12",
+                    "#14532d",
+                    "#831843",
+                    "#ffffff",
+                  ].map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setSidebarColor(color)}
+                      className={`w-7 h-7 rounded-full border-2 ${isLightSidebar ? "border-black/20" : "border-white"
+                        }`}
+                      style={{
+                        backgroundColor: color,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </aside>
+          )}
+        </div>
+      </aside>
+
+      {isMobile && open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40"
+          onClick={onClose}
+        />
+      )
+      }
+    </>
+
   );
 }

@@ -15,6 +15,7 @@ export default function EBasicDetails({
   const [legalVehicalNameList, setlegalVehicalNameList] = useState([]);
   const [userData, setUserData] = useState(null);
 
+  const partnerLogoRef = useRef(null);
 
   const countryList = statecity.map((item) => item.country);
 
@@ -139,7 +140,6 @@ export default function EBasicDetails({
   const fetchDetailsCollection = async () => {
     try {
       const response = await axiosInstance.post("/getDetailsCollection");
-
       const apiData =
         response?.respData || response?.respData || {};
       setlegalVehicalNameList(apiData?.legalVehicalNameList || []);
@@ -149,7 +149,6 @@ export default function EBasicDetails({
           name,
         })
       );
-
       setMccList(formattedMcc);
     } catch (error) {
       console.error(error);
@@ -271,8 +270,17 @@ export default function EBasicDetails({
         setData((prev) => ({
           ...prev,
           refId: response?.respData?.ref_id,
+          // old file remove and new file name show
+          partnerLogoPath: data?.partnerLogoFile?.name || "",
+
+          // clear selected file after upload
+          partnerLogoFile: null,
         }));
 
+        // clear browser file input
+        if (partnerLogoRef.current) {
+          partnerLogoRef.current.value = "";
+        }
       } else {
         toast.error(
           response?.respMsg
@@ -424,13 +432,21 @@ export default function EBasicDetails({
                 Partner Logo Check
                 <span className="text-red-500">*</span>
               </label>
-
               <select
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                 value={data?.partnerLogoCheck || ""}
-                onChange={(e) =>
-                  handleChange("partnerLogoCheck", e.target.value)
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleChange("partnerLogoCheck", value);
+                  if (value === "No") {
+                    handleChange("partnerLogoFile", null);
+
+                    // clear actual file input
+                    if (partnerLogoRef.current) {
+                      partnerLogoRef.current.value = "";
+                    }
+                  }
+                }}
               >
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -446,15 +462,17 @@ export default function EBasicDetails({
 
             {/* Partner Logo */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 font-medium mb-2">
                 Partner Logo{" "}
                 <span className="text-sm text-gray-500 font-normal">
                   (jpg or png)
                 </span>
               </label>
               <input
+                ref={partnerLogoRef}
                 type="file"
                 accept=".jpg,.jpeg,.png"
+                disabled={data?.partnerLogoCheck !== "Yes"}
                 onChange={(e) => {
                   const file = e.target.files[0];
                   // setPartnerLogo(file);
@@ -471,7 +489,7 @@ export default function EBasicDetails({
                       bg-white
                       file:mr-3
                       file:px-3
-                      file:py-1
+                      file:py-2
                       file:border-0
                       file:border-r
                       file:border-gray-300
@@ -481,13 +499,18 @@ export default function EBasicDetails({
                       hover:file:bg-gray-200
                     "
               />
+              {data?.partnerLogoPath && (
+                <p className="mt-2 text-sm text-gray-600 font-medium">
+                  {data.partnerLogoPath.split(/[/\\]/).pop()}
+                </p>
+              )}
             </div>
+
             {/* Store Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 Store Name (Business Name)
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -551,7 +574,6 @@ export default function EBasicDetails({
                         )
                       }
                     />
-
                     {doc.label}
                   </label>
                 ))}

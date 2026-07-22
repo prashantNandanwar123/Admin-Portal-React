@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import Select from "react-select";
-
+import { useRef } from "react";
 
 export default function BasicDetails({
   data,
@@ -19,6 +19,7 @@ export default function BasicDetails({
   const [refId, setRefId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [userData, setUserData] = useState(null);
+  const fileRef = useRef(null);
 
   const countryList = statecity.map((item) => item.country);
 
@@ -100,9 +101,6 @@ export default function BasicDetails({
     try {
       const response = await axiosInstance.post("/getDetailsCollection");
       const apiData = response?.respData || {};
-
-      // setStateList(apiData?.stateList || []);
-      // setCityList(apiData?.cityList || []);
       setlegalVehicalNameList(apiData?.legalVehicalNameList || []);
 
       const formattedMcc = Object.entries(apiData?.mccList || {}).map(
@@ -362,7 +360,6 @@ export default function BasicDetails({
             <label className="block text-gray-700 font-medium mb-2">
               Turnover Category
             </label>
-
             <select
               className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
               value={data?.turnoverCategory || ""}
@@ -371,11 +368,9 @@ export default function BasicDetails({
               }
             >
               <option value="">-- Select --</option>
-
               <option value="Small Merchant(<=20Lacs)">
                 Small Merchant(&lt;=20Lacs)
               </option>
-
               <option value="Other Merchant(>20Lacs)">
                 Other Merchant(&gt;20Lacs)
               </option>
@@ -392,58 +387,59 @@ export default function BasicDetails({
             <select
               className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
               value={data?.partnerLogoCheck || ""}
-              onChange={(e) =>
-                handleChange("partnerLogoCheck", e.target.value)
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                handleChange("partnerLogoCheck", value);
+                if (fileRef.current) {
+                  fileRef.current.value = "";
+                }
+              }}
             >
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-
-            {errors?.partnerLogoCheck && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.partnerLogoCheck}
-              </p>
-            )}
           </div>
 
           {/* Partner Logo */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">
+            <label className="block text-gray-700 font-medium mb-2">
               Partner Logo{" "}
               <span className="text-sm text-gray-500 font-normal">
                 (jpg or png)
               </span>
             </label>
             <input
+              ref={fileRef}
               type="file"
               accept=".jpg,.jpeg,.png"
+              disabled={data?.partnerLogoCheck !== "Yes"}
               onChange={(e) => {
                 const file = e.target.files[0];
                 setPartnerLogo(file);
                 handleChange("partnerLogoFile", file);
               }}
-              className="
-                      block
-                      w-full
-                      text-sm
-                      text-gray-700
-                      border
-                      border-gray-300
-                      rounded
-                      bg-white
-                      file:mr-3
-                      file:px-3
-                      file:py-1
-                      file:border-0
-                      file:border-r
-                      file:border-gray-300
-                      file:bg-gray-100
-                      file:text-black
-                      file:text-sm
-                      hover:file:bg-gray-200
-                    "
+
+                  className="
+                  block
+                  w-full
+                  text-sm
+                  text-gray-700
+                  border
+                  border-gray-300
+                  rounded
+                  bg-white
+                  file:mr-3
+                  file:px-3
+                  file:py-2
+                  file:border-0
+                  file:border-r
+                  file:border-gray-300
+                  file:bg-gray-100
+                  file:text-black
+                  file:text-sm
+                  hover:file:bg-gray-200
+                  "
             />
           </div>
 

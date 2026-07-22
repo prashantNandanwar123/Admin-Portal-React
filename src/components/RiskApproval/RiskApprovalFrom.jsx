@@ -68,26 +68,25 @@ export default function RiskApprovalFrom({
 
   const CurrentComponent = steps[currentStep].component;
 
-  // ✅ NEXT STEP
+  //  NEXT STEP
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     }
   };
 
-  // ✅ PREVIOUS STEP
+  //  PREVIOUS STEP
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
     } else {
-      onBack?.(); // ✅ Step 0 pe list page pe wapas
+      onBack?.(); //  Step 0 pe list page pe wapas
     }
   };
 
   return (
-    <div className="max-h-[calc(100vh-180px)] overflow-y-auto hide-scrollbar p-5">
-
-      {/* ✅ STEP PROGRESS BAR */}
+    <div className="max-h-full overflow-y-auto hide-scrollbar p-10">
+      {/* STEP PROGRESS BAR */}
       <div className="sticky top-0 z-20 flex items-center bg-[#dde3ab] rounded-full justify-between mb-10 overflow-x-auto py-4">
         {steps.map((step, index) => {
           const isCompleted = index < currentStep;
@@ -101,7 +100,6 @@ export default function RiskApprovalFrom({
             >
               {/* STEP CIRCLE */}
               <div className="flex flex-col items-center min-w-[120px]">
-
                 <div
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center
@@ -120,7 +118,6 @@ export default function RiskApprovalFrom({
                     <Icon size={18} />
                   )}
                 </div>
-
                 <p
                   className={`
                     text-sm mt-2 text-center font-medium
@@ -153,7 +150,7 @@ export default function RiskApprovalFrom({
         })}
       </div>
 
-      {/* ✅ CURRENT STEP COMPONENT */}
+      {/*  CURRENT STEP COMPONENT */}
       <CurrentComponent
         data={formData}
         setData={setFormData}
@@ -162,7 +159,6 @@ export default function RiskApprovalFrom({
         handleBack={handleBack}
         refId={merchantData}
       />
-
     </div>
   );
 }

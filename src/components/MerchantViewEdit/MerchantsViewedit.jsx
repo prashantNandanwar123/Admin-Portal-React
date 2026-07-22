@@ -283,7 +283,7 @@ export default function MerchantsViewedit() {
                   </td>
 
                   {/* Action */}
-                  < td className="border px-3 py-3 text-center" >
+                  <td className="border px-3 py-3 text-center">
                     <div className="flex justify-center gap-2">
                       <button
                         onClick={() => handleViewClick(item.ref_id)}
@@ -292,7 +292,7 @@ export default function MerchantsViewedit() {
                         VIEW
                       </button>
                       <button
-                        onClick={() => handleEditClick(1000011)}
+                        onClick={() => handleEditClick(item.ref_id)}
                         className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs">
                         EDIT
                       </button>

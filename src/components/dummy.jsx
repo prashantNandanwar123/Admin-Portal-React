@@ -1,662 +1,504 @@
-import React, { useState, useRef, useEffect } from "react";
-import axiosInstance from "../../api/axios";
+import { useRef, useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
+import axiosInstance from "../api/axios";
 import { toast } from "react-toastify";
-import { X } from "lucide-react";
-export default function EUploadDocument({
-  refId,
-  data,
-  setData,
-  handleNext,
-  handleBack,
-}) {
+import { useNavigate } from "react-router-dom";
+import { IoIosLink } from "react-icons/io";
+import { useLocation } from "react-router-dom";
 
-  const [apiData, setApiData] = useState({});
+import {
+  LayoutDashboard,
+  Users,
+  UserPlus,
+  ShieldCheck,
+  Key,
+  BarChart2,
+  Menu,
+  Shield,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  Cpu,
+  User,
+  UserCog,
+  Home,
+  Folder,
+  Settings,
+  Moon,
+  Sun,
+  Palette,
+} from "lucide-react";
+
+export default function Sidebar({ open, onClose }) {
+  const navigate = useNavigate();
+  const sidebarRef = useRef(null);
+  const location = useLocation();
+
+  const isUpiActive =
+    location.pathname === "/app/upi-payment-processor";
+
+  const isUserMenuActive =
+    location.pathname === "/app/users" ||
+    location.pathname === "/app/roles";
+
+  const [masterOpen, setMasterOpen] = useState(false);
+  const [userMgmtOpen, setUserMgmtOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  const [activeMenu, setActiveMenu] = useState("");
+
+  const userData = JSON.parse(localStorage.getItem("user") || "{}");
 
 
-  const checklistItems = [
-    "Valid licenses from local bodies / municipal corporation under shop act / VAT / Sales Tax Returns Challan",
-    "Pan Card",
-    "Address Proof, Telephone Bill / Electricity Bill",
-    "Income Tax / Vat Tax / Sale Tax Returns",
-    "Statement of account for the last three months",
-    "Existing POS terminal payment advice",
-    "Merchant establishment for installation of POS",
-    "Copy of license issued under shops and Establishment Act",
-    "Identity proof - PAN Card, Passport, Driving License etc.",
+  const roleFunctions = (userData.role_function || "")
+    .split(",")
+    .map((r) => r.trim());
+
+  const hasAccess = (userName) =>
+    roleFunctions.includes(userName);
+
+  const getMenuClass = (menu) =>
+    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${activeMenu === menu && open
+      ? isLightSidebar
+        ? "bg-yellow-400 text-white"
+        : "bg-white text-black"
+      : isLightSidebar
+        ? "text-black hover:bg-black/10"
+        : "text-white/60 hover:bg-white/10"
+    }`;
+
+  const menuConfig = [
+    {
+      title: "Dashboard",
+      path: "/app/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Merchant Registration",
+      path: "/app/register-merchant",
+      icon: UserPlus,
+    },
+    {
+      title: "Reseller",
+      path: "/app/reseller",
+      icon: UserCog,
+    },
+    {
+      title: "Risk Approval",
+      path: "/app/risk-approval",
+      icon: ShieldCheck,
+    },
+    {
+      title: "Merchant View / Edit",
+      path: "/app/merchants",
+      icon: Users,
+    },
+    {
+      title: "Merchant Crediential",
+      path: "/app/merchant-credential",
+      icon: Key,
+    },
+    {
+      title: "Merchant Webhook",
+      path: "/app/merchant-webhook",
+      icon: IoIosLink,
+    },
+    {
+      title: "Report",
+      path: "/app/reports",
+      icon: BarChart2,
+    },
   ];
 
-  const fileRefs = useRef([]);
-  const [documents, setDocuments] = useState(
+  const otherMenuActive =
+    masterOpen || userMgmtOpen;  //Logical OR Operator
 
-    checklistItems.map((item) => ({
-      item,
-      status: "",
-      remarks: "",
-      date: "",
-      file: null,
-    }))
+  const [darkMode, setDarkMode] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [sidebarColor, setSidebarColor] = useState();
 
+  const isLightSidebar =
+    sidebarColor === "#ffffff" ||
+    sidebarColor === "#ffffff" ||
+    sidebarColor === "#fff";
+
+  const activeBgColor = isLightSidebar
+    ? "#facc15"
+    : "#ffffff";
+
+  const activeTextColor = isLightSidebar
+    ? "#ffffff"
+    : "#000000";
+
+  const activeMenuClass = "font-semibold";
+
+  const menuClass = (isActive) =>
+    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${isActive
+      ? activeMenuClass
+      : isLightSidebar
+        ? "text-black hover:text-black hover:bg-black/10"
+        : "text-white/60 hover:text-white hover:bg-white/10"
+    }`;
+
+  // Dark-Light Mode Function
+  useEffect(() => {
+    if (darkMode) {
+      setSidebarColor("#1a1d2e");
+    } else {
+      setSidebarColor("#ffffff");
+    }
+  }, [darkMode]);
+
+  const showMainSection = menuConfig.some((menu) =>
+    roleFunctions.includes(menu.title)
   );
 
-  // ================= HANDLE CHANGE =================
-  const handleChange = (
-    index,
-    field,
-    value
-  ) => {
+  localStorage.removeItem("sidebarColor");
 
-    const updated = [...documents];
-    updated[index][field] = value;
-    setDocuments(updated);
+  const showOtherSection =
+    roleFunctions.includes("Master") ||
+    roleFunctions.includes("User Management") ||
+    roleFunctions.includes("Reseller");
+
+  //  Merchant Registration ke liye alag class — color class nahi lagegi
+  // taaki inline style override ho sake
+
+  const merchantMenuClass = (isActive) =>
+    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition font-semibold ${isActive
+      ? ""
+      : isLightSidebar
+        ? "text-black hover:text-black hover:bg-black/10"
+        : "text-white/60 hover:text-white hover:bg-white/10"
+    }`;
+
+  const buttonClass = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition ${isLightSidebar
+    ? "text-black hover:text-black hover:bg-black/10"
+    : "text-white/60 hover:text-white hover:bg-white/10"
+    }`;
+
+  const activeMenuStyle = {
+    backgroundColor: activeBgColor,
+    color: activeTextColor,
   };
 
-  // ================= REMOVE FILE =================
-  const removeFile = (index) => {
-    const updated = [...documents];
-    updated[index] = {
-      ...updated[index],
-      file: null,
-    };
-    setDocuments(updated);
-    if (fileRefs.current[index]) {
-      fileRefs.current[index].value = "";
-    }
-  };
-  // ================= SAVE API ================
-  const uploadMeDocuments = async () => {
+  const handleLogout = async () => {
     try {
+      const response = await axiosInstance.post("/auth/logout");
+      if (response.respCode === 0) {
 
-      if (!validateDocuments()) return;
-      console.log("Data print-->>", refId);
-
-      const formData = new FormData();
-      formData.append(
-        "ref_id", refId
-
-      );
-
-      // ================= VALID LICENSE 1 =================
-
-      formData.append(
-        "validLicense1Status",
-        documents[0].status
-      );
-
-      formData.append(
-        "validLicense1Result",
-        documents[0].remarks
-      );
-
-      formData.append(
-        "validLicense1Date",
-        documents[0].date
-      );
-
-      if (documents[0].file) {
-
-        formData.append(
-          "validLicense1upload",
-          documents[0].file
-        );
-      }
-
-      // ================= PAN CARD =================
-
-      formData.append(
-        "panCardStatus",
-        documents[1].status
-      );
-
-      formData.append(
-        "panCardResult",
-        documents[1].remarks
-      );
-
-      formData.append(
-        "panCardDate",
-        documents[1].date
-      );
-
-      if (documents[1].file) {
-
-        formData.append(
-          "panCardupload",
-          documents[1].file
-        );
-      }
-      // ================= ADDRESS PROOF =================
-
-      formData.append(
-        "addressProofTelephoneElectricityBillStatus",
-        documents[2].status
-      );
-
-      formData.append(
-        "addressProofTelephoneElectricityBillResult",
-        documents[2].remarks
-      );
-
-      formData.append(
-        "addressProofTelephoneElectricityBillDate",
-        documents[2].date
-      );
-
-      if (documents[2].file) {
-
-        formData.append(
-          "addressProofTelephoneElectricityBillupload",
-          documents[2].file
-        );
-      }
-
-      // ================= INCOME TAX =================
-
-      formData.append(
-        "incomeTaxStatus",
-        documents[3].status
-      );
-
-      formData.append(
-        "incomeTaxResult",
-        documents[3].remarks
-      );
-
-      formData.append(
-        "incomeTaxDate",
-        documents[3].date
-      );
-      if (documents[3].file) {
-
-        formData.append(
-          "incomeTaxupload",
-          documents[3].file
-        );
-      }
-
-      // ================= STATEMENT ACCOUNT =================
-
-      formData.append(
-        "statementAccountStatus",
-        documents[4].status
-      );
-
-      formData.append(
-        "statementAccountResult",
-        documents[4].remarks
-      );
-
-      formData.append(
-        "statementAccountDate",
-        documents[4].date
-      );
-
-      if (documents[4].file) {
-
-        formData.append(
-          "statementAccountUpload",
-          documents[4].file
-        );
-      }
-
-      // ================= EXISTING POS =================
-
-      formData.append(
-        "existingPOSStatus",
-        documents[5].status
-      );
-
-      formData.append(
-        "existingPOSResult",
-        documents[5].remarks
-      );
-
-      formData.append(
-        "existingPOSDate",
-        documents[5].date
-      );
-
-      if (documents[5].file) {
-
-        formData.append(
-          "existingPOSUpload",
-          documents[5].file
-        );
-      }
-
-      // ================= MERCHANT ESTABLISHMENT POS =================
-
-      formData.append(
-        "mEstablishmentPOSStatus",
-        documents[6].status
-      );
-
-      formData.append(
-        "mEstablishmentPOSResult",
-        documents[6].remarks
-      );
-
-      formData.append(
-        "mEstablishmentPOSDate",
-        documents[6].date
-      );
-
-      if (documents[6].file) {
-
-        formData.append(
-          "mEstablishmentPOSUpload",
-          documents[6].file
-        );
-      }
-
-      // ================= COPY OF LICENSE =================
-      formData.append(
-        "copyOfLicenseStatus",
-        documents[7].status
-      );
-
-      formData.append(
-        "copyOfLicenseResult",
-        documents[7].remarks
-      );
-
-      formData.append(
-        "copyOfLicenseDate",
-        documents[7].date
-      );
-
-      if (documents[7].file) {
-
-        formData.append(
-          "copyOfLicenseUpload",
-          documents[7].file
-        );
-      }
-
-      // ================= IDENTITY PROOF =================
-      formData.append(
-        "identityProofStatus",
-        documents[8].status
-      );
-
-      formData.append(
-        "identityProofResult",
-        documents[8].remarks
-      );
-
-      formData.append(
-        "identityProofDate",
-        documents[8].date
-      );
-
-      if (documents[8].file) {
-
-        formData.append(
-          "identityProofUpload",
-          documents[8].file
-        );
-      }
-
-      console.log(
-        "UPLOAD FORM DATA =>",
-        [...formData.entries()]
-      );
-
-      const response =
-        await axiosInstance.post(
-          "/saveEditUploadMeDocuments",
-          formData,
-          {
-            headers: {
-              "Content-Type":
-                "multipart/form-data",
-            },
-          }
-        );
-
-      console.log(
-        "PAYMENT RESPONSE =>",
-        response
-      );
-
-      const resData = response;
-      if (resData?.respCode === 0) {
-
-        toast.success(
-          resData?.respMsg
-        );
-
-        setData((prev) => ({
-          ...prev,
-          refId:
-            resData?.respData?.ref_id ||
-            prev.refId,
-        }));
-
+        localStorage.removeItem("isLogin");
+        localStorage.removeItem("user");
+        toast.success(response.respMsg);
+        setTimeout(() => {
+          navigate("/");
+        }, 200);
       } else {
-        toast.error(
-          resData?.respMsg
-        );
-      }
 
+        localStorage.removeItem("isLogin");
+        localStorage.removeItem("user");
+        toast.success(response.respMsg);
+        setTimeout(() => {
+          navigate("/");
+        }, 100);
+      }
     } catch (error) {
-      console.error(
-        "UPLOAD ERROR =>",
-        error
-      );
-      toast.error(
-        error?.response?.data?.respMsg
-      );
+      toast.error(error);
+      localStorage.removeItem("isLogin");
+      localStorage.removeItem("user");
+      window.location.href = "/";
     }
-  };
-
-  // ================= Fetch API ================
-  useEffect(() => {
-    if (!refId) return;
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.post(
-          `rMerchantUploadDocument/${refId}`
-        );
-        if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
-
-          const updatedDocs = [
-            {
-              item: checklistItems[0],
-              status: res?.validLicense1Status || "",
-              remarks: res?.validLicense1Result || "",
-              date: formatInputDate(res?.validLicense1Date),
-              file: null,
-            },
-            {
-              item: checklistItems[1],
-              status: res?.panCardStatus || "",
-              remarks: res?.panCardResult || "",
-              date: formatInputDate(res?.panCardDate),
-              file: null,
-            },
-            {
-              item: checklistItems[2],
-              status:
-                res?.addressProofTelephoneElectricityBillStatus || "",
-              remarks:
-                res?.addressProofTelephoneElectricityBillResult || "",
-              date: formatInputDate(res?.addressProofTelephoneElectricityBillDate),
-              file: null,
-            },
-            {
-              item: checklistItems[3],
-              status: res?.incomeTaxStatus || "",
-              remarks: res?.incomeTaxResult || "",
-              date: formatInputDate(res?.incomeTaxDate),
-              file: null,
-            },
-            {
-              item: checklistItems[4],
-              status: res?.statementAccountStatus || "",
-              remarks: res?.statementAccountResult || "",
-              date: formatInputDate(res?.statementAccountDate),
-              file: null,
-            },
-            {
-              item: checklistItems[5],
-              status: res?.existingPOSStatus || "",
-              remarks: res?.existingPOSResult || "",
-              date: formatInputDate(res?.existingPOSDate),
-              file: null,
-            },
-            {
-              item: checklistItems[6],
-              status: res?.mEstablishmentPOSStatus || "",
-              remarks: res?.mEstablishmentPOSResult || "",
-              date: formatInputDate(res?.mEstablishmentPOSDate),
-              file: null,
-            },
-            {
-              item: checklistItems[7],
-              status: res?.copyOfLicenseStatus || "",
-              remarks: res?.copyOfLicenseResult || "",
-              date: formatInputDate(res?.copyOfLicenseDate),
-              file: null,
-            },
-            {
-              item: checklistItems[8],
-              status: res?.identityProofStatus || "",
-              remarks: res?.identityProofResult || "",
-              date: formatInputDate(res?.identityProofDate),
-              file: null,
-            },
-          ];
-          setDocuments(updatedDocs);
-        }
-      } catch (err) {
-        toast.error(error);
-      }
-    };
-
-    fetchData();
-  }, [refId]);
-
-  // Date Function Add
-
-  const formatInputDate = (dateStr) => {
-    if (!dateStr) return "";
-
-    if (dateStr.includes("/")) {
-      const [dd, mm, yyyy] = dateStr.split("/");
-      return `${yyyy}-${mm}-${dd}`;
-    }
-    return dateStr;
-  };
-
-
-  const validateDocuments = () => {
-    for (let doc of documents) {
-
-      if (!doc.status) {
-        toast.error(`Please select status for: ${doc.item}`);
-        return false;
-      }
-
-      if (!doc.remarks) {
-        toast.error(`Please enter remarks for: ${doc.item}`);
-        return false;
-      }
-
-      if (!doc.date) {
-        toast.error(`Please select date for: ${doc.item}`);
-        return false;
-      }
-
-      // 🚨 FILE ONLY REQUIRED WHEN YES
-      if (
-        doc.status === "Yes" &&
-        !doc.file &&
-        !apiData?.existingFile
-      ) {
-        toast.error(`Please upload file for: ${doc.item}`);
-        return false;
-      }
-    }
-
-    return true;
-  };
-  // Date
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    const [yyyy, mm, dd] = dateStr.split("-");
-    return `${dd}/${mm}/${yyyy}`;
   };
 
   return (
-
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      uploadMeDocuments();
-    }}>
-      <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-3">
-        Edited Upload Document
-      </h2>
-      <p className="text-blue-900 mb-6 border-b border-gray-300 pb-4">
-        This step will ensure faster verification
-        of your company and promoters leading to
-        a faster approval.
-      </p>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-4 py-3 text-left whitespace-nowrap">
-                Item
-              </th>
-              <th className="px-4 py-3 text-center whitespace-nowrap">
-                Status
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                Result / Remarks
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                Date
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                Upload
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                Remove
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents.map((doc, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-50 border-b"
+    <aside
+      ref={sidebarRef}
+      style={{ backgroundColor: sidebarColor }}
+      className={`
+        fixed top-0 left-0 h-full z-30
+        ${open ? "w-64" : "w-20"}
+        ${isLightSidebar ? "text-black" : "text-white"}
+        flex flex-col
+        transition-all duration-300
+        shadow-2xl
+        backdrop-blur-xl
+        border-r
+        ${isLightSidebar ? "border-black/10" : "border-white/10"}
+      `}
+    >
+      {/* Header */}
+      <div
+        className={`px-4 py-5 flex items-center justify-between border-b ${isLightSidebar ? "border-black/10" : "border-white/10"
+          }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e]">
+            H
+          </div>
+          {open && (
+            <div>
+              <h2 className="font-bold text-lg block">HelloPe</h2>
+              <p
+                className={`text-xs ${isLightSidebar ? "text-black/80" : "text-white/60"
+                  }`}
               >
-                <td className="px-4 py-4 whitespace-nowrap">
-                  {doc.item} <span className="text-red-500">*</span>
-                </td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center justify-center gap-4">
-                    <label className="flex items-center gap-1">
-                      <input
-                        type="radio"
-                        name={`status-${index}`}
-                        required
-                        checked={doc.status === "Yes"}
-                        onChange={() =>
-                          handleChange(index, "status", "Yes")
-                        }
-                      />
-                      Yes
-                    </label>
-                    <label className="flex items-center gap-1">
-                      <input
-                        type="radio"
-                        name={`status-${index}`}
-                        checked={doc.status === "No"}
-                        required
-                        onChange={() => {
-                          handleChange(index, "status", "No");
-                          handleChange(index, "file", null); // 👈 ADD HERE
-                        }}
-                      />
-                      No
-                    </label>
-                  </div>
-                </td>
+                Admin Panel
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
-                <td className="px-4 py-4">
-                  <input
-                    type="text"
-                    value={doc.remarks}
-                    placeholder="Enter remarks"
-                    required
-                    onChange={(e) =>
-                      handleChange(index, "remarks", e.target.value)
-                    }
-                    className="w-full bg-gray-100 rounded px-3 py-2 focus:outline-none"
-                  />
-                </td>
-                <td className="px-4 py-4">
-                  <input
-                    type="date"
-                    value={doc.date}
-                    required
-                    onChange={(e) =>
-                      handleChange(index, "date", e.target.value)
-                    }
-                    className="w-full bg-gray-100 rounded px-3 py-2 focus:outline-none"
-                  />
-                </td>
-                <td className="px-4 py-4">
-                  <input
-                    ref={(el) => (fileRefs.current[index] = el)}
-                    type="file"
-                    accept=".jpg,.jpeg,.png"
-                    required
-                    disabled={doc.status !== "Yes"}
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      handleChange(index, "file", file);
-                    }}
-                    className={`
-    block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
-    file:mr-3 file:px-3 file:py-1 file:border-0 file:border-r file:border-gray-300
-    file:bg-gray-100 file:text-black file:text-sm hover:file:bg-gray-200
-    ${doc.status !== "Yes" ? "opacity-50 cursor-not-allowed" : ""}
-  `}
-                  />
-                </td>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto hide-scrollbar px-3 py-4">
+        {/* MAIN MENU */}
+        {open && showMainSection && (
+          <div
+            className={`px-3 mb-2 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
+              }`}
+          >
+            <Home size={12} />
+            MAIN MENU
+          </div>
+        )}
+        <div className="space-y-1 mb-5 ml-3">
+          {menuConfig
+            .filter((menu) => roleFunctions.includes(menu.title))
+            .map((menu) => {
+              const Icon = menu.icon;
+              return (
+                <NavLink
+                  key={menu.title}
+                  to={menu.path}
+                  onClick={() => {
+                    setActiveSection("main");
+                    setActiveMenu(menu.title);
+                    setMasterOpen(false);
+                    setUserMgmtOpen(false);
+                  }}
+                  className={getMenuClass(menu.title)}
+                  style={
+                    activeMenu === menu.title
+                      ? activeMenuStyle
+                      : {}
+                  }
+                >
+                  <Icon size={18} />
+                  {open && <span>{menu.title}</span>}
+                </NavLink>
+              );
+            })}
 
-                <td className="px-4 py-4 text-center">
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="text-red-500 hover:text-red-700 flex justify-center w-full"
+          {/* OTHER */}
+          {open && showOtherSection && (
+            <div
+              className={`px-3 mb-2 mt-4 text-[11px] font-semibold tracking-wider uppercase flex items-center gap-2 ${isLightSidebar ? "text-black/80" : "text-white"
+                }`}
+            >
+              <Folder size={12} />
+              OTHER
+            </div>
+          )}
+
+          {/* MASTER */}
+          {roleFunctions.includes("Master") && (
+            <div>
+              <button
+                onClick={() => {
+                  setMasterOpen(!masterOpen);
+                  setUserMgmtOpen(false);
+                  setActiveMenu("master");
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition
+                      ${activeMenu === "master"
+                    ? isLightSidebar
+                      ? "bg-yellow-400 text-white"
+                      : "bg-white text-black"
+                    : isLightSidebar
+                      ? "text-black hover:bg-black/10"
+                      : "text-white/60 hover:bg-white/10"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Shield size={18} />
+                  {open && <span>Master</span>}
+                </div>
+
+                {open &&
+                  (masterOpen ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  ))}
+              </button>
+
+              {masterOpen && open && (
+                <div className="ml-8 mt-1 space-y-1">
+                  <NavLink
+                    to="/app/upi-payment-processor"
+                    onClick={() => setActiveMenu("upi")}
+                    className={getMenuClass("upi")}
                   >
-                    <X size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <Cpu size={16} />
+                    <span>UPI Payment Processor</span>
+                  </NavLink>
+                </div>
+              )}
+            </div>
+          )}
 
-      {/* BUTTONS */}
-      <div className="flex justify-between mt-10">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
-        >
-          Back
-        </button>
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={uploadMeDocuments}
-            className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
-          >
-            Update
-          </button>
+          {/* USER MANAGEMENT */}
+          {(
+            roleFunctions.includes("User Management") ||
+            roleFunctions.includes("Reseller")
+          ) && (
+              <div>
+                <button
+                  onClick={() => {
+                    setUserMgmtOpen(!userMgmtOpen);
+                    setMasterOpen(false);
+                    setActiveMenu("user-management");
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition
+                       ${activeMenu === "user-management"
+                      ? isLightSidebar
+                        ? "bg-yellow-400 text-white"
+                        : "bg-white text-black"
+                      : isLightSidebar
+                        ? "text-black hover:bg-black/10"
+                        : "text-white/60 hover:bg-white/10"
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Users size={18} />
+                    {open && <span>User Management</span>}
+                  </div>
+
+                  {open &&
+                    (userMgmtOpen ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    ))}
+                </button>
+
+                {userMgmtOpen && open && (
+                  <div className="ml-8 mt-1 space-y-1">
+
+                    {roleFunctions.includes("User Management") && (
+                      <>
+                        <NavLink
+                          to="/app/users"
+                          onClick={() => setActiveMenu("all-user")}
+                          className={getMenuClass("all-user")}
+                        >
+                          <User size={16} />
+                          <span>All User</span>
+                        </NavLink>
+
+                        <NavLink
+                          to="/app/roles"
+                          onClick={() => setActiveMenu("role-access")}
+                          className={getMenuClass("role-access")}
+                        >
+                          <UserCog size={16} />
+                          <span>Role & Access</span>
+                        </NavLink>
+                      </>
+                    )}
+
+                  </div>
+                )}
+              </div>
+            )
+          }
         </div>
+      </nav>
 
-        {/* SAVE BUTTON */}
-        <div className="flex justify-end">
+      {/* SETTINGS + LOGOUT SECTION */}
+      <div
+        className={`border-t ${isLightSidebar ? "border-black/10" : "border-white/10"
+          }`}
+      >
+        {/* Buttons Row */}
+        <div className="flex items-center gap-2 p-3">
+          <div>
+            {/* LOGOUT BUTTON */}
+            <button
+              onClick={handleLogout}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition"
+            >
+              <LogOut size={18} />
+              {open && <span>Logout</span>}
+            </button>
+          </div>
+
+
+          {/* SETTINGS BUTTON */}
           <button
-            type="button"
-            onClick={handleNext}
-            className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2 rounded"
+            onClick={() => setShowSettings(!showSettings)}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm transition ${isLightSidebar
+              ? "hover:bg-black/10 text-black"
+              : "hover:bg-white/10 text-white"
+              }`}
           >
-            Next
+            <Settings size={18} />
           </button>
-        </div>
 
+        </div>
+        {/* SETTINGS PANEL */}
+        {showSettings && open && (
+          <div
+            className={`mx-3 mb-3 p-3 rounded-xl space-y-4 ${isLightSidebar ? "bg-black/5" : "bg-white/5"
+              }`}
+          >
+            {/* DARK MODE */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {darkMode ? <Moon size={16} /> : <Sun size={16} />}
+                <span className="text-sm">
+                  {darkMode ? "Dark Mode" : "Light Mode"}
+                </span>
+              </div>
+
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="px-3 py-1 rounded-md bg-yellow-400 text-black text-xs font-semibold"
+              >
+                Toggle
+              </button>
+            </div>
+
+            {/* SIDEBAR COLOR */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Palette size={16} />
+                <span className="text-sm">Sidebar Color</span>
+              </div>
+
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  "#1a1d2e",
+                  "#1e293b",
+                  "#312e81",
+                  "#7c2d12",
+                  "#14532d",
+                  "#831843",
+                  "#ffffff",
+                ].map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setSidebarColor(color)}
+                    className={`w-7 h-7 rounded-full border-2 ${isLightSidebar ? "border-black/20" : "border-white"
+                      }`}
+                    style={{
+                      backgroundColor: color,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </form>
+    </aside>
   );
-};
-
+}

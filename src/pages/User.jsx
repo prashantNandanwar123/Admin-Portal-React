@@ -189,7 +189,7 @@ export default function User() {
   };
 
   return (
-    <div className="h-full overflow-hidden flex flex-col p-4 md:p-6">
+    <div className="h-full overflow-auto flex flex-col p-4 md:p-6">
       {/* ── Header ── */}
       <div className="flex-shrink-0 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -245,14 +245,14 @@ export default function User() {
         </div>
 
         {/* ── ROW 2: Table — 1fr, scroll jab overflow ── */}
-        <div className="overflow-auto min-h-0">
+        <div className="flex-1 overflow-x-auto overflow-y-auto">
           <table className="min-w-[1400px] w-full text-xs whitespace-nowrap border-separate border-spacing-0">
             <thead>
               <tr>
                 {TABLE_COLS.map((col) => (
                   <th
                     key={col}
-                    className="sticky top-0 z-30 bg-orange-600 text-white px-3 py-3 text-left font-semibold"
+                    className="sticky top-0 z-10 bg-orange-600 text-white px-3 py-3 text-left font-semibold"
                   >
                     {col}
                   </th>

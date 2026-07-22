@@ -43,7 +43,7 @@ export default function Navbar() {
     <>
       {/* Navbar */}
       <header
-        className="flex justify-end items-center mx-[22px] mt-4 rounded-xl px-4 py-2 sticky top-0 z-50"
+        className="flex justify-end items-center lg:mx-[22px] mx-2 mt-4 rounded-xl px-4 py-2 sticky top-0 z-50"
         style={{
           background:
             "linear-gradient(135deg, #75acf4 0%, #f0fdf4 100%)",

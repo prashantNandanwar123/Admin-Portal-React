@@ -3,6 +3,7 @@ import RiskApprovalFrom from "../RiskApproval/RiskApprovalFrom";
 import axiosInstance from "../../api/axios";
 import { LiaEyeSolid } from "react-icons/lia";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 import {
@@ -40,7 +41,6 @@ export default function RiskApproval() {
     setSelectedMerchant(null);
   }, [location]);
 
-
   //  Fetch Merchant List
   const fetchMerchants = async () => {
     try {
@@ -53,7 +53,7 @@ export default function RiskApproval() {
       if (response?.respCode === 0) {
         setData(response?.respData || []);
       }
-    } catch (err) {
+    } catch (error) {
       toast.error(error);
     } finally {
       setLoading(false);
@@ -99,7 +99,7 @@ export default function RiskApproval() {
 
   return (
     <>
-      <div className="min-h-screen p-6">
+      <div className="p-10">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -217,7 +217,7 @@ export default function RiskApproval() {
                     <td className="px-4 py-3 text-center">
                       <button
                         type="button"
-                        onClick={() => handleAddClick("1000011")}
+                        onClick={() => handleAddClick(item[5])}
                         className="inline-flex items-center justify-center"
                       >
                         <LiaEyeSolid className="text-3xl text-green-500" />

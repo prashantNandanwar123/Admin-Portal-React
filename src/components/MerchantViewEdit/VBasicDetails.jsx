@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 
-
 export default function VBasicDetails({
   refId,
   data,
@@ -20,16 +19,12 @@ export default function VBasicDetails({
         const response = await axiosInstance.post(
           `/viewMerchantBasicDetails/${refId}`
         );
-
-        console.log("API RESPONSE------:", response);
-
         if (response.respCode === 0) {
           const res = response.respData;
           setApiData(res || {});
         }
-
       } catch (err) {
-        console.error("API ERROR:", err);
+        toast.error(err);
       }
     };
 
@@ -53,13 +48,11 @@ export default function VBasicDetails({
         <h2 className="text-2xl uppercase text-blue-900 font-extrabold border-b border-gray-300 py-3">
           View Basic Details
         </h2>
-
         <div className="pt-4">
           {/* Store Onboarding Status */}
           <h2 className="text-[20px] text-gray-700 mb-6">
             Store Onboarding Status
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
               <label className="text-gray-700 text-[15px]">
@@ -71,7 +64,6 @@ export default function VBasicDetails({
                 Created Date : {apiData?.createdDate}
               </label>
             </div>
-
             {/* Sourcing Channel */}
             <div className="flex items-center gap-2">
               <label className="w-49 text-gray-700 font-medium">
@@ -95,7 +87,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-3">
                 Store Type
               </label>
-
               <div className="flex items-center gap-5">
                 {["Physical", "Web Store"].map((type) => (
                   <label key={type} className="flex items-center gap-2">
@@ -109,7 +100,6 @@ export default function VBasicDetails({
                 ))}
               </div>
             </div>
-
             {/* Channel */}
             <div>
               <label className="block text-gray-700 font-medium mb-3">
@@ -163,7 +153,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 Partner Logo
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -177,7 +166,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 Store Name (Business Name)
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -191,7 +179,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 Legal Name
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -199,7 +186,6 @@ export default function VBasicDetails({
                 readOnly
               />
             </div>
-
           </div>
 
           {/* ── Basic Document Details ───────────────────────────────────── */}
@@ -213,7 +199,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-3">
                 Documents
               </label>
-
               <div className="flex items-center gap-5">
                 {documentOptions.map((doc) => (
                   <label key={doc.value} className="flex items-center gap-2">
@@ -233,7 +218,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 Aadhar No.
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -267,7 +251,6 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 GSTN No.
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -281,8 +264,7 @@ export default function VBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 Pan No
               </label>
-
-              <input
+             <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
                 value={apiData?.bddPanNo || ""}

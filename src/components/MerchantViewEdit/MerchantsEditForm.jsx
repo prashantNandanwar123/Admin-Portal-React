@@ -31,31 +31,31 @@ export default function MerchantsEditForm({
 
   //  STEP CONFIG
   const steps = [
-    // {
-    //   title: "Basic Details",
-    //   component: EBasicDetails,
-    //   icon: User,
-    // },
-    // {
-    //   title: "Acquiring Bank",
-    //   component: EAcquiringBank,
-    //   icon: Landmark,
-    // },
-    // {
-    //   title: "Payment Type",
-    //   component: EPaymentType,
-    //   icon: CreditCard,
-    // },
-    // {
-    //   title: "MSF Fee",
-    //   component: EMSFFee,
-    //   icon: IndianRupee,
-    // },
-    // {
-    //   title: "Checklist",
-    //   component: EChecklist,
-    //   icon: ClipboardCheck,
-    // },
+    {
+      title: "Basic Details",
+      component: EBasicDetails,
+      icon: User,
+    },
+    {
+      title: "Acquiring Bank",
+      component: EAcquiringBank,
+      icon: Landmark,
+    },
+    {
+      title: "Payment Type",
+      component: EPaymentType,
+      icon: CreditCard,
+    },
+    {
+      title: "MSF Fee",
+      component: EMSFFee,
+      icon: IndianRupee,
+    },
+    {
+      title: "Checklist",
+      component: EChecklist,
+      icon: ClipboardCheck,
+    },
     {
       title: "Upload Documents",
       component: EUploadDocuments,
@@ -83,11 +83,6 @@ export default function MerchantsEditForm({
       setCurrentStep((prev) => prev - 1);
     }
   };
-
-  <MerchantsEditForm
-    merchantData={merchantData}
-    onBack={() => setShowForm(false)}
-  />
 
   return (
     <div className="max-h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar p-5">

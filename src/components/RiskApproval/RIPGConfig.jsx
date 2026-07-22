@@ -21,6 +21,7 @@ export default function RIPGConfig({
     user_id: "",
     mid_created: "",
   });
+
   const navigate = useNavigate();
   useEffect(() => {
     if (!refId) return;
@@ -29,13 +30,12 @@ export default function RIPGConfig({
         const response = await axiosInstance.post(
           `rMerchantIpg/${refId}`
         );
-        console.log("API RESPONSE:", response);
         if (response?.respCode === 0) {
           const res = response?.respData;
           setApiData(res || {});
         }
       } catch (err) {
-        console.error("API ERROR:", err);
+        toast.error(err);
       }
     };
 
@@ -55,59 +55,54 @@ export default function RIPGConfig({
       [field]: value,
     }));
   };
-
-
   const submitRiskAprRject = async (status) => {
     try {
-
       const payload = {
         ref_id: refId,
         UserName: "",
         rremark: form.rremark,
         rstatus: status,
       };
-
       const response = await axiosInstance.post(
         "submitRiskAprRject",
         payload
       );
-      // APPROVE SUCCESS
+
       if (response?.respCode === 0) {
         // Success toast
-        toast.success(response?.respMsg);
-        const resData = response?.respData || {};
-        // Modal data
-        setModalData({
-          respMsg: response?.respMsg || "",
-          user_id: resData?.user_id || "",
-          mid_created: resData?.mid_created || "",
-        });
-
         if (status === "Approved") {
+          toast.success(response?.respMsg);
+          const resData = response?.respData || {};
+          // Modal data
+          setModalData({
+            respMsg: response?.respMsg || "",
+            user_id: resData?.user_id || "",
+            mid_created: resData?.mid_created || "",
+          });
           setShowModal(true);
         } else if (status == "Rejected") {
           toast.error(response?.respMsg);
           setTimeout(() => {
-            window.location.href = "/app/risk-approval";
-          }, 100);
+            window.location.reload("/app/risk-approval");
+          }, 1000);
         }
       } else {
         toast.error(response?.respMsg);
         setTimeout(() => {
-          window.location.href = "/app/risk-approval";
-        }, 100);
+          window.location.reload("/app/risk-approval");
+        }, 300);
       }
 
     } catch (err) {
-      toast.error(error);
+      toast.error(err);
     }
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setTimeout(() => {
-      window.location.href = "/app/risk-approval";
-    }, 100);
+      window.location.reload("/app/risk-approval");
+    }, 300);
   };
 
   return (

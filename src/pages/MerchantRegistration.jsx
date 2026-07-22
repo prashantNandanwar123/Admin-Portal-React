@@ -117,7 +117,7 @@ export default function MerchantRegistration() {
     );
   }
   return (
-    <div className="h-screen p-6 overflow-hidden">
+    <div className="p-6 overflow-hidden">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
         <div>

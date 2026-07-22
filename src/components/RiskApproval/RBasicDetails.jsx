@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
-
+import { toast } from "react-toastify";
 
 export default function BasicDetails({ refId, data, setData, errors, handleNext }) {
   const [apiData, setApiData] = useState({});
@@ -13,25 +13,21 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
     const fetchData = async () => {
       try {
-
         const response = await axiosInstance.post(
           `/rMerchantBasicDetails/${refId}`
-
         );
-        console.log("API RESPONSE:", response);
-
         if (response?.respCode === 0) {
           const res = response?.respData;
           setApiData(res || {});
         }
-
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
+        toast.error(error);
       }
     };
-
     fetchData();
   }, [refId]);
+
+
 
   const documentOptions = [
     { label: "Aadhar No", name: "bddDocument", value: "AadharNo" },
@@ -49,13 +45,11 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
         <h1 className="text-2xl uppercase pb-3 text-blue-900 font-extrabold">
           Review Basic Details Form
         </h1>
-
         <div className="border-t border-gray-300 pt-4">
           {/* Store Onboarding Status */}
           <h2 className="text-[20px] text-gray-700 mb-6">
             Store Onboarding Status
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
               <label className="text-gray-700 text-[15px]">
@@ -67,20 +61,29 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
                 Created Date : {apiData?.createdDate}
               </label>
             </div>
+            <div className="flex items-center gap-2">
+              <label className="w-49 text-gray-700 font-medium">
+                Sourcing Channel<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                value={apiData?.basicSrcChannel || ""}
+                readOnly
+              />
+            </div>
           </div>
+
           {/* Store Information */}
           <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
             Store Information
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
             {/* Store Type */}
             <div>
               <label className="block text-gray-700 font-medium mb-3">
                 Store Type
               </label>
-
               <div className="flex items-center gap-5">
                 {["Physical", "Web Store"].map((type) => (
                   <label key={type} className="flex items-center gap-2">
@@ -100,7 +103,6 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               <label className="block text-gray-700 font-medium mb-3">
                 Channel
               </label>
-
               <div className="flex items-center gap-5">
                 {["IPG", "POS"].map((ch) => (
                   <label key={ch} className="flex items-center gap-2">
@@ -117,24 +119,18 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
             {/* Turnover Category */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Turnover Category
+              <label className="text-gray-700 font-medium">
+                Sourcing Channel
               </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.storeTurnoverCategory || ""}
-                readOnly
-              />
+              <p className="mt-2 text-gray-800">
+                {apiData?.basicSrcChannel || "-"}
+              </p>
             </div>
-
             {/* Partner Logo Check */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 Partner Logo Check
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -148,7 +144,6 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               <label className="block text-gray-700 font-medium mb-2">
                 Partner Logo
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -162,7 +157,6 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               <label className="block text-gray-700 font-medium mb-2">
                 Store Name (Business Name)
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -176,7 +170,6 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               <label className="block text-gray-700 font-medium mb-2">
                 Legal Name
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -184,7 +177,6 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
                 readOnly
               />
             </div>
-
           </div>
 
           {/* ── Basic Document Details ───────────────────────────────────── */}
@@ -833,7 +825,7 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
             </button>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 }

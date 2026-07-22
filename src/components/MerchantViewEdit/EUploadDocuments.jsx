@@ -64,19 +64,7 @@ export default function EUploadDocument({
     setDocuments(updated);
   };
 
-  // ================= REMOVE FILE =================
-  const removeFile = (index) => {
-    const updated = [...documents];
-    updated[index] = {
-      ...updated[index],
-      file: null,
-      fileName: "",
-    };
-    setDocuments(updated);
-    if (fileRefs.current[index]) {
-      fileRefs.current[index].value = "";
-    }
-  };
+
   // ================= SAVE API ================
   const uploadMeDocuments = async () => {
     try {
@@ -440,8 +428,7 @@ export default function EUploadDocument({
           },
         ];
         setDocuments(updatedDocs);
-        console.log("valid license Name-->>>", res?.validLicense1FileName);
-        console.log("valid license Name-->>>", res?.panCardpathFileName);
+        console.log("final response-->>>", updatedDocs)
       }
     } catch (err) {
       toast.error(err);
@@ -505,22 +492,21 @@ export default function EUploadDocument({
       formData.append("refId", refId);
       formData.append("fileName", fileName);
 
-      const response = await axiosInstance.post(
+      const blob = await axiosInstance.post(
         "/meDownloadDocs",
         formData,
         {
           responseType: "blob",
         }
       );
-      console.log("Blob size:", blob.size);
-      console.log("Blob type:", blob.type);
-      const blobUrl = URL.createObjectURL(response);
+
+      const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, "_blank");
 
       // Optional: free memory after some time
       setTimeout(() => {
         window.URL.revokeObjectURL(blobUrl);
-      }, 5000);
+      }, 300000);
 
     } catch (error) {
       toast.error(error);
@@ -562,10 +548,7 @@ export default function EUploadDocument({
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
                 Action
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                Remove
-              </th>
+              </th>              
             </tr>
           </thead>
           <tbody>
@@ -620,6 +603,7 @@ export default function EUploadDocument({
                     className="w-full bg-gray-100 rounded px-3 py-2 focus:outline-none"
                   />
                 </td>
+
                 <td className="px-4 py-4">
                   <input
                     type="date"
@@ -631,6 +615,8 @@ export default function EUploadDocument({
                     className="w-full bg-gray-100 rounded px-3 py-2 focus:outline-none"
                   />
                 </td>
+
+
                 <td className="px-4 py-4">
                   <input
                     ref={(el) => (fileRefs.current[index] = el)}
@@ -640,25 +626,32 @@ export default function EUploadDocument({
                     disabled={doc.status !== "Yes"}
                     onChange={(e) => {
                       const selectedFile = e.target.files[0];
-                      console.log("Selected File:", selectedFile);
-                      console.log("File Size KB:", selectedFile.size / 1024);
                       handleChange(index, "file", selectedFile);
+
+                      // Optional: backend filename clear kar do
                       handleChange(index, "fileName", "");
                     }}
                     className={`
-                      block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
-                      file:mr-3 file:px-3 file:py-1 file:border-0 file:border-r file:border-gray-300
-                      file:bg-gray-100 file:text-black file:text-sm hover:file:bg-gray-200
-                      ${doc.status !== "Yes" ? "opacity-50 cursor-not-allowed" : ""}
-                    `}
+      block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
+      file:mr-3 file:px-3 file:py-1 file:border-0 file:border-r file:border-gray-300
+      file:bg-gray-100 file:text-black file:text-sm hover:file:bg-gray-200
+      ${doc.status !== "Yes" ? "opacity-50 cursor-not-allowed" : ""}
+    `}
                   />
+
+                  {/* Filename */}
+                  <p className="mt-2 text-xs text-gray-600 break-all">
+                    {documents[index].file
+                      ? documents[index].file.name
+                      : documents[index].fileName || "No file selected"}
+                  </p>
                 </td>
+
+
                 <td className="px-4 py-4 text-center">
                   {documents[index].file ? (
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-xs text-green-600 break-all">
-                        {documents[index].file.name}
-                      </span>
+                     
                     </div>
                   ) : documents[index].fileName ? (
                     <div className="flex flex-col items-center gap-1">
@@ -675,16 +668,7 @@ export default function EUploadDocument({
                       No File
                     </span>
                   )}
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="text-red-500 hover:text-red-700 flex justify-center w-full"
-                  >
-                    <X size={18} />
-                  </button>
-                </td>
+                </td>               
               </tr>
             ))}
           </tbody>
