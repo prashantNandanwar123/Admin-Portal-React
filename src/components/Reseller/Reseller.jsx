@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
-import { FaPlus, FaEdit, FaSave, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaSave, FaTimes, FaEye, FaEyeSlash, FaInfoCircle, FaSearch } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -11,11 +10,10 @@ export default function Reseller() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [modalMode, setModalMode] = useState(null);
-    const [saving, setSaving] = useState(false);
 
     const [entriesPerPage, setEntriesPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [showViewForm, setShowViewForm] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState("APPROVED");
 
     const navigate = useNavigate();
     // Search
@@ -25,6 +23,7 @@ export default function Reseller() {
         const valuesToCheck = [
             item.id,
             item.userId,
+            item.requestId,
             item.companyCode,
             item.companyName,
             item.firstName,
@@ -40,33 +39,20 @@ export default function Reseller() {
         console.log(valuesToCheck);
     });
 
-    const handleViewClick = (refId) => {
-        setSelectedMerchant(refId);
-        setShowViewForm(true);
-    };
-    //  Open Form
-    if (showViewForm) {
-        return (
-            <ResellerBasicDetails
-                onBack={() => setShowViewForm(false)}  //  sahi state
-            />
-        );
-    }
-
     // ─── Table columns ───────────────────────────────────────────────────────────
     const TABLE_COLS = [
         "ID",
-        "USERID",
-        "COMPANY CODE",
+        "REQUESTED ID",
+        "RESELLER ID",
         "COMPANY NAME",
         "FIRST NAME",
         "LAST NAME",
-        "EMAIL ID",
         "MOBILE NO",
-        "CREATE BY",
+        "CREATED AT",
         "STATUS",
         "ACTION",
     ];
+
     // Pagination Logic 
     const totalPages = Math.ceil(filteredData.length / entriesPerPage);
     const indexOfLast = currentPage * entriesPerPage;
@@ -74,7 +60,6 @@ export default function Reseller() {
 
     const currentData = filteredData.slice(indexOfFirst, indexOfLast);
 
-    const [showModal, setShowModal] = useState(false);
     const [form, setForm] = useState({
         ID: "",
         UserId: "",
@@ -97,8 +82,9 @@ export default function Reseller() {
     };
 
     useEffect(() => {
-        fetchResellers();
-    }, []);
+        fetchResellers(selectedStatus, 0);
+    }, [selectedStatus, entriesPerPage]);
+
 
     const getPageNumbers = () => {
         const pages = [];
@@ -131,47 +117,30 @@ export default function Reseller() {
     };
 
     // ─── Fetch List ─────────────────────────────────────────────────────────────
-    const fetchResellers = async () => {
+    const fetchResellers = async (status = selectedStatus, page = 0) => {
         try {
             setLoading(true);
             const response = await axiosInstance.post(
-                "/reSeller?page=0&size=10"
+                `/reseller/status/${status}?page=${page}&size=${entriesPerPage}`
             );
-            console.log("RESPONSE -->", response)
-            if (response?.respCode === 0) {
+
+            console.log("RESELLER RESPONSE -->", response);
+
+            if (response.respCode === 0) {
                 setData(response.data || []);
             } else {
                 setData([]);
+                toast.error(response.respMsg);
             }
         } catch (error) {
-            console.error(error);
-            toast.error(error);
+            console.error("Reseller API Error:", error);
             setData([]);
+            toast.error(error);
         } finally {
             setLoading(false);
         }
     };
 
-
-    // ───Status Api ─────────────────────────────────────────────────────────────
-    const handleStatusChange = async (item) => {
-        try {
-            const payload = {
-                userId: item.userId,
-                status: item.status === "A" ? "D" : "A",
-            };
-            const response = await axiosInstance.post("/updateReStatus", payload);
-            if (response?.respCode === 0) {
-                toast.success(response?.respMsg);
-                fetchResellers();
-            } else {
-                toast.error(response?.respMsg);
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error(error);
-        }
-    };
 
     return (
         <div className="h-full overflow-hidden flex flex-col p-4 md:p-6">
@@ -199,8 +168,59 @@ export default function Reseller() {
                 className="min-h-0 overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white"
                 style={{ display: "flex", flexDirection: "column", height: "fit-content", maxHeight: "100%" }}
             >
-                {/* ── ROW 1: Search bar — auto height ── */}
+                {/* ── ROW 1: Search bar ── */}
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 px-5 py-4 border-b border-slate-200 bg-white">
+                    {/* APPROVED */}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSelectedStatus("APPROVED");
+                            setCurrentPage(1);
+                            setSearchTerm("");
+                        }}
+                        className={`px-5 py-2.5 rounded-lg font-semibold text-sm border transition
+                             ${selectedStatus === "APPROVED"
+                                ? "bg-green-600 text-white border-green-600 shadow-sm"
+                                : "bg-white text-green-700 border-green-300 hover:bg-green-50"
+                            }`}
+                    >
+                        APPROVED
+                    </button>
+
+                    {/* PENDING */}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSelectedStatus("PENDING");
+                            setCurrentPage(1);
+                            setSearchTerm("");
+                        }}
+                        className={`px-5 py-2.5 rounded-lg font-semibold text-sm border transition
+                        ${selectedStatus === "PENDING"
+                                ? "bg-yellow-500 text-white border-yellow-500 shadow-sm"
+                                : "bg-white text-yellow-700 border-yellow-300 hover:bg-yellow-50"
+                            }`}
+                    >
+                        PENDING
+                    </button>
+
+                    {/* REJECTED */}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSelectedStatus("REJECTED");
+                            setCurrentPage(1);
+                            setSearchTerm("");
+                        }}
+                        className={`px-5 py-2.5 rounded-lg font-semibold text-sm border transition
+                          ${selectedStatus === "REJECTED"
+                                ? "bg-red-600 text-white border-red-600 shadow-sm"
+                                : "bg-white text-red-700 border-red-300 hover:bg-red-50"
+                            }`}
+                    >
+                        REJECTED
+                    </button>
+
                     <div className="flex items-center gap-3 text-sm">
                         <span className="text-slate-600 font-medium">Show</span>
                         <select
@@ -248,60 +268,171 @@ export default function Reseller() {
                         </thead>
 
                         <tbody className="divide-y divide-slate-200">
-                            {currentData.map((item, index) => (
-                                <tr
-                                    key={index}
-                                    className="hover:bg-slate-50 transition"
-                                >
-                                    <td className="px-3 py-3">{index + 1}</td>
-                                    <td className="px-3 py-3">{item.userId}</td>
-                                    <td className="px-3 py-3">{item.companyCode}</td>
-                                    <td className="px-3 py-3">{item.companyName}</td>
-                                    <td className="px-3 py-3">{item.firstName}</td>
-                                    <td className="px-3 py-3">{item.lastName}</td>
-                                    <td className="px-3 py-3">{item.emailId}</td>
-                                    <td className="px-3 py-3">{item.mobileNo}</td>
-
-                                    <td className="px-3 py-3">{item.createdBy}</td>
-                                    <td className="px-3 py-3">
-                                        <button
-                                            onClick={() => handleStatusChange(item)}
-                                            className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide border transition ${item.status === "A"
-                                                ? "bg-green-100 text-green-700 border-green-300 hover:bg-green-200"
-                                                : "bg-red-100 text-red-700 border-red-300 hover:bg-red-200"
-                                                }`}
-                                        >
-                                            {item.status === "A" ? "A" : "D"}
-                                        </button>
-                                    </td>
-
-                                    {/* Action */}
-                                    < td className="px-3 py-3 text-center" >
-                                        <div className="flex justify-center gap-2">
-                                            <button
-                                                onClick={() => navigate("/app/reseller-view-details", {
-                                                    state: {
-                                                        userId: item.userId,
-                                                    },
-                                                })
-                                                }
-                                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
-                                            >
-                                                VIEW
-                                            </button>
-                                            <button
-                                                onClick={() => navigate("/app/reseller-edit-details", {
-                                                    state: {
-                                                        userId: item.userId,
-                                                    },
-                                                })}
-                                                className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs">
-                                                EDIT
-                                            </button>
-                                        </div>
+                            {loading ? (
+                                <tr>
+                                    <td
+                                        colSpan={TABLE_COLS.length}
+                                        className="text-center py-10 text-slate-500"
+                                    >
+                                        Loading...
                                     </td>
                                 </tr>
-                            ))}
+                            ) : currentData.length === 0 ? (
+                                <tr>
+                                    <td
+                                        colSpan={TABLE_COLS.length}
+                                        className="text-center py-10 text-slate-500"
+                                    >
+                                        No {selectedStatus.toLowerCase()} reseller found.
+                                    </td>
+                                </tr>
+                            ) : (
+                                currentData.map((item, index) => (
+                                    <tr
+                                        key={item.id || index}
+                                        className="hover:bg-slate-50 transition"
+                                    >
+
+                                        {/* ID */}
+                                        <td className="px-3 py-3">
+                                            {index + 1}
+                                        </td>
+
+                                        {/* REQUESTED ID */}
+                                        <td className="px-3 py-3">
+                                            {item.requestId || "-"}
+                                        </td>
+
+                                        {/* RESELLER ID */}
+                                        <td className="px-3 py-3">
+                                            {item.resellerId || "-"}
+                                        </td>
+
+                                        {/* COMPANY NAME */}
+                                        <td className="px-3 py-3">
+                                            {item.companyName || "-"}
+                                        </td>
+
+                                        {/* FIRST NAME */}
+                                        <td className="px-3 py-3">
+                                            {item.firstName || "-"}
+                                        </td>
+
+                                        {/* LAST NAME */}
+                                        <td className="px-3 py-3">
+                                            {item.lastName || "-"}
+                                        </td>
+
+                                        {/* MOBILE NO */}
+                                        <td className="px-3 py-3">
+                                            {item.mobile || "-"}
+                                        </td>
+
+                                        {/* CREATED AT */}
+                                        <td className="px-3 py-3">
+                                            {item.createdAt || "-"}
+                                        </td>
+
+                                        {/* STATUS */}
+                                        <td className="px-3 py-3">
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs font-bold border
+                                                ${item.status === "APPROVED"
+                                                        ? "bg-green-100 text-green-700 border-green-300"
+                                                        : item.status === "PENDING"
+                                                            ? "bg-yellow-100 text-yellow-700 border-yellow-300"
+                                                            : "bg-red-100 text-red-700 border-red-300"
+                                                    }`}
+                                            >
+                                                {item.status || selectedStatus}
+                                            </span>
+                                        </td>
+
+                                        {/* ACTION */}
+                                        <td className="px-3 py-3 text-center">
+                                            <div className="flex justify-center items-center gap-2">
+
+                                                {/* PENDING → ONLY INFO ICON */}
+                                                {selectedStatus === "PENDING" && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            navigate("/app/reseller-edit-details", {
+                                                                state: {
+                                                                    id: item.id,
+                                                                    requestId: item.requestId,
+                                                                    resellerId: item.resellerId,
+                                                                },
+                                                            })
+                                                        }
+                                                        title="View Details"
+                                                        className="w-8 h-8 flex items-center justify-center rounded-full  text-green-900 transition"
+                                                    >
+                                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 32 32" class="text-3xl text-green-500" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M 16 8 C 7.664063 8 1.25 15.34375 1.25 15.34375 L 0.65625 16 L 1.25 16.65625 C 1.25 16.65625 7.097656 23.324219 14.875 23.9375 C 15.246094 23.984375 15.617188 24 16 24 C 16.382813 24 16.753906 23.984375 17.125 23.9375 C 24.902344 23.324219 30.75 16.65625 30.75 16.65625 L 31.34375 16 L 30.75 15.34375 C 30.75 15.34375 24.335938 8 16 8 Z M 16 10 C 18.203125 10 20.234375 10.601563 22 11.40625 C 22.636719 12.460938 23 13.675781 23 15 C 23 18.613281 20.289063 21.582031 16.78125 21.96875 C 16.761719 21.972656 16.738281 21.964844 16.71875 21.96875 C 16.480469 21.980469 16.242188 22 16 22 C 15.734375 22 15.476563 21.984375 15.21875 21.96875 C 11.710938 21.582031 9 18.613281 9 15 C 9 13.695313 9.351563 12.480469 9.96875 11.4375 L 9.9375 11.4375 C 11.71875 10.617188 13.773438 10 16 10 Z M 16 12 C 14.34375 12 13 13.34375 13 15 C 13 16.65625 14.34375 18 16 18 C 17.65625 18 19 16.65625 19 15 C 19 13.34375 17.65625 12 16 12 Z M 7.25 12.9375 C 7.09375 13.609375 7 14.285156 7 15 C 7 16.753906 7.5 18.394531 8.375 19.78125 C 5.855469 18.324219 4.105469 16.585938 3.53125 16 C 4.011719 15.507813 5.351563 14.203125 7.25 12.9375 Z M 24.75 12.9375 C 26.648438 14.203125 27.988281 15.507813 28.46875 16 C 27.894531 16.585938 26.144531 18.324219 23.625 19.78125 C 24.5 18.394531 25 16.753906 25 15 C 25 14.285156 24.90625 13.601563 24.75 12.9375 Z"></path></svg>
+                                                    </button>
+                                                )}
+
+                                                {/* REJECTED → ONLY VIEW */}
+                                                {selectedStatus === "REJECTED" && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            navigate("/app/reseller-view-details", {
+                                                                state: {
+                                                                    id: item.id,
+                                                                    requestId: item.requestId,
+                                                                    resellerId: item.resellerId,
+                                                                },
+                                                            })
+                                                        }
+                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-medium"
+                                                    >
+                                                        VIEW
+                                                    </button>
+                                                )}
+
+                                                {/* APPROVED → VIEW + EDIT */}
+                                                {selectedStatus === "APPROVED" && (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                navigate("/app/reseller-view-details", {
+                                                                    state: {
+                                                                        id: item.id,
+                                                                        requestId: item.requestId,
+                                                                        resellerId: item.resellerId,
+                                                                    },
+                                                                })
+                                                            }
+                                                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-medium"
+                                                        >
+                                                            VIEW
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                navigate("/app/reseller-edit-details", {
+                                                                    state: {
+                                                                        id: item.id,
+                                                                        requestId: item.requestId,
+                                                                        resellerId: item.resellerId,
+                                                                    },
+                                                                })
+                                                            }
+                                                            className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded text-xs font-medium"
+                                                        >
+                                                            EDIT
+                                                        </button>
+                                                    </>
+                                                )}
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

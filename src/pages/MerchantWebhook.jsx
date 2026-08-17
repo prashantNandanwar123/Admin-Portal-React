@@ -79,7 +79,6 @@ export default function MerchantCredential() {
         toast.error(response.respMsg);
       }
     } catch (error) {
-      console.error("FETCH ERROR :", error);
       toast.error(error);
       setData([]);
     } finally {

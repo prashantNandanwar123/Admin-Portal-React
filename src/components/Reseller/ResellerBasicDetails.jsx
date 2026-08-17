@@ -134,7 +134,6 @@ export default function ResellerBasicDetails() {
                         toast.error(msg);
                     });
                 }
-
             }
         } catch (error) {
             console.log(error);
@@ -155,6 +154,7 @@ export default function ResellerBasicDetails() {
                     <p className="pb-3 text-lg text-blue-900">Streamlined reseller onboarding with secure registration, verification, and role-based access setup for faster activation.
                     </p>
                 </div>
+                
                 {/* ── Basic Document Details ───────────────────────────────────── */}
                 <h2 className="text-[20px] text-gray-700 mt-5 my-3">
                     Basic Reseller Details
@@ -428,9 +428,9 @@ export default function ResellerBasicDetails() {
                                 handleChange("partnerLogoFile", file);
                             }}
                             className="block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
-                       file:mr-3 file:px-3 file:py-2 file:border-0 file:border-r
-                       file:border-gray-300 file:bg-gray-100 file:text-black
-                       hover:file:bg-gray-200"
+                            file:mr-3 file:px-3 file:py-2 file:border-0 file:border-r
+                            file:border-gray-300 file:bg-gray-100 file:text-black
+                            hover:file:bg-gray-200"
                         />
                     </div>
                     <div>
@@ -582,7 +582,7 @@ export default function ResellerBasicDetails() {
                     <p className="border-t border-gray-300 py-3"></p>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
-                        {/* ✅ Fixed: value+onChange now on the <input>, not <label> */}
+                        {/*  Fixed: value+onChange now on the <input>, not <label> */}
                         <div>
                             <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
                                 Settlement Type <span className="text-red-500">*</span>

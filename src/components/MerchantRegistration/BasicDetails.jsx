@@ -232,7 +232,6 @@ export default function BasicDetails({
             toast.error(msg);
           });
         }
-
       }
     } catch (error) {
       toast.error(error);
@@ -251,17 +250,18 @@ export default function BasicDetails({
       </h2>
       <p className="pb-3 text-lg text-blue-900">Basic Details Form collects essential information such as personal and contact details to create a user profile.
       </p>
-      <div className="border-t border-gray-300 pt-4">
+      <div className="border-t border-gray-300 pt-4 bg-light">
         {/* Store Onboarding Status */}
-        <h2 className="text-[20px] text-gray-700 mb-6">
+        <h2 className="text-[20px] xl:text-lg text-gray-700 mb-6">
           Store Onboarding Status
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 mb-8">
           <div>
             <label className="text-gray-900 text-[15px] rounded-full border bg-yellow-300 px-4 py-2 font-medium">
               Created By : {userData?.userName}
             </label>
           </div>
+
           <div>
             <label className="text-gray-700 text-[15px] pe-3">
               Created Date : {new Date().toLocaleDateString()}
@@ -296,201 +296,297 @@ export default function BasicDetails({
         </div>
 
         {/* Store Information */}
-        <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
-          Store Information
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Store Type */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-3">
-              Store Type
-            </label>
-            <div className="flex items-center gap-5">
-              {["Physical", "Web Store"].map((type) => (
-                <label key={type} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="storeType"
-                    value={type}
-                    checked={data?.storeType === type}
-                    onChange={(e) =>
-                      handleChange("storeType", e.target.value)
-                    }
-                  />
-                  {type}
-                </label>
-              ))}
-            </div>
-            {errors?.storeType && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.storeType}
-              </p>
-            )}
+        <div className="bg-[#F9F9F9] border border-gray-200 rounded-2xl p-6 md:p-7 shadow-[0_2px_10px_rgba(0,0,0,0.04)]">
+          {/* Section Header */}
+          <div className="mb-7">
+            <h2 className="text-[21px] font-semibold text-gray-700">
+              Store Information
+            </h2>
+            <div className="w-12 h-[3px] bg-yellow-500 rounded-full mt-2"></div>
           </div>
-          {/* Channel */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-3">
-              Channel
-            </label>
-            <div className="flex items-center gap-5">
-              {["IPG", "POS"].map((ch) => (
-                <label key={ch} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="channel"
-                    value={ch}
-                    checked={data?.channel === ch}
-                    onChange={(e) =>
-                      handleChange("channel", e.target.value)
-                    }
-                  />
-                  {ch}
-                </label>
-              ))}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-7 gap-y-6">
+
+            {/* Store Type */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Store Type
+              </label>
+
+              <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-6 shadow-sm">
+                {["Physical", "Web Store"].map((type) => (
+                  <label
+                    key={type}
+                    className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="storeType"
+                      value={type}
+                      checked={data?.storeType === type}
+                      onChange={(e) =>
+                        handleChange("storeType", e.target.value)
+                      }
+                      className="w-4 h-4 accent-yellow-500 cursor-pointer"
+                    />
+                    {type}
+                  </label>
+                ))}
+              </div>
+
+              {errors?.storeType && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.storeType}
+                </p>
+              )}
             </div>
 
-            {errors?.channel && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.channel}
-              </p>
-            )}
-          </div>
-          {/* Turnover Category */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Turnover Category
-            </label>
-            <select
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
-              value={data?.turnoverCategory || ""}
-              onChange={(e) =>
-                handleChange("turnoverCategory", e.target.value)
-              }
-            >
-              <option value="">-- Select --</option>
-              <option value="Small Merchant(<=20Lacs)">
-                Small Merchant(&lt;=20Lacs)
-              </option>
-              <option value="Other Merchant(>20Lacs)">
-                Other Merchant(&gt;20Lacs)
-              </option>
-            </select>
-          </div>
+            {/* Channel */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Channel
+              </label>
 
-          {/* Partner Logo Check */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Partner Logo Check
-              <span className="text-red-500">*</span>
-            </label>
+              <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-6 shadow-sm">
+                {["IPG", "POS"].map((ch) => (
+                  <label
+                    key={ch}
+                    className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="channel"
+                      value={ch}
+                      checked={data?.channel === ch}
+                      onChange={(e) =>
+                        handleChange("channel", e.target.value)
+                      }
+                      className="w-4 h-4 accent-yellow-500 cursor-pointer"
+                    />
+                    {ch}
+                  </label>
+                ))}
+              </div>
 
-            <select
-              className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
-              value={data?.partnerLogoCheck || ""}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleChange("partnerLogoCheck", value);
-                if (fileRef.current) {
-                  fileRef.current.value = "";
+              {errors?.channel && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.channel}
+                </p>
+              )}
+            </div>
+
+            {/* Turnover Category */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Turnover Category
+              </label>
+
+              <select
+                className="
+          w-full
+          h-[44px]
+          bg-white
+          border border-gray-200
+          rounded-lg
+          px-3
+          text-sm
+          text-gray-700
+          shadow-sm
+          outline-none
+          transition
+          focus:border-yellow-400
+          focus:ring-2
+          focus:ring-yellow-100
+          cursor-pointer
+        "
+                value={data?.turnoverCategory || ""}
+                onChange={(e) =>
+                  handleChange("turnoverCategory", e.target.value)
                 }
-              }}
-            >
-              <option value="">-- Select --</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </div>
+              >
+                <option value="">-- Select --</option>
+                <option value="Small Merchant(<=20Lacs)">
+                  Small Merchant(&lt;=20Lacs)
+                </option>
+                <option value="Other Merchant(>20Lacs)">
+                  Other Merchant(&gt;20Lacs)
+                </option>
+              </select>
+            </div>
 
-          {/* Partner Logo */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Partner Logo{" "}
-              <span className="text-sm text-gray-500 font-normal">
-                (jpg or png)
-              </span>
-            </label>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              disabled={data?.partnerLogoCheck !== "Yes"}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                setPartnerLogo(file);
-                handleChange("partnerLogoFile", file);
-              }}
+            {/* Partner Logo Check */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Partner Logo Check
+                <span className="text-red-500 ml-1">*</span>
+              </label>
 
-                  className="
-                  block
-                  w-full
-                  text-sm
-                  text-gray-700
-                  border
-                  border-gray-300
-                  rounded
-                  bg-white
-                  file:mr-3
-                  file:px-3
-                  file:py-2
-                  file:border-0
-                  file:border-r
-                  file:border-gray-300
-                  file:bg-gray-100
-                  file:text-black
-                  file:text-sm
-                  hover:file:bg-gray-200
-                  "
-            />
-          </div>
+              <select
+                className="
+          w-full
+          h-[44px]
+          bg-white
+          border border-gray-200
+          rounded-lg
+          px-3
+          text-sm
+          text-gray-700
+          shadow-sm
+          outline-none
+          transition
+          focus:border-yellow-400
+          focus:ring-2
+          focus:ring-yellow-100
+          cursor-pointer
+        "
+                value={data?.partnerLogoCheck || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
 
-          {/* Store Name */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Store Name (Business Name)
-              <span className="text-red-500">*</span>
-            </label>
+                  handleChange("partnerLogoCheck", value);
 
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              value={data?.storeDbaName || ""}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^A-Za-z\s]/g, "");
-                handleChange("storeDbaName", value);
-              }}
-            />
+                  if (fileRef.current) {
+                    fileRef.current.value = "";
+                  }
+                }}
+              >
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
 
-            {errors?.storeDbaName && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.storeDbaName}
-              </p>
-            )}
-          </div>
+            {/* Partner Logo */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Partner Logo
+                <span className="text-xs text-gray-500 font-normal ml-1">
+                  (jpg or png)
+                </span>
+              </label>
 
-          {/* Legal Name */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Legal Name
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              value={data?.storeLegalName || ""}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^A-Za-z\s]/g, "");
-                handleChange("storeLegalName", value);
-              }}
-            />
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                disabled={data?.partnerLogoCheck !== "Yes"}
+                onChange={(e) => {
+                  const file = e.target.files[0];
 
-            {errors?.storeLegalName && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.storeLegalName}
-              </p>
-            )}
+                  setPartnerLogo(file);
+                  handleChange("partnerLogoFile", file);
+                }}
+                className="
+          block
+          w-full
+          h-[44px]
+          text-sm
+          text-gray-600
+          bg-white
+          border border-gray-200
+          rounded-lg
+          shadow-sm
+          cursor-pointer
+          file:h-full
+          file:mr-3
+          file:px-4
+          file:border-0
+          file:border-r
+          file:border-gray-200
+          file:bg-gray-50
+          file:text-gray-700
+          file:text-sm
+          file:font-medium
+          hover:file:bg-gray-100
+          disabled:bg-gray-100
+          disabled:cursor-not-allowed
+        "
+              />
+            </div>
+
+            {/* Store Name */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Store Name (Business Name)
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                className="
+                w-full
+                h-[44px]
+                bg-white
+                border border-gray-200
+                rounded-lg
+                px-3
+                text-sm
+                text-gray-700
+                shadow-sm
+                outline-none
+                transition
+                placeholder:text-gray-400
+                focus:border-yellow-400
+                focus:ring-2
+                focus:ring-yellow-100
+              "
+                value={data?.storeDbaName || ""}
+                placeholder="Enter store name"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^A-Za-z\s]/g, "");
+                  handleChange("storeDbaName", value);
+                }}
+              />
+
+              {errors?.storeDbaName && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.storeDbaName}
+                </p>
+              )}
+            </div>
+
+            {/* Legal Name */}
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-700 mb-3">
+                Legal Name
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                className="
+                w-full
+                h-[44px]
+                bg-white
+                border border-gray-200
+                rounded-lg
+                px-3
+                text-sm
+                text-gray-700
+                shadow-sm
+                outline-none
+                transition
+                placeholder:text-gray-400
+                focus:border-yellow-400
+                focus:ring-2
+                focus:ring-yellow-100
+              "
+                value={data?.storeLegalName || ""}
+                placeholder="Enter legal name"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^A-Za-z\s]/g, "");
+                  handleChange("storeLegalName", value);
+                }}
+              />
+
+              {errors?.storeLegalName && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.storeLegalName}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-
         {/* ── Basic Document Details ───────────────────────────────────── */}
         <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
           Basic Document Details

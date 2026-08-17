@@ -175,7 +175,6 @@ function ProcessorModal({
           >
             Cancel
           </button>
-
           <button
             onClick={onSubmit}
             disabled={loading} //false
@@ -282,6 +281,7 @@ export default function Role() {
 
   // ─── Open Edit Modal ─────────────────────────────────────────────────────────
   const openEdit = (item) => {
+
     setForm({
       userName: item.userName || "",
       roleFunction: Array.isArray(item.roleFunction)
@@ -303,12 +303,23 @@ export default function Role() {
   };
 
   const handleFormChange = (name, value) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+    if (name === "userName") {
+      setForm((prev) => ({
+        ...prev,
+        userName: value,
+        roleFunction: [],
+      }));
+      return;
+    }
 
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
   // ─── Save (Add or Edit) ──────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    try {      
+    try {
       setSaving(true);
 
       const payload = {

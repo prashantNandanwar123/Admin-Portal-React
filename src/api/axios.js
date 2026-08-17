@@ -1,10 +1,9 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-
 const axiosInstance = axios.create({
   baseURL: "/api",
-    timeout: 300000,
+  timeout: 300000,
   withCredentials: true,
   headers: {
     Accept: "application/json",
@@ -36,7 +35,7 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem("user");
       toast.error("Access Denied");
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.hash = "/";
       }, 200);
       return Promise.reject(error);
     }
@@ -45,7 +44,7 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem("user");
       toast.error("Session expired. Please Login Again.");
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.hash = "/";
       }, 500);
       return Promise.reject(error);
     }

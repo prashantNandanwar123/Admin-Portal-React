@@ -25,7 +25,7 @@ const UpiPaymentProcessor = lazy(() => import("./pages/UpiPaymentProcessor"));
 const User = lazy(() => import("./pages/User"));
 const Role = lazy(() => import("./pages/Role"));
 const Rseller = lazy(() => import("./components/Reseller/Reseller"));
-const VirtualAccount = lazy(() => import("./components/virtualAccount/VirtualAccount"));
+const VirtualAccounts = lazy(() => import("./components/virtualAccounts/VirtualAccounts"));
 
 
 /* Protected Route */
@@ -94,7 +94,7 @@ function App() {
             <Route path="reseller-basic-details" element={<ResellerBasicDetails />} />
             <Route path="reseller-view-details" element={<ResellesViewDetails />} />
             <Route path="reseller-edit-details" element={<ResellesEditDetails />} />
-            <Route path="virtual-account" element={<VirtualAccount />} />
+            <Route  path="virtual-accounts" element={<VirtualAccounts />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />

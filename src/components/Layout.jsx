@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-import { Menu } from "lucide-react";
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -37,36 +36,6 @@ export default function Layout() {
         isMobile={isMobile}
       />
 
-      {/* Sidebar Toggle Button */}
-      <button
-        onClick={toggleSidebar}
-        className={`
-        fixed
-        top-5
-        z-50
-        w-8
-        h-8
-        rounded-xl
-        bg-gray-300
-        flex
-        items-center
-        justify-center
-        transition-all
-        duration-300
-        hover:scale-105
-        ${isMobile ? "left-4" : ""}
-        `}
-        style={
-          !isMobile
-            ? {
-              left: sidebarOpen ? "253px" : "68px",
-              transform: "translateX(-35%)",
-            }
-            : {}
-        }
-      >
-        <Menu size={18} />
-      </button>
       {/* Main Area */}
       <div
         className={`
@@ -101,16 +70,16 @@ export default function Layout() {
             }
           `}
         >
-          <Navbar />
+          <Navbar toggleSidebar={toggleSidebar} />
         </div>
 
         {/* Page Content */}
         <main
-          className="/*  */
-            h-screen
-            overflow-y-auto
-            pt-16
-          "
+          className="
+    pt-16
+    h-screen
+    overflow-y-auto
+  "
         >
           <Outlet />
         </main>

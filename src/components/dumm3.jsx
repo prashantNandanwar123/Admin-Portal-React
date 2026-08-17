@@ -143,29 +143,29 @@ export default function ForgotPassword() {
   const req = <span className="text-red-500">*</span>;
 
   return (
-    <div className="bg-[#f4f4f4] min-h-screen w-full p-4 md:p-6 lg:p-8 xl:p-3 flex items-center justify-center">
-      <div className="w-full max-w-7xl xl:max-w-4xl bg-white rounded-2xl overflow-hidden shadow-2xl">
+    <div className="bg-[#f4f4f4] min-h-screen w-full p-4 md:p-6 lg:p-8 flex items-center justify-center">
+      <div className="w-full max-w-7xl bg-white rounded-2xl overflow-hidden shadow-2xl">
         {/* Left Section- Desktop */}
         <div className="hidden lg:grid lg:grid-cols-2 cursor-default">
 
           {/* Left Section */}
           <div className="bg-[#05070B] text-white relative overflow-hidden">
-            <div className="px-10 py-6 xl:px-6 xl:py-4 h-full flex flex-col relative">
+            <div className="px-10 py-6 h-full flex flex-col relative">
               {/* Logo */}
               <img
                 src={logo1}
                 alt="HelloPe"
-                className="h-32 xl:h-20 object-contain ml-[-210px] xl:ml-[-150px]"
-                style={{ marginLeft: "-162px" }}
+                className="h-32 object-contain"
+                style={{ marginLeft: "-210px" }}
               />
               {/* Heading */}
               <div>
-                <h1 className="lg:text-4xl xl:text-2xl text-2xl font-bold">
+                <h1 className="lg:text-4xl text-2xl font-bold">
                   Welcome to{" "}
                   <span className="text-[#FFC400]">HelloPe!</span>{" "}
                   👋
                 </h1>
-                <p className="mt-2 xl:mt-1 text-lg xl:text-xs text-gray-300">
+                <p className="mt-2 text-lg text-gray-300">
                   Fast,
                   <span className="text-[#FFC400] font-medium"> Secure & Reliable </span>
                   Payment Gateway
@@ -173,59 +173,59 @@ export default function ForgotPassword() {
               </div>
 
               {/* Features */}
-              <div className="mt-7 xl:mt-3 space-y-5 xl:space-y-2.5 relative z-10">
+              <div className="mt-7 space-y-5 relative z-10">
                 {/* Item */}
                 <div className="flex items-center">
-                  <div className="w-13 h-13 xl:w-9 xl:h-9 rounded-xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl xl:text-lg shadow">
+                  <div className="w-13 h-13 rounded-xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl shadow">
                     ⚡
                   </div>
-                  <div className="ml-5 xl:ml-3">
-                    <h3 className="text-lg xl:text-sm font-semibold">Instant UPI Payments</h3>
-                    <p className="text-gray-400 text-sm xl:text-xs mt-1 xl:mt-0">Lightning fast transactions, 24/7</p>
+                  <div className="ml-5">
+                    <h3 className="text-lg font-semibold">Instant UPI Payments</h3>
+                    <p className="text-gray-400 text-sm mt-1">Lightning fast transactions, 24/7</p>
                   </div>
                 </div>
 
                 {/* Item */}
                 <div className="flex items-center">
-                  <div className="w-13 h-13 xl:w-9 xl:h-9 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl xl:text-lg">
+                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
                     🛡️
                   </div>
-                  <div className="ml-5 xl:ml-3">
-                    <h3 className="text-lg xl:text-sm font-semibold">HMAC-SHA256 Security</h3>
-                    <p className="text-gray-400 text-sm xl:text-xs mt-1 xl:mt-0">Enterprise grade security for your data</p>
+                  <div className="ml-5">
+                    <h3 className="text-lg font-semibold">HMAC-SHA256 Security</h3>
+                    <p className="text-gray-400 text-sm mt-1">Enterprise grade security for your data</p>
                   </div>
                 </div>
 
                 {/* Item */}
                 <div className="flex items-center">
-                  <div className="w-13 h-13 xl:w-9 xl:h-9 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl xl:text-lg">
+                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
                     📊
                   </div>
-                  <div className="ml-5 xl:ml-3">
-                    <h3 className="text-lg xl:text-sm font-semibold">Real-time Dashboard</h3>
-                    <p className="text-gray-400 text-sm xl:text-xs mt-1 xl:mt-0">Track and monitor in real-time</p>
+                  <div className="ml-5">
+                    <h3 className="text-lg font-semibold">Real-time Dashboard</h3>
+                    <p className="text-gray-400 text-sm mt-1">Track and monitor in real-time</p>
                   </div>
                 </div>
 
                 {/* Item */}
                 <div className="flex items-center">
-                  <div className="w-13 h-13 xl:w-9 xl:h-9 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl xl:text-lg">
+                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
                     💳
                   </div>
-                  <div className="ml-5 xl:ml-3">
-                    <h3 className="text-lg xl:text-sm font-semibold">Multi Payment Support</h3>
-                    <p className="text-gray-400 text-sm xl:text-xs mt-1 xl:mt-0">UPI, Cards, Wallets & more</p>
+                  <div className="ml-5">
+                    <h3 className="text-lg font-semibold">Multi Payment Support</h3>
+                    <p className="text-gray-400 text-sm mt-1">UPI, Cards, Wallets & more</p>
                   </div>
                 </div>
 
                 {/* Item */}
                 <div className="flex items-center">
-                  <div className="w-13 h-13 xl:w-9 xl:h-9 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl xl:text-lg">
+                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
                     📈
                   </div>
-                  <div className="ml-5 xl:ml-3">
-                    <h3 className="text-lg xl:text-sm font-semibold">High Success Rate</h3>
-                    <p className="text-gray-400 text-sm xl:text-xs mt-1 xl:mt-0">Optimized for maximum success</p>
+                  <div className="ml-5">
+                    <h3 className="text-lg font-semibold">High Success Rate</h3>
+                    <p className="text-gray-400 text-sm mt-1">Optimized for maximum success</p>
                   </div>
                 </div>
               </div>
@@ -234,14 +234,14 @@ export default function ForgotPassword() {
               <img
                 src={bgImage}
                 alt="Security"
-                className="absolute w-[380px] xl:w-[225px] object-contain pointer-events-none"
+                className="absolute w-[380px] object-contain pointer-events-none"
                 style={{ right: "-22px", bottom: "85px" }}
               />
               {/* Divider line with gap below Features */}
-              <div className="border-b border-[#1f1f1f] w-3/4 mt-13 xl:mt-6"></div>
+              <div className="border-b border-[#1f1f1f] w-3/4 mt-13"></div>
               {/* Bottom */}
-              <div className="mt-5 xl:mt-2 pt-2 xl:pt-1 flex items-center text-gray-300 text-xs relative z-10">
-                <span className="text-[#FFC400] text-xl xl:text-base mr-3 xl:mr-2">
+              <div className="mt-5 pt-2 flex items-center text-gray-300 text-xs relative z-10">
+                <span className="text-[#FFC400] text-xl mr-3">
                   <FaShieldAlt />
                 </span>
                 Trusted by Merchants across India
@@ -260,32 +260,32 @@ export default function ForgotPassword() {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center justify-center p-8 xl:p-4 bg-gray-50">
-            <div className="w-full max-w-md xl:max-w-sm bg-white rounded-2xl shadow-lg p-18 xl:p-8">
+          <div className="flex items-center justify-center p-8 bg-gray-50">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-18">
               {/* Logo */}
-              <div className="flex justify-center mb-6 xl:mb-3">
+              <div className="flex justify-center mb-6">
                 <img
                   src="/logo1.avif"
                   alt="Logo"
-                  className="h-14 xl:h-9 object-contain"
+                  className="h-14 object-contain"
                 />
               </div>
 
               {/* Heading */}
-              <div className="text-center mb-8 xl:mb-4">
-                <h2 className="text-3xl xl:text-xl font-bold text-gray-800">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800">
                   Reset Your Password
                 </h2>
-                <p className="text-gray-500 mt-2 xl:mt-1 text-sm xl:text-xs">
+                <p className="text-gray-500 mt-2 text-sm">
                   Enter your details to reset password
                 </p>
               </div>
 
               {/* Form */}
-              <form className="space-y-5 xl:space-y-3">
+              <form className="space-y-5">
                 {/* Username */}
                 <div className="relative">
-                  <label className="block text-sm xl:text-xs font-medium text-gray-700 mb-2 xl:mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Username {req}
                   </label>
 
@@ -296,12 +296,12 @@ export default function ForgotPassword() {
                     readOnly={otpVerified}
                     onChange={(e) => setUserName(e.target.value)}
                     placeholder="Enter username"
-                    className={`w-full border border-gray-300 rounded-xl px-4 py-3 xl:px-3 xl:py-2 xl:text-sm pr-12 ${otpVerified ? "bg-gray-100 cursor-not-allowed" : ""
+                    className={`w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 ${otpVerified ? "bg-gray-100 cursor-not-allowed" : ""
                       }`}
                   />
 
                   {otpSent && (
-                    <span className="absolute right-4 top-[42px] xl:top-[34px] text-green-600 text-xl xl:text-base font-bold">
+                    <span className="absolute right-4 top-[42px] text-green-600 text-xl font-bold">
                       ✓
                     </span>
                   )}
@@ -313,7 +313,7 @@ export default function ForgotPassword() {
                     type="button"
                     onClick={sendOtp}
                     disabled={loading}
-                    className="w-full bg-[#FEC62F] hover:bg-[#FEC91F] text-white py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
+                    className="w-full bg-[#FEC62F] hover:bg-[#FEC91F] text-white py-3 rounded-xl font-semibold"
                   >
                     {loading ? "Sending..." : "Send OTP"}
                   </button>
@@ -322,7 +322,7 @@ export default function ForgotPassword() {
                 {/* OTP */}
                 {otpSent && !otpVerified && (
                   <div className="relative">
-                    <label className="block text-sm xl:text-xs font-medium text-gray-700 mb-2 xl:mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       OTP {req}
                     </label>
 
@@ -332,7 +332,7 @@ export default function ForgotPassword() {
                       maxLength={6}
                       onChange={(e) => setOtp(e.target.value)}
                       placeholder="Enter OTP"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-3 xl:px-3 xl:py-2 xl:text-sm pr-12"
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12"
                     />
                   </div>
                 )}
@@ -343,7 +343,7 @@ export default function ForgotPassword() {
                     type="button"
                     onClick={verifyOtp}
                     disabled={loading}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold"
                   >
                     {loading ? "Verifying..." : "Verify OTP"}
                   </button>
@@ -353,7 +353,7 @@ export default function ForgotPassword() {
                 {otpVerified && (
                   <>
                     <div className="relative">
-                      <label className="block text-sm xl:text-xs font-medium text-gray-700 mb-2 xl:mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         New Password {req}
                       </label>
                       <div className="relative">
@@ -362,17 +362,17 @@ export default function ForgotPassword() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter new password"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 xl:px-3 xl:py-2 xl:text-sm pr-20"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-10 xl:right-8 top-1/2 -translate-y-1/2 text-gray-500 xl:[&>svg]:w-3.5 xl:[&>svg]:h-3.5"
+                          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
                         >
                           {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                         {password.length > 0 && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl xl:text-base font-bold">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
                             ✓
                           </span>
                         )}
@@ -381,7 +381,7 @@ export default function ForgotPassword() {
 
                     {/* Confirm Password */}
                     <div className="relative">
-                      <label className="block text-sm xl:text-xs font-medium text-gray-700 mb-2 xl:mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Confirm Password {req}
                       </label>
 
@@ -391,19 +391,19 @@ export default function ForgotPassword() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Confirm Password"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 xl:px-3 xl:py-2 xl:text-sm pr-20"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
                         />
 
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-10 xl:right-8 top-1/2 -translate-y-1/2 text-gray-500 xl:[&>svg]:w-3.5 xl:[&>svg]:h-3.5"
+                          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
                         >
                           {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
 
                         {confirmPassword && password === confirmPassword && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl xl:text-base font-bold">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
                             ✓
                           </span>
                         )}
@@ -414,7 +414,7 @@ export default function ForgotPassword() {
                       type="button"
                       onClick={handleResetPassword}
                       disabled={loading}
-                      className="w-full bg-[#FDBB01] hover:bg-[#FDC630] text-white py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
+                      className="w-full bg-[#FDBB01] hover:bg-[#FDC630] text-white py-3 rounded-xl font-semibold"
                     >
                       {loading ? "Processing..." : "Reset Password"}
                     </button>
@@ -425,7 +425,7 @@ export default function ForgotPassword() {
                 <button
                   type="button"
                   onClick={() => navigate("/")}
-                  className="w-full border border-gray-300 hover:bg-gray-100 text-gray-700 py-3 xl:py-2 xl:text-sm rounded-xl font-medium"
+                  className="w-full border border-gray-300 hover:bg-gray-100 text-gray-700 py-3 rounded-xl font-medium"
                 >
                   Back to Login
                 </button>

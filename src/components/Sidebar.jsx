@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { IoIosLink } from "react-icons/io";
 import { useLocation } from "react-router-dom";
+import balcklogo from "../assets/img-1.jpeg";
+import whitelogo from "../assets/logo-copy.png";
 
 import {
   LayoutDashboard,
@@ -48,7 +50,6 @@ export default function Sidebar({ open, onClose, isMobile }) {
 
   const userData = JSON.parse(localStorage.getItem("user") || "{}");
 
-
   const roleFunctions = (userData.role_function || "")
     .split(",")
     .map((r) => r.trim());
@@ -78,11 +79,6 @@ export default function Sidebar({ open, onClose, isMobile }) {
       icon: UserPlus,
     },
     {
-      title: "Virtual Account",
-      path: "/app/virtual-account",
-      icon: UserCog,
-    },
-    {
       title: "Reseller",
       path: "/app/reseller",
       icon: UserCog,
@@ -96,6 +92,11 @@ export default function Sidebar({ open, onClose, isMobile }) {
       title: "Merchant View / Edit",
       path: "/app/merchants",
       icon: Users,
+    },
+    {
+      title: "Virtual Accounts",
+      path: "/app/virtual-accounts",
+      icon: UserCog,
     },
     {
       title: "Merchant Crediential",
@@ -242,19 +243,18 @@ export default function Sidebar({ open, onClose, isMobile }) {
           className={`px-4 py-5 flex items-center justify-between border-b ${isLightSidebar ? "border-black/10" : "border-white/10"
             }`}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e]">
+          <div className="flex items-center ml-2 gap-0 h-10">
+            <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e] shrink-0">
               H
             </div>
+
             {open && (
-              <div>
-                <h2 className="font-bold text-lg block">HelloPe</h2>
-                <p
-                  className={`text-xs ${isLightSidebar ? "text-black/80" : "text-white/60"
-                    }`}
-                >
-                  Admin Panel
-                </p>
+              <div className="flex items-center h-10 overflow-visible">
+                <img
+                  className="h-14 xl:h-20 w-auto object-contain max-w-[150px] xl:max-w-[150px] -ml-1"
+                  src={isLightSidebar ? whitelogo : balcklogo}
+                  alt="logo"
+                />
               </div>
             )}
           </div>

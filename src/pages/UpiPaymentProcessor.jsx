@@ -41,7 +41,7 @@ const FORM_FIELDS = [
     label: "UPI Acquirer",
     type: "select",
     required: true,
-    options: ["UNLIMIT", "RAZORPAY", "PAYU"],
+    options: ["UNLIMIT","ENKASH", "IDFC"],
   },
   {
     name: "midName",
@@ -430,11 +430,6 @@ export default function UpiPaymentProcessor() {
         .includes(search);
     });
   });
-
-  console.log("data print first avlue", data[0]);
-  console.log("Search =", searchTerm);
-  console.log("Filtered Data =", filteredData);
-
   useEffect(() => {
     fetchProcessors();
   }, []);
@@ -528,13 +523,6 @@ export default function UpiPaymentProcessor() {
   // ─── Paginated slice ─────────────────────────────────────────────────────────
   const totalRows = filteredData.length;
   const pagedData = filteredData.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
-
-
-  console.log("Total Data", data.length);
-  console.log("Filtered", filteredData.length);
-  console.log("Paged", pagedData.length);
-  console.log(pagedData);
-
   const TABLE_COLS = [
     "#", "UPI Processor", "UPI Acquirer", "MID Name", "Merchant ID",
     "Currency", "Txn Limit", "Bank URL", "Bank Code",
@@ -592,7 +580,6 @@ export default function UpiPaymentProcessor() {
             </thead>
 
             <tbody>
-              {console.log("Rendering", pagedData)}
               {loading ? (
                 <tr>
                   <td colSpan={TABLE_COLS.length} className="text-center py-14">

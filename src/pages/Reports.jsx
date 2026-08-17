@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axios";
 import { FaSearch, FaFileExcel } from "react-icons/fa";
 
@@ -38,8 +38,6 @@ const exportToExcel = (data) => {
   a.click();
   URL.revokeObjectURL(url);
 };
-
-
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 const StatusBadge = ({ msg }) => {
@@ -82,10 +80,6 @@ export default function Reports() {
     )
   );
 
-  console.log(data);
-  console.log(filteredData);
-  console.log(searchTerm);
-  console.log(data[0]);
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -100,16 +94,18 @@ export default function Reports() {
     return `${d}/${m}/${y}`;
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [fromDate, toDate]);
+
   // ─── Search API ─────────────────────────────────────────────────────────────
   const fetchData = async (currentPage = 0, currentSize = size) => {
     if (!fromDate || !toDate) {
       alert("Please select From Date and To Date");
       return;
     }
-
     try {
       setLoading(true);
-
       // Interceptor unwraps response.data — resData IS the JSON body
       const resData = await axiosInstance.post(
         `/TxnReport?page=${currentPage}&size=${currentSize}`,
@@ -129,7 +125,6 @@ export default function Reports() {
         setTotalPages(0);
         setTotalRecords(0);
       }
-
       setSearched(true);
     } catch (error) {
       console.error("TXN REPORT ERROR :", error);
@@ -140,9 +135,7 @@ export default function Reports() {
   };
 
   const handleSearch = () => fetchData(0, size);
-
   const handlePageChange = (newPage) => fetchData(newPage, size);
-
   const handleSizeChange = (newSize) => {
     setSize(newSize);
     fetchData(0, newSize);
@@ -163,6 +156,7 @@ export default function Reports() {
   const columns = [
     { label: "#", key: "srNo" },
     { label: "MID", key: "mid" },
+    { label: "Fee Type", key: "FeeType" },
     { label: "DBA Name", key: "dbaName" },
     { label: "Merchant Type", key: "merchantType" },
     { label: "Payment Type", key: "paymentType" },
@@ -182,7 +176,6 @@ export default function Reports() {
     { label: "Email", key: "emailId" },
     { label: "Status", key: "respMessage" },
     { label: "RRN", key: "rrn" },
-    { label: "Charge Type", key: "chargeType" },
   ];
 
   return (
@@ -340,6 +333,8 @@ export default function Reports() {
                       <td className="px-3 py-2.5 font-semibold text-blue-700">
                         {item.mid || "-"}
                       </td>
+                      <td className="px-3 py-2.5">{item.chargeType || "-"}</td>
+
                       <td className="px-3 py-2.5">{item.dbaName || "-"}</td>
                       <td className="px-3 py-2.5">{item.merchantType || "-"}</td>
 
@@ -354,7 +349,7 @@ export default function Reports() {
                       <td className="px-3 py-2.5">{item.procTrnRefId || "-"}</td>
 
                       <td className="px-3 py-2.5 font-semibold text-gray-800">
-                        ₹{item.payAmount || "0"}
+                        ₹{item.payAmount / 100 || "0"}
                       </td>
 
                       <td className="px-3 py-2.5">{item.msfFee ?? "-"}</td>
@@ -363,7 +358,7 @@ export default function Reports() {
                       <td className="px-3 py-2.5">{item.gstFee ?? "-"}</td>
 
                       <td className="px-3 py-2.5 font-bold text-gray-800">
-                        ₹{item.totalAmount || "0"}
+                        ₹{item.totalAmount / 100 || "0"}
                       </td>
 
                       <td className="px-3 py-2.5">{item.txnDate || "-"}</td>
@@ -377,7 +372,6 @@ export default function Reports() {
                       </td>
 
                       <td className="px-3 py-2.5">{item.rrn || "-"}</td>
-                      <td className="px-3 py-2.5">{item.chargeType || "-"}</td>
                     </tr>
                   ))
                 ) : (

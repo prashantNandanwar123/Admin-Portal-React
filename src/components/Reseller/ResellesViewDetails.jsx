@@ -2,21 +2,26 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-
+import { User, CalendarDays } from "lucide-react";
 
 export default function ResellerViewDetails() {
     const [apiData, setData] = useState({});
     const location = useLocation();
-    const userId = location.state?.userId;
-    console.log("user Id", userId);
+    const resellerId = location.state?.resellerId;
+
+    console.log("Reseller Id", resellerId);
 
     useEffect(() => {
         viewResellers();
     }, []);
+
     const viewResellers = async () => {
         try {
-            const response = await axiosInstance.post(`/viewReseller/${userId}`);
+            const response = await axiosInstance.post(
+                `/reseller/viewReseller/${resellerId}`
+            );
             console.log("FULL RESPONSE-->>>:", response);
+
             if (response?.respCode === 0) {
                 setData(response?.respData?.[0] || {});
             } else {
@@ -24,319 +29,137 @@ export default function ResellerViewDetails() {
                 setData({});
             }
         } catch (error) {
+            console.error("View Reseller Error:", error);
             toast.error(error);
             setData({});
         }
     };
 
+    /* ── Reusable read-only field (matches the reference card design) ── */
     const ViewField = ({ label, value, required }) => (
         <div>
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
-
-            <div className="w-full min-h-[42px] border border-gray-300 rounded-md bg-gray-100 px-3 py-2 flex items-center text-gray-700">
+            <div className="w-full min-h-[42px] border border-gray-200 rounded-lg bg-white px-3 py-2 flex items-center text-[13px] sm:text-sm text-gray-800 shadow-sm">
                 {value || "-"}
             </div>
         </div>
     );
 
+    /* ── Section wrapper card ── */
+    const SectionCard = ({ title, children, className = "" }) => (
+        <div
+            className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`}
+        >
+            <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                {title}
+            </h2>
+            <div className="border-t border-gray-200 mt-3 mb-5" />
+            {children}
+        </div>
+    );
+
     return (
-        <div className="overflow-y-auto hide-scrollbar p-6" style={{ height: "calc(100vh - 120px)" }}>
-            <h2 className="text-2xl uppercase text-blue-900 font-bold">
-                View  Reseller
-            </h2>
-            <p className="py-3 text-lg text-blue-900">View and manage reseller onboarding details including profile information, verification status, and account configuration in a centralized dashboard.
-            </p>
-            <p className="border-t border-gray-300 py-3"></p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 my-8">
-                <div>
-                    <label className="text-gray-700 text-[18px]">
-                        Created By : {apiData?.createdBy}
-                    </label>
-                </div>
-                <div>
-                    <label className="text-gray-700 text-[18px] pe-5">
-                        Created Date : {apiData?.createdDate}
-                    </label>
-                </div>
-            </div>
-
-            {/* ── Basic Document Details ───────────────────────────────────── */}
+        <div className="overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
             <div>
-                <h2 className="text-[20px] text-gray-700 mt-5 my-3">
-                    Basic Reseller Details
+                <h2 className="text-xl xl:text-2xl sm:text-lg uppercase text-slate-800 font-bold tracking-tight">
+                    View Reseller
                 </h2>
-                <p className="border-t border-gray-300 py-3"></p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.firstName || ""}
-                        />
-                    </div>
-                    {/* Last Name */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.lastName || ""}
-                            readOnly
-                        />
-
-                    </div>
-                    {/* Email */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Email Id<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.emailId || ""}
-                            readOnly
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    {/*Mobile*/}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Mobile<span className="text-red-500">*</span>
-                        </label>
-
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.mobileNo || ""}
-                            readOnly
-                        />
-                    </div>
-
-                    {/* Comapny Name */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Comapny Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.companyName || ""}
-                            readOnly
-                        />
-                    </div>
-
-                    {/* Company Code */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Company Code <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.companyCode || ""}
-                            readOnly
-                        />
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    {/* AAdhar No */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Aadhar No.<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.reAadharNo || ""}
-                            readOnly
-                        />
-                    </div>
-                    {/* GSTN No */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            GSTN No.<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.reGstnNO || ""}
-                            readOnly
-                        />
-
-                    </div>
-                    {/* Pan No */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Pan No<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.rePanNo || ""}
-                            readOnly
-                        />
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    {/* Logo */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Logo
-                            <span className="text-sm text-gray-500 font-normal">
-                                {" "} (jpg or png)
-                            </span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.logoPath || ""}
-                            readOnly
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                            Reseller Type <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={apiData?.legalVehicleType || ""}
-                            readOnly
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        />
-                    </div>
-                    <div></div>
-                </div>
+                <p className="pt-2 pb-1 text-sm sm:text-base text-[#0D47A1] font-medium">
+                    View and manage reseller onboarding details including profile
+                    information, verification status, and account configuration in a
+                    centralized dashboard.
+                </p>
             </div>
-            {/* ── Address  Details ───────────────────────────────────── */}
-            <h2 className="text-[20px] text-gray-700 my-3">
-                Address
-            </h2>
-            <p className="border-t border-gray-300 py-3"></p>
-            {/* Row-1*/}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Address 1<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reAddress1 || ""}
-                        readOnly
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Address 2<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reAddress2 || ""}
-                        readOnly
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Address 3<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reAddress3 || ""}
-                        readOnly
-                    />
-                </div>
-            </div>
-            {/* Row-2*/}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Country */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Country<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reCountry || ""}
-                        readOnly
-                    />
-                </div>
-                {/* State */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        State<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reState || ""}
-                        readOnly
-                    />
-                </div>
-                {/* City */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        City<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reCity || ""}
-                        readOnly
-                    />
-                </div>
-            </div>
-            {/* Row-3*/}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                {/* Zip Code */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Zip Code<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                        value={apiData?.reZipcode || ""}
-                        readOnly
-                    />
-                </div>
-                <div></div>
-                <div></div>
-            </div>
-            {/* ── Settlement Setup ──────────────────────────────────────────── */}
-            <div className="pt-4">
-                <h2 className="text-[18px] text-[#5c5c5c] mb-5">
-                    Settlement Setup
-                </h2>
-                <p className="border-t border-gray-300 py-3"></p>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
-                    {/* Settlement Type */}
+            {/* ── Onboarding Status ─────────────────────────────────────── */}
+            <SectionCard title="Reseller Onboarding Status">
+                <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#F3E3B0] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
+                    <div className="flex items-center gap-3">
+                        <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
+                            <User className="w-4 h-4 text-[#8a6d1a]" />
+                        </span>
+                        <div>
+                            <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
+                                Created By
+                            </p>
+                            <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                                {apiData?.approvedBy || "-"}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
+                            <CalendarDays className="w-4 h-4 text-[#8a6d1a]" />
+                        </span>
+                        <div>
+                            <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
+                                Created Date
+                            </p>
+                            <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                                {apiData?.createdAt || "-"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </SectionCard>
+
+            {/* ── Basic Reseller Details ───────────────────────────────── */}
+            <SectionCard title="Basic Reseller Details">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
+                    <ViewField label="First Name" required value={apiData?.firstName} />
+                    <ViewField label="Last Name" required value={apiData?.lastName} />
+                    <ViewField label="Email Id" required value={apiData?.email} />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
+                    <ViewField label="Mobile" required value={apiData?.mobile} />
+                    <ViewField label="Company Name" required value={apiData?.companyName} />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
+                    <ViewField label="Aadhar No." required value={apiData?.aadharNo} />
+                    <ViewField label="GSTN No." required value={apiData?.gstNo} />
+                    <ViewField label="Pan No" required value={apiData?.panNo} />
+                </div>
+            </SectionCard>
+
+            {/* ── Address ───────────────────────────────────────────────── */}
+            <SectionCard title="Address">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
+                    <ViewField label="Address" required value={apiData?.address} />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
+                    <ViewField label="Country" required value={apiData?.country} />
+                    <ViewField label="State" required value={apiData?.state} />
+                    <ViewField label="City" required value={apiData?.city} />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
+                    <ViewField label="Zip Code" required value={apiData?.pincode} />
+                </div>
+            </SectionCard>
+
+            {/* ── Settlement Setup ──────────────────────────────────────── */}
+            <SectionCard title="Settlement Setup">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-6 xl:gap-x-7 gap-y-5">
                     <div>
-                        <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
+                        <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-2">
                             Settlement Type
                         </label>
-                        <div className="flex items-center gap-5 mt-2">
+                        <div className="flex items-center gap-5">
                             {["Manual", "Automatic"].map((type) => (
                                 <label
                                     key={type}
-                                    className="flex items-center gap-1 text-[14px] text-[#5c5c5c]"
+                                    className="flex items-center gap-1.5 text-[13px] sm:text-sm text-gray-700"
                                 >
                                     <input
                                         type="radio"
                                         checked={apiData?.RSS_SettlementType === type}
                                         readOnly
+                                        className="accent-amber-500 w-4 h-4"
                                     />
                                     {type}
                                 </label>
@@ -344,114 +167,59 @@ export default function ResellerViewDetails() {
                         </div>
                     </div>
 
-                    {/* Settlement Cycle */}
-                    <div>
-                        <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                            Settlement Cycle (If Automated)
-                        </label>
-                        <input
-                            type="text"
-                            value={apiData?.RSS_SettlementCycle || ""}
-                            readOnly
-                            className="w-full h-8 border border-gray-400 rounded-sm bg-gray-100 px-3 outline-none"
-                        />
-                    </div>
-                    {/* Payment By */}
-                    <div>
-                        <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                            Payment By
-                        </label>
-
-                        <input
-                            type="text"
-                            value={apiData?.RSS_PaymentBy || ""}
-                            readOnly
-                            className="w-full h-8 border border-gray-400 rounded-sm bg-gray-100 px-3 outline-none"
-                        />
-                    </div>
-                    {/* Payment Advice */}
-                    <div>
-                        <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                            Payment Advice
-                        </label>
-
-                        <input
-                            type="text"
-                            value={apiData?.RSS_PaymentAdvice || ""}
-                            readOnly
-                            className="w-full h-8 border border-gray-400 rounded-sm bg-gray-100 px-3 outline-none"
-                        />
-                    </div>
+                    <ViewField
+                        label="Settlement Cycle (If Automated)"
+                        value={apiData?.RSS_SettlementCycle}
+                    />
+                    <ViewField label="Payment By" value={apiData?.RSS_PaymentBy} />
+                    <ViewField label="Payment Advice" value={apiData?.RSS_PaymentAdvice} />
                 </div>
-            </div>
-            {/* ── Beneficiary Account Details ───────────────────────────────── */}
-            <div className="pt-4">
-                <h2 className="text-[20px] text-gray-700 my-3">
-                    Beneficiary Account Details
-                </h2>
-                <p className="border-t border-gray-300 py-3"></p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Beneficiary Account Name<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.RE_BeneficiaryAccountName || ""}
-                            readOnly
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Beneficiary Account No<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.RE_BeneficiaryAccountNo || ""}
-                            readOnly
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Beneficiary Bank Name<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.RE_BeneficiaryBankName || ""}
-                            readOnly
-                        />
-                    </div>
+            </SectionCard>
+
+            {/* ── Beneficiary Account Details ──────────────────────────── */}
+            <SectionCard title="Beneficiary Account Details">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
+                    <ViewField
+                        label="Beneficiary Account Name"
+                        required
+                        value={apiData?.RE_BeneficiaryAccountName}
+                    />
+                    <ViewField
+                        label="Beneficiary Account No"
+                        required
+                        value={apiData?.RE_BeneficiaryAccountNo}
+                    />
+                    <ViewField
+                        label="Beneficiary Bank Name"
+                        required
+                        value={apiData?.RE_BeneficiaryBankName}
+                    />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Beneficiary Branch Name<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.RE_BeneficiaryBranchName || ""}
-                            readOnly
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            IFSC Code<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                            value={apiData?.RE_IFSCCode || ""}
-                            readOnly
-                        />
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
+                    <ViewField
+                        label="Beneficiary Branch Name"
+                        required
+                        value={apiData?.RE_BeneficiaryBranchName}
+                    />
+                    <ViewField label="IFSC Code" required value={apiData?.RE_IFSCCode} />
                 </div>
-            </div>
+            </SectionCard>
+
+            {/* Status */}
+            <SectionCard title="Status">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
+                    <ViewField
+                        label="Status"
+                        value={apiData?.status}
+                    />
+
+                    <ViewField
+                        label="Rejection Reason"
+                        value={apiData?.rejectionReason}
+                    />
+                </div>
+            </SectionCard>
         </div>
     );
 }

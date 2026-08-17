@@ -374,8 +374,8 @@ export default function MerchantsViewedit() {
           >
             Next
           </button>
-        </div >
-      </div >
-    </div >
+        </div>
+      </div>
+    </div>
   );
 }

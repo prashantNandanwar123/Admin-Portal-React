@@ -29,7 +29,12 @@ body {
 }
 
 .hide-scrollbar {
-  overflow: auto !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Chrome, Safari */
