@@ -254,7 +254,7 @@ export default function Reseller() {
                     </div>
                 </div>
 
-                {/* ── ROW 2: Table — 1fr, scroll jab overflow ── */}
+                {/* ── ROW 2 ── */}
                 <div className="overflow-auto min-h-0">
                     <table className="min-w-[1400px] w-full text-xs whitespace-nowrap border-separate border-spacing-0">
                         <thead>
@@ -351,7 +351,6 @@ export default function Reseller() {
                                         {/* ACTION */}
                                         <td className="px-3 py-3 text-center">
                                             <div className="flex justify-center items-center gap-2">
-
                                                 {/* PENDING → ONLY INFO ICON */}
                                                 {selectedStatus === "PENDING" && (
                                                     <button

@@ -29,7 +29,6 @@ export default function ResellerViewDetails() {
                 setData({});
             }
         } catch (error) {
-            console.error("View Reseller Error:", error);
             toast.error(error);
             setData({});
         }

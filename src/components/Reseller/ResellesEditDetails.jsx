@@ -4,8 +4,7 @@ import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
-import { User, CalendarDays } from "lucide-react";
-
+import { Eye, Upload, User, CalendarDays } from "lucide-react";
 
 export default function ResellerBasicDetails() {
 
@@ -17,36 +16,44 @@ export default function ResellerBasicDetails() {
         legalVehicleType: "",
         companyName: "",
         companyCode: "",
-        mobileNo: "",
-        emailId: "",
-        reAddress1: "",
-        reAddress2: "",
-        reAddress3: "",
-        reCountry: "",
-        reState: "",
-        reCity: "",
-        reZipcode: "",
-        reAadharNo: "",
-        reGstnNO: "",
-        rePanNo: "",
-        RE_BeneficiaryAccountName: "",
-        RE_BeneficiaryAccountNo: "",
-        RE_BeneficiaryBankName: "",
-        RE_BeneficiaryBranchName: "",
-        RE_IFSCCode: ""
+        mobile: "",
+        email: "",
+        address: "",
+        country: "",
+        State: "",
+        City: "",
+        pincode: "",
+        aadharNo: "",
+        gstNo: "",
+        PanNo: "",
+        reBeneficiaryAccountName: "",
+        reBeneficiaryAccountNo: "",
+        reBeneficiaryBankName: "",
+        reBeneficiaryBranchName: "",
+        reIFSCCode: "",
+        rssSettlementType: "",
+        rssSettlementCycle: "",
+        rssPaymentBy: "",
+        RSS_PaymentAdvice: "",
+        status: "",
     })
 
     const [userData, setUserData] = useState(null);
-
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
             setUserData(JSON.parse(storedUser));
         }
     }, []);
+
     const [errors, setErrors] = useState({});
     const countryList = statecity.map((item) => item.country);
     const [submitLoading, setSubmitLoading] = useState(false);
+
+    const [passportPhoto, setPassportPhoto] = useState(null);
+    const [aadharCard, setAadharCard] = useState(null);
+    const [panCard, setPanCard] = useState(null);
+    const [addressProof, setAddressProof] = useState(null);
 
     const [responsePopup, setResponsePopup] = useState({
         show: false,
@@ -55,6 +62,14 @@ export default function ResellerBasicDetails() {
         resellerId: "",
         firstName: "",
         lastName: "",
+    });
+
+
+    const [documents, setDocuments] = useState({
+        PASSPORT_PHOTO: null,
+        AADHAAR_CARD: null,
+        PAN_CARD: null,
+        ADDRESS_PROOF: null,
     });
 
     const location = useLocation();
@@ -66,13 +81,11 @@ export default function ResellerBasicDetails() {
     );
 
     const stateList = selectedCountry?.states || [];
-
     const selectedState = stateList.find(
         (item) => item.state === data?.state
     );
 
     const cityList = selectedState?.cities || [];
-
     const handleChange = (field, value) => {
         setData((prev) => ({
             ...prev,
@@ -83,7 +96,7 @@ export default function ResellerBasicDetails() {
         viewResellers();
     }, []);
 
-
+    // View reseller details
     const viewResellers = async () => {
         try {
             if (!resellerId) {
@@ -91,26 +104,96 @@ export default function ResellerBasicDetails() {
                 return;
             }
             console.log("Reseller ID:", resellerId);
-
             const response = await axiosInstance.post(
                 `/reseller/viewReseller/${resellerId}`
             );
 
-            console.log("FULL RESPONSE --->>>", response);
-
             if (response.respCode === 0) {
-                const resellerData = response?.respData?.[0];
-                setData(resellerData || {});
-                console.log("SUCCESS RESELLER DATA:", resellerData);
+                const resellerData = response?.respData || {};
+
+                console.log("RESELLER DATA --->>>", resellerData);
+
+                // Set all reseller data into form state
+                setData((prev) => ({
+                    ...prev,
+                    ...resellerData,
+                }));
+
+                // Documents
+                const apiDocuments = resellerData?.documents || [];
+
+                const documentMap = {
+                    PASSPORT_PHOTO: null,
+                    AADHAAR_CARD: null,
+                    PAN_CARD: null,
+                    ADDRESS_PROOF: null,
+                };
+
+                apiDocuments.forEach((doc) => {
+                    documentMap[doc.documentType] = {
+                        id: doc.id,
+                        originalFileName: doc.originalFileName,
+                        downloadUrl: doc.downloadUrl,
+                    };
+                });
+
+                setDocuments(documentMap);
             } else {
                 toast.error(response.respMsg);
             }
-
         } catch (error) {
-            console.error("View reseller error:", error);
             toast.error(error);
         }
     };
+
+    // View document
+    const viewFile = async (documentId) => {
+        try {
+            if (!documentId) {
+                toast.error("Document ID is missing");
+                return;
+            }
+
+            console.log("Downloading document ID:", documentId);
+
+            const response = await axiosInstance.get(
+                `/reseller/reDownloadDocs/${documentId}`,
+                {
+                    responseType: "blob",
+                }
+            );
+
+            console.log("BLOB RESPONSE --->>>", response);
+
+            const blobUrl = URL.createObjectURL(response);
+            window.open(blobUrl, "_blank");
+            // Optional: free memory after some time
+            setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+            }, 5000);
+
+        } catch (error) {
+            toast.error(error);
+        }
+    };
+    const documentList = [
+        {
+            title: "Reseller Photograph",
+            documentType: "PASSPORT_PHOTO",
+        },
+        {
+            title: "Aadhar Card",
+            documentType: "AADHAAR_CARD",
+        },
+        {
+            title: "Pan Card",
+            documentType: "PAN_CARD",
+        },
+        {
+            title: "Address Proof",
+            documentType: "ADDRESS_PROOF",
+        },
+    ];
 
     // ─── Reseller Update Save Api ─────────────────────────────────────────────────────────────
     const resellerAdminUpdate = async () => {
@@ -130,72 +213,41 @@ export default function ResellerBasicDetails() {
         }
         try {
             setSubmitLoading(true);
-
             const status = data.status;
             const payload = {
 
-                requestId: data?.requestId,
+                requestId: `REQ${Date.now()}`,
                 resellerId: resellerId,
-
-                firstName: data?.firstName,
-                lastName: data?.lastName,
-                email: data?.email,
-                mobile: data?.mobile,
-                companyName: data?.companyName,
-
-                country: data?.country,
-                address: data?.address,
-                city: data?.city,
-                state: data?.state,
-                pincode: data?.pincode,
-
-                aadharNo: data?.aadharNo,
-                gstNo: data?.gstNo,
-                panNo: data?.panNo,
-
-                createdAt: data?.createdAt,
-                approvedBy: userData?.userName,
-
-                rejectionReason: data?.RSS_Remark,
-                status: status,
-
-                RE_BeneficiaryAccountName:
-                    data?.RE_BeneficiaryAccountName,
-
-                RE_BeneficiaryAccountNo:
-                    data?.RE_BeneficiaryAccountNo,
-
-                RE_BeneficiaryBankName:
-                    data?.RE_BeneficiaryBankName,
-
-                RE_BeneficiaryBranchName:
-                    data?.RE_BeneficiaryBranchName,
-
-                RE_IFSCCode:
-                    data?.RE_IFSCCode,
-
-                RSS_SettlementType:
-                    data?.RSS_SettlementType,
-
-                RSS_SettlementCycle:
-                    data?.RSS_SettlementCycle,
-
-                RSS_PaymentBy:
-                    data?.RSS_PaymentBy,
-
-                RSS_PaymentAdvice:
-                    data?.RSS_PaymentAdvice,
-
-                RSS_Remark:
-                    data?.RSS_Remark?.trim(),
+                createdBy: userData?.userName,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                companyName: data.companyName,
+                mobile: data.mobile,
+                email: data.email,
+                address: data.address,
+                country: data.country,
+                state: data.state,
+                city: data.city,
+                pincode: data.pincode,
+                aadharNo: data.aadharNo,
+                gstNo: data.gstNo,
+                panNo: data.panNo,
+                reBeneficiaryAccountName: data.reBeneficiaryAccountName,
+                reBeneficiaryAccountNo: data.reBeneficiaryAccountNo,
+                reBeneficiaryBankName: data.reBeneficiaryBankName,
+                reBeneficiaryBranchName: data.reBeneficiaryBranchName,
+                reIFSCCode: data.reIFSCCode,
+                rssSettlementType: data?.rssSettlementType,
+                rssSettlementCycle: data?.rssSettlementCycle,
+                rssPaymentBy: data?.rssPaymentBy,
+                RSS_PaymentAdvice: data?.RSS_PaymentAdvice,
+                status: data?.status,
             };
 
             const response = await axiosInstance.post(
                 `/reseller/admin/${resellerId}/${status}`,
                 payload
             );
-
-            console.log("Reseller Admin Update Response --->>>", response);
 
             // SUCCESS RESPONSE
             if (response?.respCode === 0) {
@@ -238,7 +290,6 @@ export default function ResellerBasicDetails() {
         }
     };
 
-
     return (
         <>
             <div className="overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
@@ -265,7 +316,7 @@ export default function ResellerBasicDetails() {
                                 Created By
                             </p>
                             <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
-                                {data?.approvedBy || "-"}
+                                {data?.createdBy}
                             </p>
                         </div>
                     </div>
@@ -278,7 +329,7 @@ export default function ResellerBasicDetails() {
                                 Created Date
                             </p>
                             <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
-                                {data?.createdAt || "-"}
+                                {data?.createdAt}
                             </p>
                         </div>
                     </div>
@@ -641,6 +692,7 @@ export default function ResellerBasicDetails() {
                                 }}
                             />
                         </div>
+
                     </div>
                 </div>
 
@@ -664,12 +716,12 @@ export default function ResellerBasicDetails() {
                                     >
                                         <input
                                             type="radio"
-                                            name="RSS_SettlementType"
+                                            name=" rssSettlementType"
                                             required
                                             value={type}
-                                            checked={data?.RSS_SettlementType === type}
+                                            checked={data?.rssSettlementType === type}
                                             onChange={(e) =>
-                                                handleChange("RSS_SettlementType", e.target.value)
+                                                handleChange(" rssSettlementType", e.target.value)
                                             }
                                             className="accent-amber-500 w-4 h-4"
                                         />
@@ -682,12 +734,12 @@ export default function ResellerBasicDetails() {
                         {[
                             {
                                 label: "Settlement Cycle (If Automated)",
-                                field: "RSS_SettlementCycle",
+                                field: "rssSettlementCycle",
                                 options: ["Daily", "Daily Twice", "Two Days Once", "Weekly"],
                             },
                             {
                                 label: "Payment By",
-                                field: "RSS_PaymentBy",
+                                field: "rssPaymentBy",
                                 options: ["A/C Credit", "IMPS", "NEFT", "RTGS"],
                             },
                             {
@@ -729,14 +781,14 @@ export default function ResellerBasicDetails() {
                         {[
                             {
                                 label: "Beneficiary Account Name",
-                                field: "RE_BeneficiaryAccountName",
+                                field: "reBeneficiaryAccountName",
                                 required: true,
                                 pattern: /^[A-Za-z ]+$/,
                                 message: "Only alphabets are allowed",
                             },
                             {
                                 label: "Beneficiary Account No",
-                                field: "RE_BeneficiaryAccountNo",
+                                field: "reBeneficiaryAccountNo",
                                 required: true,
                                 maxLength: 25,
                                 pattern: /^[0-9]+$/,
@@ -744,7 +796,7 @@ export default function ResellerBasicDetails() {
                             },
                             {
                                 label: "Beneficiary Bank Name",
-                                field: "RE_BeneficiaryBankName",
+                                field: "reBeneficiaryBankName",
                                 required: true,
                                 maxLength: 100,
                                 pattern: /^[A-Za-z ]+$/,
@@ -752,7 +804,7 @@ export default function ResellerBasicDetails() {
                             },
                             {
                                 label: "Beneficiary Branch Name",
-                                field: "RE_BeneficiaryBranchName",
+                                field: "reBeneficiaryBranchName",
                                 required: true,
                                 maxLength: 50,
                                 pattern: /^[A-Za-z ]+$/,
@@ -760,7 +812,7 @@ export default function ResellerBasicDetails() {
                             },
                             {
                                 label: "IFSC Code",
-                                field: "RE_IFSCCode",
+                                field: "reIFSCCode",
                                 required: true,
                                 placeholder: "ABCD***",
                                 pattern: /^[A-Z0-9]+$/,
@@ -778,12 +830,12 @@ export default function ResellerBasicDetails() {
                                     required
                                     maxLength={maxLength}
                                     placeholder={
-                                        field === "RE_IFSCCode" ? "SBIN0001234" : "Enter value"
+                                        field === "reIFSCCode" ? "SBIN0001234" : "Enter value"
                                     }
                                     onChange={(e) => {
                                         let value = e.target.value;
 
-                                        if (field === "RE_IFSCCode") {
+                                        if (field === "reIFSCCode") {
                                             value = value.toUpperCase();
                                             value = value.replace(/[^A-Z0-9]/g, "");
                                         }
@@ -809,6 +861,149 @@ export default function ResellerBasicDetails() {
                                 )}
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Upload Documents Details */}
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm sm:p-6  overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 space-y-5 sm:space-y-6">
+                    <div className="w-full">
+                        <h2 className="text-[20px] text-gray-700 pb-2">
+                            Upload Documents Details
+                        </h2>
+                        <p className="border-t border-gray-300 py-3"></p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            {documentList.map((document, index) => {
+                                const existingDocument =
+                                    documents[document.documentType];
+                                const hasDocument = !!existingDocument;
+                                return (
+                                    <div
+                                        key={index}
+                                        className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
+                                            ? "border-2 border-green-500 bg-[#f9fbfd]"
+                                            : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
+                                            }`}
+                                    >
+
+                                        {/* Green Tick */}
+                                        {hasDocument && (
+                                            <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-3 w-3 text-white"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth="3"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M5 13l4 4L19 7"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
+
+                                        {/* Hidden File Input */}
+                                        <input
+                                            id={`document-${index}`}
+                                            type="file"
+                                            accept=".pdf,.jpg,.jpeg,.png,.jfif"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file =
+                                                    e.target.files?.[0];
+
+                                                if (!file) return;
+
+                                                if (
+                                                    file.size >
+                                                    5 * 1024 * 1024
+                                                ) {
+                                                    toast.error(
+                                                        "File size must be less than 5 MB"
+                                                    );
+
+                                                    e.target.value = "";
+                                                    return;
+                                                }
+
+                                                // For now only UI update
+                                                setDocuments((prev) => ({
+                                                    ...prev,
+                                                    [document.documentType]: {
+                                                        id: null,
+                                                        originalFileName:
+                                                            file.name,
+                                                        downloadUrl: null,
+                                                        file: file,
+                                                    },
+                                                }));
+                                            }}
+                                        />
+
+                                        {/* Document Name */}
+                                        <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
+                                            {document.title}
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </p>
+
+                                        {/* Existing File Name */}
+                                        {hasDocument ? (
+                                            <p
+                                                className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
+                                                title={
+                                                    existingDocument.originalFileName
+                                                }
+                                            >
+                                                {existingDocument.originalFileName}
+                                            </p>
+                                        ) : (
+                                            <p className="mt-1 text-[9px] text-[#94a3b8]">
+                                                PDF / JPG / PNG - max 5 MB
+                                            </p>
+                                        )}
+
+                                        {/* Icons */}
+                                        <div className="mt-2 flex items-center gap-3">
+                                            {/* Eye Icon - First */}
+                                            {hasDocument && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        viewFile(
+                                                            existingDocument.id
+                                                        )
+                                                    }
+                                                    title="View document"
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Eye
+                                                        className="h-5 w-5 text-blue-500"
+                                                        strokeWidth={1.8}
+                                                    />
+                                                </button>
+                                            )}
+
+                                            {/* Upload Icon - Second */}
+                                            <label
+                                                htmlFor={`document-${index}`}
+                                                className="cursor-pointer"
+                                                title="Upload document"
+                                            >
+                                                <Upload
+                                                    className="h-6 w-6 text-[#94a3b8]"
+                                                    strokeWidth={1.7}
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 
@@ -860,6 +1055,8 @@ export default function ResellerBasicDetails() {
                     </div>
                 </div>
 
+
+
                 {/* ── Submit ───────────────────────────────────────────────── */}
                 <div className="flex justify-center pt-2">
                     <button
@@ -884,15 +1081,12 @@ export default function ResellerBasicDetails() {
                                 <span className="text-4xl text-green-600">✓</span>
                             </div>
                         </div>
-
                         <h2 className="text-center text-2xl font-bold text-slate-800 mb-2">
                             Success
                         </h2>
-
                         <p className="text-center text-slate-500 text-[15px] mb-5">
                             {responsePopup.message}
                         </p>
-
                         <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                             <div className="flex justify-between items-center py-2 border-b border-gray-200">
                                 <span className="font-semibold text-gray-600">Reseller ID</span>
@@ -913,7 +1107,6 @@ export default function ResellerBasicDetails() {
                                 </span>
                             </div>
                         </div>
-
                         <div className="flex justify-center mt-6">
                             <button
                                 type="button"
@@ -936,6 +1129,7 @@ export default function ResellerBasicDetails() {
                     </div>
                 </div>
             )}
+
         </>
     );
 }

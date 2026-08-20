@@ -6,14 +6,14 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 export default function ResellerBasicDetails() {
-    const [userName, setUserData] = useState(null);
+    const [userData, setUserData] = useState(null);
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);            
-            setUserData(parsedUser);
+            setUserData(JSON.parse(storedUser));
         }
     }, []);
+
     const navigate = useNavigate();
     const [data, setData] = useState({
         firstName: "",
@@ -21,89 +21,86 @@ export default function ResellerBasicDetails() {
         legalVehicleType: "",
         companyName: "",
         companyCode: "",
-        mobileNo: "",
-        emailId: "",
-        reAddress1: "",
-        reAddress2: "",
-        reAddress3: "",
-        reCountry: "",
-        reState: "",
-        reCity: "",
-        reZipcode: "",
-        reAadharNo: "",
-        reGstnNO: "",
-        rePanNo: "",
+        mobile: "",
+        email: "",
+        address: "",
+        country: "",
+        state: "",
+        city: "",
+        pincode: "",
+        aadharNo: "",
+        gstNo: "",
+        RePanNo : "",
         RE_BeneficiaryAccountName: "",
         RE_BeneficiaryAccountNo: "",
         RE_BeneficiaryBankName: "",
         RE_BeneficiaryBranchName: "",
-        RE_IFSCCode: ""
+        RE_IFSCCode: "",
+        RSS_SettlementType: "",
+        RSS_SettlementCycle: "",
+        RSS_PaymentBy: "",
+        RSS_PaymentAdvice: ""
+
     })
     const [errors, setErrors] = useState({});
-    const [logo, setLogo] = useState(null);
     const countryList = statecity.map((item) => item.country);
-
     // Selected Country
     const selectedCountry = statecity.find(
-        (item) => item.country === data?.reCountry
+        (item) => item.country === data?.country
     );
 
-    // States of selected country
     const stateList = selectedCountry?.states || [];
-
-    // Selected State
     const selectedState = stateList.find(
-        (item) => item.state === data?.reState
+        (item) => item.state === data?.state
     );
-
-    // Cities of selected state
     const cityList = selectedState?.cities || [];
-
     const handleChange = (field, value) => {
         setData((prev) => ({
             ...prev,
             [field]: value,
         }));
     };
-
+    const [passportPhoto, setPassportPhoto] = useState(null);
+    const [aadharCard, setAadharCard] = useState(null);
+    const [panCard, setPanCard] = useState(null);
+    const [addressProof, setAddressProof] = useState(null);
     // ─── Handle Save Api ─────────────────────────────────────────────────────────────
     const saveResellerDetails = async () => {
         try {
             const formData = new FormData();
-            formData.append("logo", logo);
+            formData.append("passportPhoto", passportPhoto);
+            formData.append("aadharCard", aadharCard);
+            formData.append("panCard", panCard);
+            formData.append("addressProof", addressProof);
             formData.append(
                 "reseller",
                 new Blob(
                     [
                         JSON.stringify({
+                            requestId: `REQ${Date.now()}`,
+                            createdBy: userData?.userName,
                             firstName: data.firstName,
                             lastName: data.lastName,
-                            legalVehicleType: data.legalVehicleType,
                             companyName: data.companyName,
-                            companyCode: data.companyCode,
-                            mobileNo: data.mobileNo,
-                            emailId: data.emailId,
-                            reAddress1: data.reAddress1,
-                            reAddress2: data.reAddress2,
-                            reAddress3: data.reAddress3,
-                            reCountry: data.reCountry,
-                            reState: data.reState,
-                            reCity: data.reCity,
-                            reZipcode: data.reZipcode,
-                            reAadharNo: data.reAadharNo,
-                            reGstnNO: data.reGstnNO,
-                            rePanNo: data.rePanNo,
-
-                            RSS_SettlementType: data?.RSS_SettlementType,
-                            RSS_SettlementCycle: data?.RSS_SettlementCycle,
-                            RSS_PaymentBy: data?.RSS_PaymentBy,
-                            RSS_PaymentAdvice: data?.RSS_PaymentAdvice,
-
+                            mobile: data.mobile,
+                            email: data.email,
+                            address: data.address,
+                            country: data.country,
+                            state: data.state,
+                            city: data.city,
+                            pincode: data.pincode,
+                            aadharNo: data.aadharNo,
+                            gstNo: data.gstNo,
+                            panNo: data.panNo,
                             RE_BeneficiaryAccountName: data.RE_BeneficiaryAccountName,
                             RE_BeneficiaryAccountNo: data.RE_BeneficiaryAccountNo,
                             RE_BeneficiaryBankName: data.RE_BeneficiaryBankName,
                             RE_BeneficiaryBranchName: data.RE_BeneficiaryBranchName,
-                            RE_IFSCCode: data.RE_IFSCCode
+                            RE_IFSCCode: data.RE_IFSCCode,
+                            RSS_SettlementType: data?.RSS_SettlementType,
+                            RSS_SettlementCycle: data?.RSS_SettlementCycle,
+                            RSS_PaymentBy: data?.RSS_PaymentBy,
+                            RSS_PaymentAdvice: data?.RSS_PaymentAdvice,
                         }),
                     ],
                     {
@@ -111,9 +108,10 @@ export default function ResellerBasicDetails() {
                     }
                 )
             );
+            console.log("Form Data payload : " + formData);
 
             const response = await axiosInstance.post(
-                `/saveResellerDetails/${userName?.userName}`,
+                `/reseller/admin/signup`,
                 formData, {
                 headers: {
                     "content-type": "multipart/form-data",
@@ -121,13 +119,17 @@ export default function ResellerBasicDetails() {
             }
             );
 
-            if (response?.respCode === 0) {
-                toast.success(response.respMsg);
+            if (response.success === true) {
+                toast.success(response.message);
                 // navigate after success
                 setTimeout(() => {
                     navigate("/app/reseller");
                 }, 1000);
-            } else {
+            } else if (response.success === false) {
+                toast.error(response.message);
+            }
+
+            else {
                 toast.error(response?.respMsg);
                 if (response?.respData && typeof response.respData === "object") {
                     Object.values(response.respData).forEach((msg) => {
@@ -143,10 +145,7 @@ export default function ResellerBasicDetails() {
 
     return (
         <>
-            <div
-                className="overflow-y-auto hide-scrollbar p-6"
-                style={{ height: "calc(100vh - 120px)" }}
-            >                {/*Header Section*/}
+            <div className="overflow-y-auto hide-scrollbar p-6">
                 <div>
                     <h2 className="text-2xl uppercase pb-2 text-blue-900 font-extrabold">
                         Reseller Onboarding
@@ -154,7 +153,7 @@ export default function ResellerBasicDetails() {
                     <p className="pb-3 text-lg text-blue-900">Streamlined reseller onboarding with secure registration, verification, and role-based access setup for faster activation.
                     </p>
                 </div>
-                
+
                 {/* ── Basic Document Details ───────────────────────────────────── */}
                 <h2 className="text-[20px] text-gray-700 mt-5 my-3">
                     Basic Reseller Details
@@ -212,12 +211,12 @@ export default function ResellerBasicDetails() {
                             type="email"
                             placeholder="Eg. example@example.com"
                             className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.emailId || ""}
+                            value={data?.email || ""}
                             required
-                            onChange={(e) => handleChange("emailId", e.target.value)}
+                            onChange={(e) => handleChange("email", e.target.value)}
                         />
-                        {errors?.emailId && (
-                            <p className="text-red-500 text-xs mt-1">{errors.emailId}</p>
+                        {errors?.email && (
+                            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
                         )}
                     </div>
                 </div>
@@ -236,10 +235,10 @@ export default function ResellerBasicDetails() {
                             inputMode="numeric"
                             pattern="[0-9]*"
                             className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.mobileNo || ""}
+                            value={data?.mobile || ""}
                             onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, "");
-                                handleChange("mobileNo", value);
+                                handleChange("mobile", value);
                             }}
                         />
                     </div>
@@ -264,26 +263,7 @@ export default function ResellerBasicDetails() {
                         )}
                     </div>
 
-                    {/* Email */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Company Code <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.companyCode || ""}
-                            onChange={(e) =>
-                                setData({
-                                    ...data,
-                                    companyCode: e.target.value,
-                                })
-                            }
-                        />
-                        {errors?.companyCode && (
-                            <p className="text-red-500 text-sm mt-1">{errors.companyCode}</p>
-                        )}
-                    </div>
+
                 </div>
                 {/* Row-3 */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
@@ -294,16 +274,16 @@ export default function ResellerBasicDetails() {
                         </label>
                         <input
                             type="text"
-                            name="reAadharNo"
+                            name="aadharNo"
                             maxLength={12}
                             required
                             inputMode="numeric"
                             pattern="[0-9]*"
                             className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.reAadharNo || ""}
+                            value={data?.aadharNo || ""}
                             onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, "");
-                                handleChange("reAadharNo", value);
+                                handleChange("aadharNo", value);
                             }}
                         />
                         {errors?.aadharNo && (
@@ -321,13 +301,13 @@ export default function ResellerBasicDetails() {
                             required
                             placeholder="Eg. 27AAPFU0939F1ZV"
                             className="w-full border border-gray-300 rounded px-3 py-2 uppercase"
-                            value={data?.reGstnNO || ""}
+                            value={data?.gstNo || ""}
                             onChange={(e) => {
                                 const value = e.target.value.toUpperCase();
 
                                 // Allow only A-Z and 0-9
                                 if (/^[A-Z0-9]*$/.test(value)) {
-                                    handleChange("reGstnNO", value);
+                                    handleChange("gstNo", value);
 
                                     // GST Validation
                                     const gstRegex =
@@ -337,27 +317,27 @@ export default function ResellerBasicDetails() {
                                         if (!gstRegex.test(value)) {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                reGstnNO: "Invalid GST format",
+                                                gstNo: "Invalid GST format",
                                             }));
                                         } else {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                reGstnNO: "",
+                                                gstNo: "",
                                             }));
                                         }
                                     } else {
                                         setErrors((prev) => ({
                                             ...prev,
-                                            reGstnNO: "GST must be 15 characters",
+                                            gstNo: "GST must be 15 characters",
                                         }));
                                     }
                                 }
                             }}
                         />
 
-                        {errors?.reGstnNO && (
+                        {errors?.gstNo && (
                             <p className="text-red-500 text-xs mt-1">
-                                {errors.reGstnNO}
+                                {errors.gstNo}
                             </p>
                         )}
                     </div>
@@ -369,7 +349,7 @@ export default function ResellerBasicDetails() {
                         <input
                             type="text"
                             className="w-full border border-gray-300 rounded px-3 py-2 uppercase"
-                            value={data?.rePanNo || ""}
+                            value={data?.panNo || ""}
                             maxLength={10}
                             placeholder="Eg. ABCDE1234F"
                             required
@@ -378,7 +358,7 @@ export default function ResellerBasicDetails() {
 
                                 // Allow only valid characters (A-Z, 0-9)
                                 if (/^[A-Z0-9]*$/.test(value)) {
-                                    handleChange("rePanNo", value);
+                                    handleChange("panNo", value);
 
                                     // Format validation (only when length is 10)
                                     if (value.length === 10) {
@@ -387,99 +367,58 @@ export default function ResellerBasicDetails() {
                                         if (!panRegex.test(value)) {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                rePanNo: "Invalid PAN format (e.g. ABCDE1234F)",
+                                                panNo: "Invalid PAN format (e.g. ABCDE1234F)",
                                             }));
                                         } else {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                rePanNo: "",
+                                                panNo: "",
                                             }));
                                         }
                                     } else {
                                         setErrors((prev) => ({
                                             ...prev,
-                                            rePanNo: "PAN must be 10 characters",
+                                            panNo: "PAN must be 10 characters",
                                         }));
                                     }
                                 }
                             }}
                         />
 
-                        {errors?.rePanNo && (
-                            <p className="text-red-500 text-xs mt-1">{errors.rePanNo}</p>
+                        {errors?.panNo && (
+                            <p className="text-red-500 text-xs mt-1">{errors.panNo}</p>
                         )}
                     </div>
                 </div>
-                {/* Logo */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Logo
-                            <span className="text-sm text-gray-500 font-normal">
-                                {" "} (jpg or png)
-                            </span>
-                        </label>
-                        <input
-                            type="file"
-                            accept=".jpg,.jpeg,.png"
-                            onChange={(e) => {
-                                const file = e.target.files[0];
-                                setLogo(file);
-                                handleChange("partnerLogoFile", file);
-                            }}
-                            className="block w-full text-sm text-gray-700 border border-gray-300 rounded bg-white
-                            file:mr-3 file:px-3 file:py-2 file:border-0 file:border-r
-                            file:border-gray-300 file:bg-gray-100 file:text-black
-                            hover:file:bg-gray-200"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                            Reseller Type <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            value={data?.legalVehicleType || ""}
-                            required
-                            onChange={(e) => handleChange("legalVehicleType", e.target.value)}
-                            className="w-full h-8 border border-gray-400 rounded-sm bg-white px-3 text-sm text-gray-600 outline-none"
-                        >
-                            <option value="">-- Select --</option>
-                            <option value="Referral / Partner Model">Referral / Partner Model</option>
-                            <option value="Aggregator Model">Aggregator Model</option>
-                            <option value="Hosted Model">Hosted Model</option>
-                        </select>
-                    </div>
-                    <div></div>
-                </div>
+
                 {/* ── Address  Details ───────────────────────────────────── */}
                 <div className="">
-                    <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3 pt-5"> Address Details</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-                        {[
-                            { label: "Address 1", field: "reAddress1", required: true },
-                            { label: "Address 2", field: "reAddress2" },
-                            { label: "Address 3", field: "reAddress3" },
-                        ].map(({ label, field, required }) => (
-                            <div key={field}>
-                                <label className="block text-gray-700 font-medium mb-2">
-                                    {label}{required && <span className="text-red-500">*</span>}
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    value={data?.[field] || ""}
-                                    onChange={(e) => handleChange(field, e.target.value)}
-                                />
-                                {errors?.[field] && (
-                                    <p className="text-red-500 text-xs mt-1">{errors[field]}</p>
-                                )}
-                            </div>
-                        ))}
+                    <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                        Address Details
+                    </h2>
+                    <div className="border-t border-gray-200 mt-3 mb-5" />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7">
+                        {/* Address */}
+                        <div>
+                            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
+                                Address <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full border border-gray-200 rounded-lg bg-white px-3 py-2.5 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition"
+                                value={data?.address || ""}
+                                onChange={(e) => handleChange("address", e.target.value)}
+                            />
+                            {errors?.address && (
+                                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                            )}
+                        </div>
 
                         {/* Country */}
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">
-                                Country<span className="text-red-500">*</span>
+                            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
+                                Country <span className="text-red-500">*</span>
                             </label>
                             <Select
                                 options={countryList.map((country) => ({
@@ -487,27 +426,26 @@ export default function ResellerBasicDetails() {
                                     label: country,
                                 }))}
                                 value={
-                                    data?.reCountry
-                                        ? { value: data.reCountry, label: data.reCountry }
+                                    data?.country
+                                        ? { value: data.country, label: data.country }
                                         : null
                                 }
                                 onChange={(selected) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        reCountry: selected?.value || "",
-                                        reState: "",
-                                        reCity: "",
+                                        country: selected?.value || "",
+                                        state: "",
+                                        city: "",
                                     }))
                                 }
                                 placeholder="Select Country"
                                 isSearchable
                             />
                         </div>
-
                         {/* State */}
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">
-                                State<span className="text-red-500">*</span>
+                            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
+                                State <span className="text-red-500">*</span>
                             </label>
                             <Select
                                 options={stateList.map((item) => ({
@@ -515,25 +453,27 @@ export default function ResellerBasicDetails() {
                                     label: item.state,
                                 }))}
                                 value={
-                                    data?.reState
-                                        ? { value: data.reState, label: data.reState }
+                                    data?.state
+                                        ? { value: data.state, label: data.state }
                                         : null
                                 }
                                 onChange={(selected) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        reState: selected?.value || "",
-                                        reCity: "",
+                                        state: selected?.value || "",
+                                        city: "",
                                     }))
                                 }
+                                placeholder="Select State"
                                 isSearchable
                             />
                         </div>
 
+
                         {/* City */}
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">
-                                City<span className="text-red-500">*</span>
+                            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
+                                City <span className="text-red-500">*</span>
                             </label>
                             <Select
                                 options={cityList.map((city) => ({
@@ -541,20 +481,20 @@ export default function ResellerBasicDetails() {
                                     label: city,
                                 }))}
                                 value={
-                                    data?.reCity
-                                        ? { value: data.reCity, label: data.reCity }
+                                    data?.city
+                                        ? { value: data.city, label: data.city }
                                         : null
                                 }
                                 onChange={(selected) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        reCity: selected?.value || "",
+                                        city: selected?.value || "",
                                     }))
                                 }
+                                placeholder="Select City"
                                 isSearchable
                             />
                         </div>
-
                         {/* Zip Code */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
@@ -566,10 +506,10 @@ export default function ResellerBasicDetails() {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 className="w-full border border-gray-300 rounded px-3 py-2"
-                                value={data?.reZipcode || ""}
+                                value={data?.pincode || ""}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
-                                    handleChange("reZipcode", value);
+                                    handleChange("pincode", value);
                                 }}
                             />
                         </div>
@@ -700,16 +640,12 @@ export default function ResellerBasicDetails() {
                                                 : "Enter value"
                                         }
                                         onChange={(e) => {
-
                                             let value = e.target.value;
-
                                             // ONLY for IFSC Code
                                             if (field === "RE_IFSCCode") {
                                                 value = value.toUpperCase();
-                                                // remove special characters and spaces
                                                 value = value.replace(/[^A-Z0-9]/g, "");
                                             }
-
                                             if (pattern && value && !pattern.test(value)) {
                                                 setErrors((prev) => ({
                                                     ...prev,
@@ -721,12 +657,10 @@ export default function ResellerBasicDetails() {
                                                     [field]: "",
                                                 }));
                                             }
-
                                             handleChange(field, value);
                                         }}
                                         className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
-
                                     {errors?.[field] && (
                                         <p className="text-red-500 text-sm mt-1">
                                             {errors[field]}
@@ -737,13 +671,121 @@ export default function ResellerBasicDetails() {
                         )}
                     </div>
                 </div>
+
+                {/* ── Upload Documents Details ───────────────────────────────── */}
+                <div className="w-full mt-5">
+                    <h2 className="text-[20px] text-gray-700 my-3">
+                        Upload Documents Details
+                    </h2>
+                    <p className="border-t border-gray-300 py-3"></p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {[
+                            {
+                                title: "Reseller Photograph",
+                                state: passportPhoto,
+                                setState: setPassportPhoto,
+                            },
+                            {
+                                title: "Aadhar Card",
+                                state: aadharCard,
+                                setState: setAadharCard,
+                            },
+                            {
+                                title: "Pan Card",
+                                state: panCard,
+                                setState: setPanCard,
+                            },
+                            {
+                                title: "Address Proof",
+                                state: addressProof,
+                                setState: setAddressProof,
+                            },
+                        ].map((document, index) => (
+                                <div
+                                    key={index}
+                                    className="flex h-[125px] flex-col items-center justify-center rounded-lg border border-dashed border-[#d9e2ef] bg-[#f9fbfd] px-3 text-center"
+                                >
+                                    {/* Upload Icon */}
+                                    <label
+                                        htmlFor={`document-${index}`}
+                                        className="cursor-pointer"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-7 w-7 text-[#94a3b8]"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M12 16V4m0 0L8 8m4-4l4 4"
+                                            />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"
+                                            />
+                                        </svg>
+                                    </label>
+
+                                    <input
+                                        id={`document-${index}`}
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+
+                                            if (file) {
+                                                // 5 MB validation
+                                                if (file.size > 5 * 1024 * 1024) {
+                                                    alert("File size must be less than 5 MB");
+                                                    e.target.value = "";
+                                                    return;
+                                                }
+
+                                                document.setState(file);
+                                            }
+                                        }}
+                                    />
+
+                                    {/* Document Name */}
+                                    <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
+                                        {document.title}
+                                        <span className="text-red-500">*</span>
+                                    </p>
+
+                                    {/* Selected File Name */}
+                                    {document.state ? (
+                                        <p
+                                            className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
+                                            title={document.state.name}
+                                        >
+                                            {document.state.name}
+                                        </p>
+                                    ) : (
+                                        <p className="mt-1 text-[9px] text-[#94a3b8]">
+                                            PDF / JPG / PNG - max 5 MB
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                    </div>
+                </div>
+
+
+
+
                 <div className="flex justify-center mt-8">
                     <button
                         onClick={saveResellerDetails}
                         type="submit"
-                        className="bg-blue-500 text-white px-6 py-2 rounded"
+                        className="bg-yellow-500 text-white px-5 py-2 rounded"
                     >
-                        Submit
+                        Submit Application
                     </button>
                 </div>
             </div>
