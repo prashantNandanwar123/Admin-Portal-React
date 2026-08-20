@@ -446,7 +446,6 @@ export default function EUploadDocument({
     return dateStr;
   };
 
-
   const validateDocuments = () => {
     for (let doc of documents) {
 
@@ -475,7 +474,6 @@ export default function EUploadDocument({
         return false;
       }
     }
-
     return true;
   };
   // Date

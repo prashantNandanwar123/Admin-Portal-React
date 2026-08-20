@@ -11,33 +11,44 @@ export default function ResellerBasicDetails() {
     const navigate = useNavigate();
     const [data, setData] = useState({
         userId: "",
+        requestId: "",
+        resellerId: "",
+
         firstName: "",
         lastName: "",
-        legalVehicleType: "",
         companyName: "",
         companyCode: "",
+
         mobile: "",
         email: "",
+
         address: "",
         country: "",
-        State: "",
-        City: "",
+        state: "",
+        city: "",
         pincode: "",
+
         aadharNo: "",
         gstNo: "",
-        PanNo: "",
+        panNo: "",
+
         reBeneficiaryAccountName: "",
         reBeneficiaryAccountNo: "",
         reBeneficiaryBankName: "",
         reBeneficiaryBranchName: "",
         reIFSCCode: "",
+
         rssSettlementType: "",
         rssSettlementCycle: "",
         rssPaymentBy: "",
         RSS_PaymentAdvice: "",
-        status: "",
-    })
 
+        RSS_Remark: "",
+        status: "",
+
+        createdBy: "",
+        createdAt: "",
+    });
     const [userData, setUserData] = useState(null);
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -196,88 +207,154 @@ export default function ResellerBasicDetails() {
     ];
 
     // ─── Reseller Update Save Api ─────────────────────────────────────────────────────────────
+
     const resellerAdminUpdate = async () => {
         if (!resellerId) {
             toast.error("Reseller ID is missing");
             return;
         }
-        // Status validation
         if (!data?.status) {
             toast.error("Please select Approve or Reject");
             return;
         }
-        // Remark validation
         if (!data?.RSS_Remark?.trim()) {
             toast.error("Please enter remark");
             return;
         }
+
         try {
             setSubmitLoading(true);
-            const status = data.status;
-            const payload = {
 
-                requestId: `REQ${Date.now()}`,
+            const formData = new FormData();
+            formData.append("passportPhoto", passportPhoto);
+            formData.append("aadharCard", aadharCard);
+            formData.append("panCard", panCard);
+            formData.append("addressProof", addressProof);
+            const status = data.status;
+
+            const payload = {
+                requestId:
+                    data?.requestId ||
+                    `REQ${Date.now()}`,
+
                 resellerId: resellerId,
-                createdBy: userData?.userName,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                companyName: data.companyName,
-                mobile: data.mobile,
-                email: data.email,
-                address: data.address,
-                country: data.country,
-                state: data.state,
-                city: data.city,
-                pincode: data.pincode,
-                aadharNo: data.aadharNo,
-                gstNo: data.gstNo,
-                panNo: data.panNo,
-                reBeneficiaryAccountName: data.reBeneficiaryAccountName,
-                reBeneficiaryAccountNo: data.reBeneficiaryAccountNo,
-                reBeneficiaryBankName: data.reBeneficiaryBankName,
-                reBeneficiaryBranchName: data.reBeneficiaryBranchName,
-                reIFSCCode: data.reIFSCCode,
-                rssSettlementType: data?.rssSettlementType,
-                rssSettlementCycle: data?.rssSettlementCycle,
-                rssPaymentBy: data?.rssPaymentBy,
-                RSS_PaymentAdvice: data?.RSS_PaymentAdvice,
-                status: data?.status,
+
+                createdBy: userData?.userName || "",
+
+                firstName: data?.firstName || "",
+                lastName: data?.lastName || "",
+                companyName: data?.companyName || "",
+
+                mobile: data?.mobile || "",
+                email: data?.email || "",
+
+                address: data?.address || "",
+                country: data?.country || "",
+                state: data?.state || "",
+                city: data?.city || "",
+                pincode: data?.pincode || "",
+
+                aadharNo: data?.aadharNo || "",
+                gstNo: data?.gstNo || "",
+                panNo: data?.panNo || "",
+
+                reBeneficiaryAccountName:
+                    data?.reBeneficiaryAccountName || "",
+
+                reBeneficiaryAccountNo:
+                    data?.reBeneficiaryAccountNo || "",
+
+                reBeneficiaryBankName:
+                    data?.reBeneficiaryBankName || "",
+
+                reBeneficiaryBranchName:
+                    data?.reBeneficiaryBranchName || "",
+
+                reIFSCCode:
+                    data?.reIFSCCode || "",
+
+                rssSettlementType:
+                    data?.rssSettlementType || "",
+
+                rssSettlementCycle:
+                    data?.rssSettlementCycle || "",
+
+                rssPaymentBy:
+                    data?.rssPaymentBy || "",
+
+                RSS_PaymentAdvice:
+                    data?.RSS_PaymentAdvice || "",
+
+                RSS_Remark:
+                    data?.RSS_Remark?.trim() || "",
+
+                status: status,
             };
+
+            console.log(
+                "FINAL UPDATED PAYLOAD --->>>",
+                payload
+            );
 
             const response = await axiosInstance.post(
                 `/reseller/admin/${resellerId}/${status}`,
                 payload
             );
 
-            // SUCCESS RESPONSE
+            console.log(
+                "UPDATE API RESPONSE --->>>",
+                response
+            );
+
             if (response?.respCode === 0) {
-                const resData = response?.respData || {};
+                const resData =
+                    response?.respData || {};
+
                 if (status === "REJECTED") {
-                    toast.success(response?.respMsg);
+                    toast.success(
+                        response?.respMsg ||
+                        "Reseller rejected successfully"
+                    );
+
                     setTimeout(() => {
                         navigate("/app/reseller");
                     }, 500);
+
                     return;
                 }
+
                 if (status === "APPROVED") {
                     setResponsePopup({
                         show: true,
-                        message: response?.respMsg,
+                        message:
+                            response?.respMsg ||
+                            "Reseller approved successfully",
+
                         success: true,
-                        resellerId: resData?.resellerId,
-                        firstName: resData?.firstName,
-                        lastName: resData?.lastName,
+
+                        resellerId:
+                            resData?.resellerId ||
+                            resellerId,
+
+                        firstName:
+                            resData?.firstName ||
+                            data?.firstName,
+
+                        lastName:
+                            resData?.lastName ||
+                            data?.lastName,
                     });
                     return;
                 }
             }
             toast.error(response?.respMsg);
-            // Backend validation errors
             if (
                 response?.respData &&
                 typeof response.respData === "object"
             ) {
-                Object.values(response.respData).forEach((msg) => {
+                Object.values(
+                    response.respData
+                ).forEach((msg) => {
                     if (msg) {
                         toast.error(msg);
                     }
@@ -488,11 +565,9 @@ export default function ResellerBasicDetails() {
                                 onChange={(e) => {
                                     const value = e.target.value.toUpperCase();
 
-                                    // Allow only A-Z and 0-9
                                     if (/^[A-Z0-9]*$/.test(value)) {
-                                        handleChange("reGstnNO", value);
+                                        handleChange("gstNo", value);
 
-                                        // GST Validation
                                         const gstRegex =
                                             /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
@@ -500,18 +575,18 @@ export default function ResellerBasicDetails() {
                                             if (!gstRegex.test(value)) {
                                                 setErrors((prev) => ({
                                                     ...prev,
-                                                    reGstnNO: "Invalid GST format",
+                                                    gstNo: "Invalid GST format",
                                                 }));
                                             } else {
                                                 setErrors((prev) => ({
                                                     ...prev,
-                                                    reGstnNO: "",
+                                                    gstNo: "",
                                                 }));
                                             }
                                         } else {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                reGstnNO: "GST must be 15 characters",
+                                                gstNo: "GST must be 15 characters",
                                             }));
                                         }
                                     }
@@ -1054,8 +1129,6 @@ export default function ResellerBasicDetails() {
                         </div>
                     </div>
                 </div>
-
-
 
                 {/* ── Submit ───────────────────────────────────────────────── */}
                 <div className="flex justify-center pt-2">
