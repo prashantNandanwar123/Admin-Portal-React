@@ -1,702 +1,956 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import axiosInstance from "../api/axios";
-import { FaEye, FaEyeSlash, FaShieldAlt } from "react-icons/fa";
-import logo1 from "../assets/img-1.jpeg";
-import bgImage from "../assets/leftimg.png";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  User,
+  Calendar,
+  Clock,
+  Phone,
+  Smartphone,
+  Mail,
+  FileText,
+  ShieldCheck,
+  Building2,
+  Globe,
+  Image as ImageIcon,
+  Store,
+  MapPin,
+  Landmark,
+  ChevronDown,
+  ArrowRight,
+  ClipboardList,
+  UploadCloud,
+} from "lucide-react";
 
-export default function ForgotPassword() {
-  const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
-  const [otp, setOtp] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+/* ────────────────────────────────────────────────────────────────────────
+   MOCK DATA
+   In your real app these come from props / API calls. Kept here only so
+   this file renders standalone. Swap these for your real lists.
+──────────────────────────────────────────────────────────────────────── */
+const legalVehicalNameList = [
+  "Online Marketplace",
+  "Sales Team",
+  "Digital Marketing",
+  "Referral Partner",
+  "Website Signup",
+];
 
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const documentOptions = [
+  { value: "Aadhar", label: "Aadhar" },
+  { value: "PAN", label: "PAN" },
+  { value: "Passport", label: "Passport" },
+];
 
+const sezOptions = [
+  { value: "Yes", label: "Yes" },
+  { value: "No", label: "No" },
+];
 
-  //----- Send Forgot Password APi CAll ----
-  const sendOtp = async (e) => {
-    e.preventDefault();
-    if (!userName) {
-      toast.error("Please enter username");
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post("/sendForgotPasswordOtp",
-        {
-          userName,
-        }
-      );
+const mccList = [
+  { code: "5411", name: "Grocery Stores" },
+  { code: "5812", name: "Restaurants" },
+  { code: "5999", name: "Retail Stores - Miscellaneous" },
+  { code: "4899", name: "Cable, Satellite & Other Pay TV" },
+  { code: "6300", name: "Insurance Sales & Underwriting" },
+  { code: "8299", name: "Educational Services" },
+];
 
-      if (response?.respCode === 0) {
-        console.log(response);
-        toast.success(response.respMsg);
-        setOtpSent(true);   // OTP field show hoga
-      } else {
-        toast.error(response.respMsg);
+const countryList = ["India", "United States", "United Arab Emirates", "Singapore", "United Kingdom"];
+
+const stateList = [
+  { state: "West Bengal" },
+  { state: "Maharashtra" },
+  { state: "Delhi" },
+  { state: "Karnataka" },
+  { state: "Tamil Nadu" },
+];
+
+const cityList = ["Kolkata", "Mumbai", "New Delhi", "Bengaluru", "Chennai"];
+
+const billingStateList = stateList;
+const billingCityList = cityList;
+
+/* ────────────────────────────────────────────────────────────────────────
+   SMALL REUSABLE UI PRIMITIVES
+──────────────────────────────────────────────────────────────────────── */
+
+const inputBase =
+  "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-800 bg-white " +
+  "placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-300/70 " +
+  "focus:border-amber-400 transition disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed";
+
+function Field({ label, required, children, className = "" }) {
+  return (
+    <div className={className}>
+      {label && (
+        <label className="block text-gray-700 font-medium text-[13.5px] mb-2">
+          {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+      )}
+      {children}
+    </div>
+  );
+}
+
+function SectionHeading({ icon: Icon, title }) {
+  return (
+    <div className="flex items-center gap-3 mb-6 pb-3 border-b border-gray-200">
+      <span className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-100 text-amber-600 shrink-0">
+        <Icon size={18} strokeWidth={2.1} />
+      </span>
+      <h2 className="text-[16px] sm:text-[18px] font-semibold text-gray-800 tracking-tight">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function Card({ children, className = "" }) {
+  return (
+    <div
+      className={`bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-6 sm:px-7 sm:py-7 ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function RadioPill({ label, checked, onChange }) {
+  return (
+    <label className="flex items-center gap-2 cursor-pointer select-none group">
+      <span
+        className={`w-4 h-4 rounded-full border flex items-center justify-center transition ${
+          checked ? "border-amber-500" : "border-gray-300 group-hover:border-amber-300"
+        }`}
+      >
+        {checked && <span className="w-2 h-2 rounded-full bg-amber-500" />}
+      </span>
+      <input type="radio" className="hidden" checked={checked} onChange={onChange} />
+      <span className={`text-sm ${checked ? "text-gray-900 font-medium" : "text-gray-600"}`}>
+        {label}
+      </span>
+    </label>
+  );
+}
+
+/* Minimal dependency-free searchable select — mirrors the react-select API
+   used in the original code (options / value / onChange / isDisabled / isSearchable)
+   so no fields or logic had to be dropped, only the underlying implementation. */
+function SearchableSelect({ options, value, onChange, placeholder, isDisabled, isSearchable = true }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function onDocClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+        setQuery("");
       }
-    } catch (error) {
-      toast.error(error);
-    } finally {
-      setLoading(false);
     }
-  };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
 
-  //----- Verify Forgot Password APi CAll ----
-  const verifyOtp = async () => {
-    if (!otp) {
-      toast.error("Please enter OTP");
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post(
-        "/verifyForgotPasswordOtp",
-        {
-          userName,
-          otp,
-        }
-      );
-
-      if (response?.respCode === 0) {
-        toast.success(response.respMsg);
-        setOtpVerified(true); // Password fields show honge
-      } else {
-        toast.error(response.respMsg);
-      }
-    } catch (error) {
-      toast.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //---- Password Validation ----
-  const passwordValidation = {
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-    special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
-
-
-  //----- Handle Password-----
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    if (
-      !passwordValidation.length ||
-      !passwordValidation.uppercase ||
-      !passwordValidation.lowercase ||
-      !passwordValidation.number ||
-      !passwordValidation.special
-    ) {
-      toast.error(
-        "Password must contain 8+ characters, uppercase, lowercase, number and special character"
-      );
-      return;
-    }
-    if (!userName || !password || !confirmPassword) {
-      toast("Please fill all fields", {
-        icon: "⚠️",
-      });
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password do not match");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post("/submitForgotPassword", {
-        userName,
-        password,
-        confPassword: confirmPassword,
-      });
-
-      if (response?.respCode === 0) {
-        console.log("rest password Message--->>>", response?.respMsg);
-        toast.success(response?.respMsg);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } else {
-        toast.error(response?.respMsg);
-      }
-
-    } catch (error) {
-      toast.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const req = <span className="text-red-500">*</span>;
+  const filtered = query
+    ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
 
   return (
-    <div className="bg-[#f4f4f4] min-h-screen w-full p-4 md:p-6 lg:p-8 flex items-center justify-center">
-      <div className="w-full max-w-7xl bg-white rounded-2xl overflow-hidden shadow-2xl">
-        {/* Left Section- Desktop */}
-        <div className="hidden lg:grid lg:grid-cols-2 cursor-default">
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        disabled={isDisabled}
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between border rounded-lg px-3 py-2.5 text-sm text-left transition
+          ${
+            isDisabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+              : "bg-white border-gray-300 hover:border-amber-400 text-gray-800"
+          }
+          ${open ? "ring-2 ring-amber-300/70 border-amber-400" : ""}`}
+      >
+        <span className={value ? "" : "text-gray-400"}>{value ? value.label : placeholder || "-- Select --"}</span>
+        <ChevronDown size={16} className={`text-gray-400 transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
+      </button>
 
-          {/* Left Section */}
-          <div className="bg-[#05070B] text-white relative overflow-hidden">
-            <div className="px-10 py-6 h-full flex flex-col relative">
-              {/* Logo */}
-              <img
-                src={logo1}
-                alt="HelloPe"
-                className="h-32 object-contain"
-                style={{ marginLeft: "-210px" }}
+      {open && !isDisabled && (
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-auto">
+          {isSearchable && (
+            <div className="p-2 sticky top-0 bg-white border-b border-gray-100">
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full text-sm px-2 py-1.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-amber-300"
               />
-              {/* Heading */}
-              <div>
-                <h1 className="lg:text-4xl text-2xl font-bold">
-                  Welcome to{" "}
-                  <span className="text-[#FFC400]">HelloPe!</span>{" "}
-                  👋
-                </h1>
-                <p className="mt-2 text-lg text-gray-300">
-                  Fast,
-                  <span className="text-[#FFC400] font-medium"> Secure & Reliable </span>
-                  Payment Gateway
-                </p>
-              </div>
+            </div>
+          )}
+          {filtered.length === 0 && <div className="px-3 py-2 text-sm text-gray-400">No options</div>}
+          {filtered.map((opt) => (
+            <div
+              key={opt.value}
+              onClick={() => {
+                onChange(opt);
+                setOpen(false);
+                setQuery("");
+              }}
+              className={`px-3 py-2 text-sm cursor-pointer hover:bg-amber-50 ${
+                value?.value === opt.value ? "bg-amber-50 text-amber-700 font-medium" : "text-gray-700"
+              }`}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
-              {/* Features */}
-              <div className="mt-7 space-y-5 relative z-10">
-                {/* Item */}
-                <div className="flex items-center">
-                  <div className="w-13 h-13 rounded-xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl shadow">
-                    ⚡
-                  </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-semibold">Instant UPI Payments</h3>
-                    <p className="text-gray-400 text-sm mt-1">Lightning fast transactions, 24/7</p>
-                  </div>
-                </div>
+/* ────────────────────────────────────────────────────────────────────────
+   MAIN COMPONENT
+──────────────────────────────────────────────────────────────────────── */
+export default function EditBasicDetailsForm() {
+  const [data, setData] = useState({
+    createdBy: "administrator",
+    createdDate: "15/06/2026 08:11:50",
+    basicSrcChannel: "",
 
-                {/* Item */}
-                <div className="flex items-center">
-                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
-                    🛡️
-                  </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-semibold">HMAC-SHA256 Security</h3>
-                    <p className="text-gray-400 text-sm mt-1">Enterprise grade security for your data</p>
-                  </div>
-                </div>
+    cpdNameTitle: "",
+    cpdName: "",
+    cpdDateOfBirth: "",
+    cpdPhoneNo: "",
+    cpdMobile: "",
+    cpdPrimaryEmailId: "",
+    cpdSecondaryEmailId: "",
 
-                {/* Item */}
-                <div className="flex items-center">
-                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
-                    📊
-                  </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-semibold">Real-time Dashboard</h3>
-                    <p className="text-gray-400 text-sm mt-1">Track and monitor in real-time</p>
-                  </div>
-                </div>
+    bddDocument: "",
+    bddAadharNo: "",
+    bddSez: "",
+    bddGstnNO: "",
+    bddPanNo: "",
+    riskCheck: "",
+    bddCategory: "",
+    bddAgpMcc: "",
+    bddVintageType: "",
+    bddMerchantBusinessType: "",
+    bddMerchantWebsiteURL: "",
+    partnerLogoCheck: "",
+    partnerLogoFile: null,
+    partnerLogoPath: "",
+    storeDbaName: "HelloPe",
+    storeLegalName: "HelloPe pvt ltd",
 
-                {/* Item */}
-                <div className="flex items-center">
-                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
-                    💳
-                  </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-semibold">Multi Payment Support</h3>
-                    <p className="text-gray-400 text-sm mt-1">UPI, Cards, Wallets & more</p>
-                  </div>
-                </div>
+    addStoreAddress1: "",
+    addStoreAddress2: "",
+    addStoreAddress3: "",
+    addCountry: "",
+    addState: "",
+    addCity: "",
+    addZipcode: "",
 
-                {/* Item */}
-                <div className="flex items-center">
-                  <div className="w-13 h-13 rounded-2xl border border-[#2a2a2a] bg-[#141414] flex items-center justify-center text-[#FFC400] text-3xl">
-                    📈
-                  </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-semibold">High Success Rate</h3>
-                    <p className="text-gray-400 text-sm mt-1">Optimized for maximum success</p>
-                  </div>
-                </div>
-              </div>
+    billingSameAsShipping: false,
+    billingAddress1: "",
+    billingAddress2: "",
+    billingAddress3: "",
+    billingCountry: "",
+    billingState: "",
+    billingCity: "",
+    billingZipcode: "",
+  });
 
-              {/* Shield Illustration*/}
-              <img
-                src={bgImage}
-                alt="Security"
-                className="absolute w-[380px] object-contain pointer-events-none"
-                style={{ right: "-22px", bottom: "85px" }}
-              />
-              {/* Divider line with gap below Features */}
-              <div className="border-b border-[#1f1f1f] w-3/4 mt-13"></div>
-              {/* Bottom */}
-              <div className="mt-5 pt-2 flex items-center text-gray-300 text-xs relative z-10">
-                <span className="text-[#FFC400] text-xl mr-3">
-                  <FaShieldAlt />
+  const [errors, setErrors] = useState({});
+  const partnerLogoRef = useRef(null);
+
+  const handleChange = (field, value) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveAndNext = () => {
+    const newErrors = {};
+    if (!data.partnerLogoCheck) newErrors.partnerLogoCheck = "Partner Logo Check is required";
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      console.log("Saving basic details:", data);
+    }
+  };
+
+  const handleNext = () => {
+    console.log("Proceeding to next step with:", data);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-[1366px] mx-auto px-4 py-6 sm:px-6 lg:px-8 xl:px-10 xl:py-10">
+        {/* HEADER */}
+        <div className="mb-8">
+          <h2 className="text-xl sm:text-2xl uppercase text-gray-900 font-extrabold py-1 tracking-tight">
+            Edit Basic Details
+          </h2>
+          <p className="text-sm sm:text-base text-gray-500 max-w-3xl">
+            Edit Basic Details Form collects essential information such as personal and contact
+            details to create a user profile.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-6 xl:gap-7">
+          {/* ── STORE ONBOARDING STATUS ─────────────────────────────── */}
+          <Card>
+            <SectionHeading icon={ClipboardList} title="Store Onboarding Status" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0 bg-amber-50 border border-amber-100 rounded-2xl px-5 py-4 mb-7 divide-y sm:divide-y-0 sm:divide-x divide-amber-200/80">
+              <div className="flex items-center gap-3 sm:pr-6">
+                <span className="w-9 h-9 rounded-full bg-amber-200/70 flex items-center justify-center text-amber-700 shrink-0">
+                  <User size={16} />
                 </span>
-                Trusted by Merchants across India
-                <svg
-                  className="ml-2 w-5 h-5 rounded-[2px] overflow-hidden"
-                  viewBox="0 0 24 16"
-                >
-                  <rect width="24" height="5.33" y="0" fill="#FF9933" />
-                  <rect width="24" height="5.33" y="5.33" fill="#FFFFFF" />
-                  <rect width="24" height="5.33" y="10.66" fill="#138808" />
-                  <circle cx="12" cy="8" r="2" fill="none" stroke="#000080" strokeWidth="0.3" />
-                  <circle cx="12" cy="8" r="0.3" fill="#000080" />
-                </svg>
+                <div>
+                  <p className="text-xs text-gray-500">Created By</p>
+                  <p className="text-sm font-semibold text-gray-800">{data?.createdBy}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 sm:px-6 pt-3 sm:pt-0">
+                <span className="w-9 h-9 rounded-full bg-amber-200/70 flex items-center justify-center text-amber-700 shrink-0">
+                  <Calendar size={16} />
+                </span>
+                <div>
+                  <p className="text-xs text-gray-500">Created Date</p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {data?.createdDate?.split(" ")[0]}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 sm:pl-6 pt-3 sm:pt-0">
+                <span className="w-9 h-9 rounded-full bg-amber-200/70 flex items-center justify-center text-amber-700 shrink-0">
+                  <Clock size={16} />
+                </span>
+                <div>
+                  <p className="text-xs text-gray-500">Created Time</p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {data?.createdDate?.split(" ")[1]}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Section */}
-          <div className="flex items-center justify-center p-8 bg-gray-50">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-18">
-              {/* Logo */}
-              <div className="flex justify-center mb-6">
-                <img
-                  src="/logo1.avif"
-                  alt="Logo"
-                  className="h-14 object-contain"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-7">
+              <Field label="Sourcing Channel" required>
+                <select
+                  className={inputBase}
+                  value={data?.basicSrcChannel || ""}
+                  onChange={(e) => handleChange("basicSrcChannel", e.target.value)}
+                >
+                  <option value="">-- Select --</option>
+                  {legalVehicalNameList?.map((item, index) => (
+                    <option key={index} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+          </Card>
 
-              {/* Heading */}
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800">
-                  Reset Your Password
-                </h2>
-                <p className="text-gray-500 mt-2 text-sm">
-                  Enter your details to reset password
-                </p>
-              </div>
+          {/* ── CONTACT PERSON DETAILS ──────────────────────────────── */}
+          <Card>
+            <SectionHeading icon={User} title="Contact Person Details" />
 
-              {/* Form */}
-              <form className="space-y-5">
-                {/* Username */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username {req}
-                  </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-7">
+              {/* Full Name */}
+              <Field label="Full Name">
+                <div className="flex w-full">
+                  <select
+                    className="border border-gray-300 rounded-l-lg px-2.5 py-2.5 bg-white w-24 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300/70 focus:border-amber-400"
+                    value={data?.cpdNameTitle || ""}
+                    onChange={(e) => handleChange("cpdNameTitle", e.target.value)}
+                  >
+                    <option value="">Title</option>
+                    {["Mr", "Ms", "Mrs", "Miss", "Dr"].map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
 
                   <input
                     type="text"
-                    value={userName}
-                    maxLength={20}
-                    readOnly={otpVerified}
-                    onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Enter username"
-                    className={`w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 ${otpVerified ? "bg-gray-100 cursor-not-allowed" : ""
-                      }`}
+                    placeholder="Full Name"
+                    className="flex-1 border border-l-0 border-gray-300 rounded-r-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300/70 focus:border-amber-400"
+                    value={data?.cpdName || ""}
+                    onChange={(e) => handleChange("cpdName", e.target.value)}
                   />
-
-                  {otpSent && (
-                    <span className="absolute right-4 top-[42px] text-green-600 text-xl font-bold">
-                      ✓
-                    </span>
-                  )}
                 </div>
+              </Field>
 
-                {/* Send OTP Button */}
-                {!otpSent && !otpVerified && (
-                  <button
-                    type="button"
-                    onClick={sendOtp}
-                    disabled={loading}
-                    className="w-full bg-[#FEC62F] hover:bg-[#FEC91F] text-white py-3 rounded-xl font-semibold"
-                  >
-                    {loading ? "Sending..." : "Send OTP"}
-                  </button>
-                )}
+              {/* Date of Birth */}
+              <Field label="Date of Birth">
+                <input
+                  type="date"
+                  className={inputBase}
+                  value={data?.cpdDateOfBirth || ""}
+                  onChange={(e) => handleChange("cpdDateOfBirth", e.target.value)}
+                />
+              </Field>
 
-                {/* OTP */}
-                {otpSent && !otpVerified && (
-                  <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      OTP {req}
-                    </label>
+              {/* Phone */}
+              <Field label="Phone No. with STD Code">
+                <div className="relative">
+                  <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    className={`${inputBase} pl-9`}
+                    value={data?.cpdPhoneNo || ""}
+                    onChange={(e) => handleChange("cpdPhoneNo", e.target.value)}
+                  />
+                </div>
+              </Field>
 
-                    <input
-                      type="text"
-                      value={otp}
-                      maxLength={6}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter OTP"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12"
+              {/* Mobile */}
+              <Field label="Mobile">
+                <div className="relative">
+                  <Smartphone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    className={`${inputBase} pl-9`}
+                    value={data?.cpdMobile || ""}
+                    onChange={(e) => handleChange("cpdMobile", e.target.value)}
+                  />
+                </div>
+              </Field>
+
+              {/* Primary Email */}
+              <Field label="Primary Email Id">
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="email"
+                    className={`${inputBase} pl-9`}
+                    value={data?.cpdPrimaryEmailId || ""}
+                    onChange={(e) => handleChange("cpdPrimaryEmailId", e.target.value)}
+                  />
+                </div>
+              </Field>
+
+              {/* Secondary Email */}
+              <Field label="Secondary Email Id">
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="email"
+                    className={`${inputBase} pl-9`}
+                    value={data?.cpdSecondaryEmailId || ""}
+                    onChange={(e) => handleChange("cpdSecondaryEmailId", e.target.value)}
+                  />
+                </div>
+              </Field>
+            </div>
+          </Card>
+
+          {/* ── BASIC DOCUMENT DETAILS ──────────────────────────────── */}
+          <Card>
+            <SectionHeading icon={FileText} title="Basic Document Details" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-7">
+              {/* Documents radio */}
+              <Field label="Documents">
+                <div className="flex items-center flex-wrap gap-5 border border-gray-200 rounded-full px-5 py-3 bg-white">
+                  {documentOptions.map((doc) => (
+                    <RadioPill
+                      key={doc.value}
+                      label={doc.label}
+                      checked={data?.bddDocument === doc.value}
+                      onChange={() => handleChange("bddDocument", doc.value)}
                     />
-                  </div>
-                )}
+                  ))}
+                </div>
+              </Field>
 
-                {/* Verify OTP Button */}
-                {otpSent && !otpVerified && (
-                  <button
-                    type="button"
-                    onClick={verifyOtp}
-                    disabled={loading}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold"
-                  >
-                    {loading ? "Verifying..." : "Verify OTP"}
-                  </button>
-                )}
+              {/* Aadhar No */}
+              <Field label="Aadhar No.">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.bddAadharNo || ""}
+                  onChange={(e) => handleChange("bddAadharNo", e.target.value)}
+                />
+              </Field>
 
-                {/* New Password */}
-                {otpVerified && (
-                  <>
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        New Password {req}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter new password"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
-                        >
-                          {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                        {password.length > 0 && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                    </div>
+              {/* SEZ Detail */}
+              <Field label="SEZ Detail">
+                <div className="border border-gray-200 rounded-full px-5 py-3 flex items-center gap-6 bg-white">
+                  {sezOptions.map((item) => (
+                    <RadioPill
+                      key={item.value}
+                      label={item.label}
+                      checked={data?.bddSez === item.value}
+                      onChange={() => handleChange("bddSez", item.value)}
+                    />
+                  ))}
+                </div>
+              </Field>
 
-                    {/* Confirm Password */}
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Confirm Password {req}
-                      </label>
+              {/* GSTN No */}
+              <Field label="GSTN No.">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.bddGstnNO || ""}
+                  onChange={(e) => handleChange("bddGstnNO", e.target.value)}
+                />
+              </Field>
 
-                      <div className="relative">
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Confirm Password"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
-                        />
+              {/* PAN NO */}
+              <Field label="Pan No">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.bddPanNo || ""}
+                  onChange={(e) => handleChange("bddPanNo", e.target.value)}
+                />
+              </Field>
 
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
-                        >
-                          {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-
-                        {confirmPassword && password === confirmPassword && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleResetPassword}
-                      disabled={loading}
-                      className="w-full bg-[#FDBB01] hover:bg-[#FDC630] text-white py-3 rounded-xl font-semibold"
-                    >
-                      {loading ? "Processing..." : "Reset Password"}
-                    </button>
-                  </>
-                )}
-
-                {/* Back Button */}
-                <button
-                  type="button"
-                  onClick={() => navigate("/")}
-                  className="w-full border border-gray-300 hover:bg-gray-100 text-gray-700 py-3 rounded-xl font-medium"
+              {/* Risk Check */}
+              <Field label="Risk Check">
+                <select
+                  className={inputBase}
+                  value={data?.riskCheck || ""}
+                  onChange={(e) => handleChange("riskCheck", e.target.value)}
                 >
-                  Back to Login
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+                  <option value="">-- Select --</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </Field>
 
-        {/* Mobile */}
-        <div className="lg:hidden">
-          {/* Top Black Section */}
-          <div className="bg-[#0b0b0b] text-white px-6 pt-8 pb-20 relative overflow-hidden">
-            <div className="flex justify-center">
-              {/* Logo */}
-              <img
-                src={logo1}
-                alt="HelloPe"
-                className="h-32 object-contain"
-                style={{ marginLeft: "-151px" }}
-              />
-            </div>
-            <h2 className="text-xl font-bold leading-tight text-center">
-              Welcome to{" "}
-              <span className="text-[#FFC400]">HelloPe!</span>{" "}
-              👋
-            </h2>
-            <p className="text-gray-300 text-center mt-1 text-sm">
-              Fast, Secure & Reliable Payment Gateway
-            </p>
+              {/* Category */}
+              <Field label="Category">
+                <select
+                  className={inputBase}
+                  value={data?.bddCategory || ""}
+                  onChange={(e) => handleChange("bddCategory", e.target.value)}
+                >
+                  <option value="">-- Select --</option>
+                  {[
+                    "Education",
+                    "Education Goverment",
+                    "Education Private",
+                    "Goverment",
+                    "Insurance",
+                    "Mutual Funds",
+                    "Travel",
+                    "Utility",
+                    "Retail",
+                    "ISP",
+                    "Cable",
+                  ].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
-            <div className="mt-8 space-y-5 relative z-10">
-              {[
-                ["⚡", "Instant UPI Payments", "Lightning fast transactions, 24/7"],
-                ["🛡️", "HMAC-SHA256 Security", "Enterprise grade security for your data"],
-                ["📊", "Real-time Dashboard", "Track and monitor in real-time"],
-                ["💳", "Multi Payment Support", "UPI, Cards, Wallets & more"],
-                ["📈", "High Success Rate", "Optimized for maximum success"],
-              ].map(([icon, title, sub]) => (
-                <div key={title} className="flex items-center">
-                  <div className="w-12 h-12 shrink-0 rounded-xl bg-[#151515] border border-[#2a2a2a] flex items-center justify-center text-[#FFC400] text-lg">
-                    {icon}
-                  </div>
-                  <div className="ml-3">
-                    <h4 className="font-semibold text-sm">{title}</h4>
-                    <p className="text-gray-400 text-xs mt-0.5">{sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+              {/* MCC */}
+              <Field label="MCC">
+                <select
+                  className={inputBase}
+                  value={data?.bddAgpMcc || ""}
+                  onChange={(e) => handleChange("bddAgpMcc", e.target.value)}
+                >
+                  <option value="">-- Select --</option>
+                  {Array.isArray(mccList) &&
+                    mccList.map((item, index) => {
+                      const fullText = `${item.code} - ${String(item.name)}`;
+                      return (
+                        <option key={index} value={fullText}>
+                          {fullText}
+                        </option>
+                      );
+                    })}
+                </select>
+              </Field>
 
-            {/* Shield*/}
-            <svg
-              viewBox="0 0 200 280"
-              className="absolute right-1 top-95 w-32 h-auto pointer-events-none select-none"
-            >
-              {/* dotted trail from top-right down to the badge */}
-              <path
-                d="M190 10 C 140 30, 150 90, 110 120"
-                fill="none"
-                stroke="#FFC400"
-                strokeWidth="2"
-                strokeDasharray="1 8"
-                strokeLinecap="round"
-              />
-              <circle cx="190" cy="10" r="4" fill="#FFC400" />
+              {/* Vintage Type */}
+              <Field label="Vintage Type">
+                <select
+                  className={inputBase}
+                  value={data?.bddVintageType || ""}
+                  onChange={(e) => handleChange("bddVintageType", e.target.value)}
+                >
+                  <option value="">-- Select --</option>
+                  <option value="<1Y - New">&lt;1Y - New</option>
+                  <option value=">1<3Y">&gt;1&lt;3Y</option>
+                  <option value=">3<5Y">&gt;3&lt;5Y</option>
+                  <option value=">5Y">&gt;5Y</option>
+                </select>
+              </Field>
 
-              {/* glow platform */}
-              <ellipse cx="100" cy="230" rx="70" ry="18" fill="#FFC400" opacity="0.15" />
-              <ellipse cx="100" cy="222" rx="55" ry="10" fill="#FFC400" opacity="0.25" />
+              {/* Merchant Business Type */}
+              <Field label="Merchant Business Type">
+                <select
+                  className={inputBase}
+                  value={data?.bddMerchantBusinessType || ""}
+                  onChange={(e) => handleChange("bddMerchantBusinessType", e.target.value)}
+                >
+                  <option value="">-- Select --</option>
+                  {[
+                    "Companies Registered Act",
+                    "Govt, Govt Undertakings",
+                    "Individuals/Proprietor",
+                    "Individuals/Professionals",
+                    "LLPS",
+                    "Pertnership",
+                    "Proprietor",
+                    "Regd Trusts",
+                  ].map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
-              {/* card, tucked behind shield */}
-              <g transform="translate(105,150) rotate(8)">
-                <rect x="0" y="0" width="70" height="45" rx="8" fill="#1c1c1c" stroke="#3a3a3a" />
-                <rect x="10" y="12" width="40" height="6" rx="3" fill="#FFC400" opacity="0.8" />
-                <rect x="10" y="24" width="24" height="5" rx="2.5" fill="#555" />
-              </g>
-
-              {/* shield */}
-              <g transform="translate(35,110)">
-                <path
-                  d="M45 0 L85 15 V55 C85 85 65 100 45 110 C25 100 5 85 5 55 V15 Z"
-                  fill="#0f0f0f"
-                  stroke="#FFC400"
-                  strokeWidth="2"
-                />
-                {/* lock */}
-                <rect x="30" y="50" width="30" height="24" rx="4" fill="#FFC400" />
-                <path
-                  d="M35 50 V30 a10 10 0 0 1 20 0 V50"
-                  fill="none"
-                  stroke="#FFC400"
-                  strokeWidth="5"
-                />
-                <circle cx="45" cy="60" r="4" fill="#0f0f0f" />
-              </g>
-            </svg>
-          </div>
-
-          {/* Login Card */}
-          <div className="-mt-8 relative z-30 bg-white rounded-t-[38px] px-6 pt-8 pb-8 shadow-xl">
-            {/* Right Section */}
-            <div className="flex items-center justify-center py-8 px-2">
-              <div>
-                {/* Logo */}
-                <div className="flex justify-center mb-6">
-                  <img
-                    src="/logo1.avif"
-                    alt="Logo"
-                    className="h-14 object-contain"
+              {/* Merchant Website URL */}
+              <Field label="Merchant Website URL">
+                <div className="relative">
+                  <Globe size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="https://www.example.com"
+                    className={`${inputBase} pl-9`}
+                    value={data?.bddMerchantWebsiteURL || ""}
+                    onChange={(e) => handleChange("bddMerchantWebsiteURL", e.target.value)}
                   />
                 </div>
+              </Field>
 
-                {/* Heading */}
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800">
-                    Reset Your Password
-                  </h2>
-                  <p className="text-gray-500 mt-1 text-sm">
-                    Enter your details to reset password
+              {/* Partner Logo Check */}
+              <Field label="Partner Logo Check" required>
+                <select
+                  className={inputBase}
+                  value={data?.partnerLogoCheck || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleChange("partnerLogoCheck", value);
+                    if (value === "No") {
+                      handleChange("partnerLogoFile", null);
+                      if (partnerLogoRef.current) {
+                        partnerLogoRef.current.value = "";
+                      }
+                    }
+                  }}
+                >
+                  <option value="">-- Select --</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+                {errors?.partnerLogoCheck && (
+                  <p className="text-red-500 text-xs mt-1">{errors.partnerLogoCheck}</p>
+                )}
+              </Field>
+
+              {/* Partner Logo */}
+              <Field
+                label={
+                  <>
+                    Partner Logo{" "}
+                    <span className="text-xs text-gray-400 font-normal">(jpg or png)</span>
+                  </>
+                }
+              >
+                <label
+                  className={`flex items-center gap-2 w-full border border-dashed rounded-lg px-3 py-2.5 text-sm cursor-pointer transition ${
+                    data?.partnerLogoCheck !== "Yes"
+                      ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-white border-gray-300 hover:border-amber-400 text-gray-600"
+                  }`}
+                >
+                  <UploadCloud size={16} className="shrink-0" />
+                  <span className="truncate">
+                    {data?.partnerLogoFile?.name || "Choose file — no file chosen"}
+                  </span>
+                  <input
+                    ref={partnerLogoRef}
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    disabled={data?.partnerLogoCheck !== "Yes"}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      handleChange("partnerLogoFile", file);
+                    }}
+                  />
+                </label>
+                {data?.partnerLogoPath && (
+                  <p className="mt-2 text-sm text-gray-600 font-medium">
+                    {data.partnerLogoPath.split(/[/\\]/).pop()}
                   </p>
+                )}
+              </Field>
+
+              {/* Store Name */}
+              <Field label="Store Name (Business Name)">
+                <div className="relative">
+                  <Store size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    className={`${inputBase} pl-9`}
+                    value={data?.storeDbaName || ""}
+                    onChange={(e) => handleChange("storeDbaName", e.target.value)}
+                  />
                 </div>
+              </Field>
 
-                {/* Form */}
-                <form className="space-y-5">
-                  {/* Username */}
-                  <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Username {req}
-                    </label>
-
-                    <input
-                      type="text"
-                      value={userName}
-                      maxLength={20}
-                      readOnly={otpVerified}
-                      onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter username"
-                      className={`w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 ${otpVerified ? "bg-gray-100 cursor-not-allowed" : ""
-                        }`}
-                    />
-                    {otpSent && (
-                      <span className="absolute right-4 top-[42px] text-green-600 text-xl font-bold">
-                        ✓
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Send OTP Button */}
-                  {!otpSent && !otpVerified && (
-                    <button
-                      type="button"
-                      onClick={sendOtp}
-                      disabled={loading}
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold"
-                    >
-                      {loading ? "Sending..." : "Send OTP"}
-                    </button>
-                  )}
-
-                  {/* OTP */}
-                  {otpSent && !otpVerified && (
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        OTP {req}
-                      </label>
-                      <input
-                        type="text"
-                        value={otp}
-                        maxLength={6}
-                        onChange={(e) => setOtp(e.target.value)}
-                        placeholder="Enter OTP"
-                        className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12"
-                      />
-                    </div>
-                  )}
-
-                  {/* Verify OTP Button */}
-                  {otpSent && !otpVerified && (
-                    <button
-                      type="button"
-                      onClick={verifyOtp}
-                      disabled={loading}
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold"
-                    >
-                      {loading ? "Verifying..." : "Verify OTP"}
-                    </button>
-                  )}
-
-                  {/* New Password */}
-                  {otpVerified && (
-                    <>
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          New Password {req}
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter new password"
-                            className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
-                          >
-                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                          </button>
-                          {password.length > 0 && (
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Confirm Password */}
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Confirm Password {req}
-                        </label>
-
-                        <div className="relative">
-                          <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm Password"
-                            className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20"
-                          />
-
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
-                          >
-                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                          </button>
-
-                          {confirmPassword && password === confirmPassword && (
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xl font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={handleResetPassword}
-                        disabled={loading}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold"
-                      >
-                        {loading ? "Processing..." : "Reset Password"}
-                      </button>
-                    </>
-                  )}
-
-                  {/* Back Button */}
-                  <button
-                    type="button"
-                    onClick={() => navigate("/")}
-                    className="w-full border border-gray-300 hover:bg-gray-100 text-gray-700 py-3 rounded-xl font-medium"
-                  >
-                    Back to Login
-                  </button>
-                </form>
-              </div>
+              {/* Legal Name */}
+              <Field label="Legal Name">
+                <div className="relative">
+                  <Building2 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    className={`${inputBase} pl-9`}
+                    value={data?.storeLegalName || ""}
+                    onChange={(e) => handleChange("storeLegalName", e.target.value)}
+                  />
+                </div>
+              </Field>
             </div>
+          </Card>
+
+          {/* ── STORE ADDRESS ───────────────────────────────────────── */}
+          <Card>
+            <SectionHeading icon={MapPin} title="Store Address" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-7">
+              {/* Address 1 */}
+              <Field label="Address 1">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.addStoreAddress1 || ""}
+                  onChange={(e) => handleChange("addStoreAddress1", e.target.value)}
+                />
+              </Field>
+
+              {/* Address 2 */}
+              <Field label="Address 2">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.addStoreAddress2 || ""}
+                  onChange={(e) => handleChange("addStoreAddress2", e.target.value)}
+                />
+              </Field>
+
+              {/* Address 3 */}
+              <Field label="Address 3">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.addStoreAddress3 || ""}
+                  onChange={(e) => handleChange("addStoreAddress3", e.target.value)}
+                />
+              </Field>
+
+              {/* Country */}
+              <Field label="Country" required>
+                <SearchableSelect
+                  options={countryList.map((country) => ({ value: country, label: country }))}
+                  value={data?.addCountry ? { value: data.addCountry, label: data.addCountry } : null}
+                  onChange={(selected) =>
+                    setData((prev) => ({
+                      ...prev,
+                      addCountry: selected?.value || "",
+                      addState: "",
+                      addCity: "",
+                    }))
+                  }
+                  placeholder="Select Country"
+                  isSearchable
+                />
+              </Field>
+
+              {/* State */}
+              <Field label="State" required>
+                <SearchableSelect
+                  options={stateList.map((item) => ({ value: item.state, label: item.state }))}
+                  value={data?.addState ? { value: data.addState, label: data.addState } : null}
+                  onChange={(selected) =>
+                    setData((prev) => ({
+                      ...prev,
+                      addState: selected?.value || "",
+                      addCity: "",
+                    }))
+                  }
+                  placeholder="Select State"
+                  isSearchable
+                />
+              </Field>
+
+              {/* City */}
+              <Field label="City" required>
+                <SearchableSelect
+                  options={cityList.map((city) => ({ value: city, label: city }))}
+                  value={data?.addCity ? { value: data.addCity, label: data.addCity } : null}
+                  onChange={(selected) =>
+                    setData((prev) => ({ ...prev, addCity: selected?.value || "" }))
+                  }
+                  placeholder="Select City"
+                  isSearchable
+                />
+              </Field>
+
+              {/* Zip Code */}
+              <Field label="Zip Code">
+                <input
+                  type="text"
+                  className={inputBase}
+                  value={data?.addZipcode || ""}
+                  onChange={(e) => handleChange("addZipcode", e.target.value)}
+                />
+              </Field>
+            </div>
+          </Card>
+
+          {/* ── BILLING ADDRESS ─────────────────────────────────────── */}
+          <Card>
+            <SectionHeading icon={Landmark} title="Billing Address" />
+
+            {/* Checkbox */}
+            <div className="mb-5 -mt-2">
+              <label className="flex items-center gap-2 text-sm text-gray-600 italic cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="accent-amber-500 w-4 h-4"
+                  checked={data?.billingSameAsShipping || false}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    handleChange("billingSameAsShipping", checked);
+                    if (checked) {
+                      setData((prev) => ({
+                        ...prev,
+                        billingAddress1: prev.addStoreAddress1 || "",
+                        billingAddress2: prev.addStoreAddress2 || "",
+                        billingAddress3: prev.addStoreAddress3 || "",
+                        billingCountry: prev.addCountry || "",
+                        billingState: prev.addState || "",
+                        billingCity: prev.addCity || "",
+                        billingZipcode: prev.addZipcode || "",
+                      }));
+                    }
+                  }}
+                />
+                Same as Shipping Address
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-7">
+              {/* Address Fields */}
+              {[
+                { label: "Address 1", field: "billingAddress1", required: true },
+                { label: "Address 2", field: "billingAddress2" },
+                { label: "Address 3", field: "billingAddress3" },
+              ].map(({ label, field, required }) => (
+                <Field label={label} required={required} key={field}>
+                  <input
+                    type="text"
+                    disabled={data?.billingSameAsShipping}
+                    className={inputBase}
+                    value={data?.[field] || ""}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                  />
+                </Field>
+              ))}
+
+              {/* Country */}
+              <Field label="Country" required>
+                <SearchableSelect
+                  isDisabled={data?.billingSameAsShipping}
+                  options={countryList.map((country) => ({ value: country, label: country }))}
+                  value={
+                    data?.billingCountry
+                      ? { value: data.billingCountry, label: data.billingCountry }
+                      : null
+                  }
+                  onChange={(selected) =>
+                    setData((prev) => ({
+                      ...prev,
+                      billingCountry: selected?.value || "",
+                      billingState: "",
+                      billingCity: "",
+                    }))
+                  }
+                />
+              </Field>
+
+              {/* State */}
+              <Field label="State" required>
+                <SearchableSelect
+                  isDisabled={data?.billingSameAsShipping}
+                  options={billingStateList.map((item) => ({ value: item.state, label: item.state }))}
+                  value={
+                    data?.billingState ? { value: data.billingState, label: data.billingState } : null
+                  }
+                  onChange={(selected) =>
+                    setData((prev) => ({
+                      ...prev,
+                      billingState: selected?.value || "",
+                      billingCity: "",
+                    }))
+                  }
+                />
+              </Field>
+
+              {/* City */}
+              <Field label="City" required>
+                <SearchableSelect
+                  isDisabled={data?.billingSameAsShipping}
+                  options={billingCityList.map((city) => ({ value: city, label: city }))}
+                  value={data?.billingCity ? { value: data.billingCity, label: data.billingCity } : null}
+                  onChange={(selected) =>
+                    setData((prev) => ({ ...prev, billingCity: selected?.value || "" }))
+                  }
+                />
+              </Field>
+
+              {/* Zip Code */}
+              <Field label="Zip Code" required>
+                <input
+                  type="text"
+                  maxLength={6}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  disabled={data?.billingSameAsShipping}
+                  className={inputBase}
+                  value={data?.billingZipcode || ""}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleChange("billingZipcode", value);
+                  }}
+                />
+              </Field>
+            </div>
+          </Card>
+
+          {/* SAVE BUTTONS */}
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pb-4">
+            <button
+              type="button"
+              onClick={handleSaveAndNext}
+              className="w-full sm:w-auto border border-gray-300 text-gray-700 font-medium px-6 py-2.5 rounded-lg hover:bg-gray-50 transition"
+            >
+              Update
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded-lg shadow-sm transition"
+            >
+              Next
+              <ArrowRight size={16} />
+            </button>
           </div>
         </div>
       </div>

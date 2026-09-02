@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import toast from "react-hot-toast";
+import { FileSearch } from "lucide-react";
+
 
 export default function VUploadDocuments({
   refId,
@@ -99,20 +101,17 @@ export default function VUploadDocuments({
         const response = await axiosInstance.post(
           `viewMerchantUploadDocument/${refId}`
         );
-
-        console.log("API RESPONSE:", response);
-
         if (response?.respCode === 0) {
           const res = response?.respData;
           setApiData(res || {});
         }
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
+        toast.error(error);
       }
     };
-
     fetchData();
   }, [refId]);
+
 
   // Document File Api Call
   const viewFile = async (fileName) => {
@@ -128,7 +127,7 @@ export default function VUploadDocuments({
           responseType: "blob",
         }
       );
-      console.log("blob file", response);
+
       const blobUrl = URL.createObjectURL(response);
       window.open(blobUrl, "_blank");
 
@@ -142,72 +141,84 @@ export default function VUploadDocuments({
     }
   };
 
+
   return (
-    <div>
-      <h2 className="text-2xl uppercase text-blue-900 border-b border-gray-300 font-extrabold py-4">
-        View  Uploaded Document
-      </h2>
-      <p className="text-gray-600 my-6">
+
+    <div className="m-3">
+      <div className="flex items-center gap-3 py-3">
+        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+          <FileSearch className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
+        </div>
+        <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold">
+          View  Uploaded Document
+        </h2>
+      </div>
+      <p className="text-gray-600 -mt-4 mb-6 ml-12 sm:ml-14">
         User can only view document data.
       </p>
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm border">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border px-4 py-3 text-left">
-                Item
-              </th>
-              <th className="border px-4 py-3 text-center">
-                Status
-              </th>
-              <th className="border px-4 py-3 text-left">
-                Remarks
-              </th>
-              <th className="border px-4 py-3 text-left">
-                Date
-              </th>
-              <th className="border px-4 py-3 text-left">
-                File Name
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {checklistItems.map((item, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-50"
-              >
-                <td className="border px-4 py-3">
-                  {item.label}
-                </td>
 
-                <td className="border px-4 py-3 text-center">
-                  {apiData?.[item.status] || "-"}
-                </td>
-
-                <td className="border px-4 py-3">
-                  {apiData?.[item.remarks] || "-"}
-                </td>
-                <td className="border px-4 py-3">
-                  {apiData?.[item.date] || "-"}
-                </td>
-                <td className="border px-4 py-3">
-                  {apiData?.[item.file] ? (
-                    <button
-                      onClick={() => viewFile(apiData[item.file])}
-                      rel="noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View File
-                    </button>
-                  ) : (
-                    "No File"
-                  )}
-                </td>
+      {/* ── Uploaded Documents card ──────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-9">
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border border-gray-200 text-lg border-gray-200 px-4 py-3 text-left">
+                  Item
+                </th>
+                <th className="border border-gray-200 text-lg border-gray-200 px-4 py-3 text-center">
+                  Status
+                </th>
+                <th className="border border-gray-200 text-lg px-4 py-3 text-left">
+                  Remarks
+                </th>
+                <th className="border border-gray-200 px-4 text-lg py-3 text-left">
+                  Date
+                </th>
+                <th className="border border-gray-200 px-4 py-3 text-lg text-left">
+                  File Name
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {checklistItems.map((item, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-50"
+                >
+                  <td className="border border-gray-200 px-4 py-3">
+                    {item.label}
+                  </td>
+
+                  <td className="border border-gray-200 px-4 py-3 text-center">
+                    {apiData?.[item.status] || "-"}
+                  </td>
+
+                  <td className="border border-gray-200 px-4 py-3">
+                    {apiData?.[item.remarks] || "-"}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-3">
+                    {apiData?.[item.date] || "-"}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-3">
+                    {apiData?.[item.file] ? (
+                      <button
+                        onClick={() => viewFile(apiData[item.file])}
+                        rel="noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View File
+                      </button>
+                    ) : (
+                      "No File"
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* BACK & NEXT BUTTON */}
@@ -223,10 +234,11 @@ export default function VUploadDocuments({
         <button
           type="button"
           onClick={handleNext}
-          className="bg-orange-500 text-white px-6 py-2 rounded"
+          className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
         >
           Next
         </button>
+        
       </div>
     </div>
   );

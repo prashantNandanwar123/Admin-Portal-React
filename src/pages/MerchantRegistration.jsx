@@ -61,7 +61,7 @@ export default function MerchantRegistration() {
     setView("list");
     setCurrentStep(0);
     setMerchantFormData({});
-  }, [location]); // location change = sidebar click
+  }, [location]);
 
   useEffect(() => {
     fetchMerchants();
@@ -118,7 +118,7 @@ export default function MerchantRegistration() {
     );
   }
   return (
-    <div className="p-4 sm:p-6 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 bg-slate-50 min-screen hide-scrollbar">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
         <div>
@@ -167,6 +167,23 @@ export default function MerchantRegistration() {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         {/* Top Controls */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 p-4 border-b border-slate-100 bg-white">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-slate-500">Show</span>
+            <select
+              value={entriesPerPage}
+              onChange={(e) => {
+                setEntriesPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-slate-200 bg-slate-50 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <span className="text-slate-500">entries</span>
+          </div>
+
           {/* Search */}
           <div className="relative w-full xl:w-80">
             <FaSearch className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 text-sm" />
@@ -178,39 +195,8 @@ export default function MerchantRegistration() {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white transition-all"
+              className="w-full border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 focus:bg-white transition-all"
             />
-          </div>
-
-          {/* Entries + Reset */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-slate-500">Show</span>
-              <select
-                value={entriesPerPage}
-                onChange={(e) => {
-                  setEntriesPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="border border-slate-200 bg-slate-50 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
-              <span className="text-slate-500">entries</span>
-            </div>
-
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setCurrentPage(1);
-              }}
-              className="flex items-center gap-2 border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-xl text-sm transition-all"
-            >
-              <FaSyncAlt size={12} />
-              Reset
-            </button>
           </div>
         </div>
 
@@ -219,14 +205,30 @@ export default function MerchantRegistration() {
           <table className="w-full text-sm min-w-[900px]">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">ID</th>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">Legal Name</th>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">Contact Person</th>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">Email</th>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">Mobile</th>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">Risk Status</th>
-                <th className="px-5 py-3 text-left font-semibold text-xs uppercase tracking-wide">Risk Remark</th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">Action</th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  ID
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Legal Name
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Contact Person
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Email
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Mobile
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Risk Status
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Risk Remark
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                  Action
+                </th>
               </tr>
             </thead>
 
@@ -243,6 +245,7 @@ export default function MerchantRegistration() {
               ) : currentData.length > 0 ? (
                 currentData.map((item, index) => {
                   const initial = (item[1] || "?").charAt(0).toUpperCase();
+
                   const avatarColors = [
                     "bg-blue-100 text-blue-700",
                     "bg-amber-100 text-amber-700",
@@ -250,6 +253,7 @@ export default function MerchantRegistration() {
                     "bg-emerald-100 text-emerald-700",
                     "bg-indigo-100 text-indigo-700",
                   ];
+
                   const avatarColor = avatarColors[index % avatarColors.length];
 
                   const statusStyles = {
@@ -259,44 +263,79 @@ export default function MerchantRegistration() {
                     "Under Review": "bg-orange-100 text-orange-700",
                     Rejected: "bg-red-100 text-red-700",
                   };
+
                   const statusLabel = item[5] || "Pending";
-                  const statusClass = statusStyles[statusLabel] || "bg-yellow-100 text-yellow-700";
+                  const statusClass =
+                    statusStyles[statusLabel] || "bg-yellow-100 text-yellow-700";
 
                   return (
                     <tr
                       key={index}
                       className="border-t border-slate-100 hover:bg-slate-50 transition-all duration-150"
                     >
-                      <td className="px-5 py-4 font-medium text-slate-500">#{item[0]}</td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
+                      {/* ID */}
+                      <td className="px-5 py-4 text-center font-medium text-slate-500">
+                        #{item[0]}
+                      </td>
+
+                      {/* Legal Name */}
+                      <td className="px-5 py-4 text-center">
+                        <div className="flex items-center justify-center gap-3">
                           <div
                             className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-semibold ${avatarColor}`}
                           >
                             {initial}
                           </div>
-                          <span className="font-semibold text-slate-800">{item[1]}</span>
+
+                          <span className="font-semibold text-slate-800">
+                            {item[1]}
+                          </span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-slate-600">{item[2]}</td>
-                      <td className="px-5 py-4 text-slate-600">{item[3]}</td>
-                      <td className="px-5 py-4 text-slate-600">{item[4]}</td>
-                      <td className="px-5 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}>
+                      {/* Contact Person */}
+                      <td className="px-5 py-4 text-center text-slate-600">
+                        {item[2]}
+                      </td>
+
+                      {/* Email */}
+                      <td className="px-5 py-4 text-center text-slate-600">
+                        {item[3]}
+                      </td>
+
+                      {/* Mobile */}
+                      <td className="px-5 py-4 text-center text-slate-600">
+                        {item[4]}
+                      </td>
+
+                      {/* Risk Status */}
+                      <td className="px-5 py-4 text-center">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
+                        >
                           {statusLabel}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-slate-500">{item[6] || "-"}</td>
+
+                      {/* Risk Remark */}
+                      <td className="px-5 py-4 text-center text-slate-500">
+                        {item[6] || "-"}
+                      </td>
+
+                      {/* Action */}
                       <td className="px-5 py-4 text-center relative">
                         <button
                           onClick={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
+
                             setMenuPosition({
                               top: rect.bottom + window.scrollY + 6,
                               left: rect.right + window.scrollX - 192,
                             });
-                            setOpenMenuIndex(openMenuIndex === index ? null : index);
+
+                            setOpenMenuIndex(
+                              openMenuIndex === index ? null : index
+                            );
                           }}
                           className="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2.5 rounded-xl transition-all duration-200"
                         >
@@ -308,11 +347,20 @@ export default function MerchantRegistration() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-16 text-slate-500">
+                  <td
+                    colSpan="8"
+                    className="text-center py-16 text-slate-500"
+                  >
                     <div className="flex flex-col items-center gap-3">
                       <div className="text-5xl">📄</div>
-                      <p className="text-lg font-medium">No Merchant Found</p>
-                      <p className="text-sm text-slate-400">Try adjusting your search criteria</p>
+
+                      <p className="text-lg font-medium">
+                        No Merchant Found
+                      </p>
+
+                      <p className="text-sm text-slate-400">
+                        Try adjusting your search criteria
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -412,7 +460,8 @@ export default function MerchantRegistration() {
               <LiaEyeSolid className="text-base" />
               View Merchant
             </button>
-            <button
+
+            {/* <button
               onClick={() => {
                 handleEdit(currentData[openMenuIndex]);
                 setOpenMenuIndex(null);
@@ -420,7 +469,8 @@ export default function MerchantRegistration() {
               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
             >
               View Details
-            </button>
+            </button> */}
+
             <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
               Review Documents
             </button>

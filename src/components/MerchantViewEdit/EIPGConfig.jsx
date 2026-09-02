@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
+import { Settings2, Link } from "lucide-react";
 
 export default function EIPGConfig({
   refId,
@@ -12,7 +13,6 @@ export default function EIPGConfig({
 
 
   const navigate = useNavigate();
-
   // ================= STATE =================
   const [form, setForm] = useState({
 
@@ -114,7 +114,7 @@ export default function EIPGConfig({
               res.posTidCount || "",
           });
         }
-      } catch (err) {
+      } catch (error) {
         toast.error(error);
       }
     };
@@ -167,9 +167,7 @@ export default function EIPGConfig({
 
       const resData = response;
       if (resData?.respCode === 0) {
-        console.log("response print--->>>>>", resData);
         toast.success(resData?.respMsg);
-
         setData((prev) => ({
           ...prev,
           refId: resData?.respData?.ref_id || prev.refId,
@@ -196,300 +194,313 @@ export default function EIPGConfig({
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-3">
-        Edited IPG Configuration
-      </h2>
-      <p className="text-blue-900 mb-6 border-b border-gray-300 pb-4">
+      <div className="flex items-center gap-3 pt-3">
+        <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+          <Settings2 className="w-5 h-5 text-yellow-600" />
+        </div>
+        <h2 className="text-2xl uppercase text-blue-900 font-bold">
+          Edited IPG Configuration
+        </h2>
+      </div>
+      <p className="text-blue-900 ml-12">
         IPG (Internet Payment Gateway) Configuration enables secure online payment processing by connecting merchants with banks and payment systems. It supports digital payments like cards, UPI, and net banking while ensuring safe, fast, and reliable transactions with proper security compliance.
       </p>
 
-
       {/* ================= TOP SECTION (NO DESIGN CHANGE) ================= */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value (Visa) {req}
-          </label>
-          <input
-            type="text"
-            value={form.IPG_ECIValueVisa}
-            required
-            maxLength={3}
-            placeholder="000"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (!/^\d*$/.test(value)) return;
-
-              handleChange("IPG_ECIValueVisa", value);
-            }}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value (Master) {req}
-          </label>
-          <input
-            type="text"
-            value={form.IPG_ECIValueMaster}
-            required
-            maxLength={3}
-            placeholder="000"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (!/^\d*$/.test(value)) return;
-              handleChange("IPG_ECIValueMaster", value);
-            }}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECIValueMaestro {req}
-          </label>
-
-          <input
-            type="text"
-            value={form.IPG_ECIValueMaestro}
-            required
-            maxLength={3}
-            placeholder="000"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (!/^\d*$/.test(value)) return;
-              handleChange("IPG_ECIValueMaestro", value);
-            }}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Integration Approach {req}
-          </label>
-          <select
-            value={form.IPG_IntegrationApproach}
-            required
-            onChange={(e) =>
-              handleChange("IPG_IntegrationApproach", e.target.value)
-            }
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-white"
-          >
-            <option value="">-- Select --</option>
-            <option value="SSL">SSL</option>
-            <option value="MOTO">MOTO</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PCI DSS Certificate Number
-          </label>
-          <input
-            type="text"
-            value={form.IPG_PCIDSSCertificateNumber}
-            onChange={(e) =>
-              handleChange(
-                "IPG_PCIDSSCertificateNumber",
-                e.target.value
-              )
-            }
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PCI DSS Expiry Date
-          </label>
-          <input
-            type="date"
-            value={form.IPG_PCIDSSExpiryDate}
-            onChange={(e) =>
-              handleChange("IPG_PCIDSSExpiryDate", e.target.value)
-            }
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          />
-        </div>
-
-        {/* EMAIL / SMS */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Merchant Email Confirmation For Transaction {req}
-          </label>
-          <div className="flex gap-4 text-sm">
-            <label>
-              <input
-                type="radio"
-                name="merchantEmail"
-                checked={form.IPG_MerchantEmail === "Yes"}
-                onChange={() =>
-                  handleChange("IPG_MerchantEmail", "Yes")
-                }
-              />{" "}
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="merchantEmail"
-                checked={form.IPG_MerchantEmail === "No"}
-                onChange={() =>
-                  handleChange("IPG_MerchantEmail", "No")
-                }
-              />{" "}
-              No
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Customer Email Confirmation For Transaction {req}
-          </label>
-          <div className="flex gap-4 text-sm">
-            <label>
-              <input
-                type="radio"
-                name="customerEmail"
-                checked={form.IPG_CustomerEmail === "Yes"}
-                onChange={() =>
-                  handleChange("IPG_CustomerEmail", "Yes")
-                }
-              />{" "}
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="customerEmail"
-                checked={form.IPG_CustomerEmail === "No"}
-                onChange={() =>
-                  handleChange("IPG_CustomerEmail", "No")
-                }
-              />{" "}
-              No
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Merchant SMS Confirmation For Transaction {req}
-          </label>
-          <div className="flex gap-4 text-sm">
-            <label>
-              <input
-                type="radio"
-                name="merchantSMS"
-                checked={form.IPG_MerchantSMS === "Yes"}
-                onChange={() =>
-                  handleChange("IPG_MerchantSMS", "Yes")
-                }
-              />{" "}
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="merchantSMS"
-                checked={form.IPG_MerchantSMS === "No"}
-                onChange={() =>
-                  handleChange("IPG_MerchantSMS", "No")
-                }
-              />{" "}
-              No
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Customer SMS Confirmation For Transaction {req}
-          </label>
-          <div className="flex gap-4 text-sm">
-            <label>
-              <input
-                type="radio"
-                name="customerSMS"
-                checked={form.IPG_CustomerSMS === "Yes"}
-                onChange={() =>
-                  handleChange("IPG_CustomerSMS", "Yes")
-                }
-              />{" "}
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="customerSMS"
-                checked={form.IPG_CustomerSMS === "No"}
-                onChange={() =>
-                  handleChange("IPG_CustomerSMS", "No")
-                }
-              />{" "}
-              No
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={form.IPG_ServertoServerCall}
-              onChange={(e) =>
-                handleChange(
-                  "IPG_ServertoServerCall",
-                  e.target.checked
-                )
-              }
-            />
-            Server to Server Call
-          </label>
-        </div>
-      </div>
-
-      {/* ================= REQUEST URLS ================= */}
-      <div className="border-t border-gray-300 my-10"></div>
-      <h2 className="text-3xl font-light text-gray-700 mb-8">
-        Request URL's
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Array.from({ length: 10 }).map((_, index) => (
-          <div key={index}>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Request URL {index + 1}
+              ECI Value (Visa) {req}
             </label>
             <input
               type="text"
-              value={form[`requestURL${index + 1}`]}
-              placeholder="www.example.com"
+              value={form.IPG_ECIValueVisa}
+              required
+              maxLength={3}
+              placeholder="000"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!/^\d*$/.test(value)) return;
+
+                handleChange("IPG_ECIValueVisa", value);
+              }}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              ECI Value (Master) {req}
+            </label>
+            <input
+              type="text"
+              value={form.IPG_ECIValueMaster}
+              required
+              maxLength={3}
+              placeholder="000"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!/^\d*$/.test(value)) return;
+                handleChange("IPG_ECIValueMaster", value);
+              }}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              ECIValueMaestro {req}
+            </label>
+
+            <input
+              type="text"
+              value={form.IPG_ECIValueMaestro}
+              required
+              maxLength={3}
+              placeholder="000"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!/^\d*$/.test(value)) return;
+                handleChange("IPG_ECIValueMaestro", value);
+              }}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Integration Approach {req}
+            </label>
+            <select
+              value={form.IPG_IntegrationApproach}
+              required
+              onChange={(e) =>
+                handleChange("IPG_IntegrationApproach", e.target.value)
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-white"
+            >
+              <option value="">-- Select --</option>
+              <option value="SSL">SSL</option>
+              <option value="MOTO">MOTO</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              PCI DSS Certificate Number
+            </label>
+            <input
+              type="text"
+              value={form.IPG_PCIDSSCertificateNumber}
               onChange={(e) =>
                 handleChange(
-                  `requestURL${index + 1}`,
+                  "IPG_PCIDSSCertificateNumber",
                   e.target.value
                 )
               }
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             />
           </div>
-        ))}
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            POS TID Count
-          </label>
-          <input
-            type="text"
-            value={form.posTidCount}
-            onChange={(e) =>
-              handleChange("posTidCount", e.target.value)
-            }
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          />
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              PCI DSS Expiry Date
+            </label>
+            <input
+              type="date"
+              value={form.IPG_PCIDSSExpiryDate}
+              onChange={(e) =>
+                handleChange("IPG_PCIDSSExpiryDate", e.target.value)
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          {/* EMAIL / SMS */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Merchant Email Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="merchantEmail"
+                  checked={form.IPG_MerchantEmail === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantEmail", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="merchantEmail"
+                  checked={form.IPG_MerchantEmail === "No"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantEmail", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Customer Email Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="customerEmail"
+                  checked={form.IPG_CustomerEmail === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerEmail", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="customerEmail"
+                  checked={form.IPG_CustomerEmail === "No"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerEmail", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Merchant SMS Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="merchantSMS"
+                  checked={form.IPG_MerchantSMS === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantSMS", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="merchantSMS"
+                  checked={form.IPG_MerchantSMS === "No"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantSMS", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Customer SMS Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="customerSMS"
+                  checked={form.IPG_CustomerSMS === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerSMS", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="customerSMS"
+                  checked={form.IPG_CustomerSMS === "No"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerSMS", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.IPG_ServertoServerCall}
+                onChange={(e) =>
+                  handleChange(
+                    "IPG_ServertoServerCall",
+                    e.target.checked
+                  )
+                }
+              />
+              Server to Server Call
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= REQUEST URLS ================= */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+            <Link className="w-5 h-5 text-yellow-600" />
+          </div>
+
+          <h2 className="text-2xl font-light text-gray-700 uppercase">
+            Request URL's
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <div key={index}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Request URL {index + 1}
+              </label>
+              <input
+                type="text"
+                value={form[`requestURL${index + 1}`]}
+                placeholder="www.example.com"
+                onChange={(e) =>
+                  handleChange(
+                    `requestURL${index + 1}`,
+                    e.target.value
+                  )
+                }
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+            </div>
+          ))}
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              POS TID Count
+            </label>
+            <input
+              type="text"
+              value={form.posTidCount}
+              onChange={(e) =>
+                handleChange("posTidCount", e.target.value)
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
         </div>
       </div>
 

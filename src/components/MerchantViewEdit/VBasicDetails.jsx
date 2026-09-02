@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 
+import {
+  User, CalendarDays, Clock, Store, UserRound, FileText, MapPin, Building2,
+  Receipt
+} from "lucide-react";
+
 export default function VBasicDetails({
   refId,
   data,
@@ -11,7 +16,6 @@ export default function VBasicDetails({
   const [apiData, setApiData] = useState({});
 
   useEffect(() => {
-    console.log("REF ID:", refId);
     if (!refId) return;
 
     const fetchData = async () => {
@@ -23,11 +27,10 @@ export default function VBasicDetails({
           const res = response.respData;
           setApiData(res || {});
         }
-      } catch (err) {
-        toast.error(err);
+      } catch (error) {
+        toast.error(error);
       }
     };
-
     fetchData();
   }, [refId]);
 
@@ -42,168 +45,178 @@ export default function VBasicDetails({
 
 
   return (
-    <>
-
-      <div className="m-7">
-        <h2 className="text-2xl uppercase text-blue-900 font-extrabold border-b border-gray-300 py-3">
-          View Basic Details
+    <div>
+      <div className="flex items-center gap-3 py-3">
+        <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+          <Building2 className="w-5 h-5 text-yellow-600" />
+        </div>
+        <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold">
+          View Merchant Onboarding Details
         </h2>
-        <div className="pt-4">
-          {/* Store Onboarding Status */}
-          <h2 className="text-[20px] text-gray-700 mb-6">
+      </div>
+      <p className="text-sm text-blue-900 -mt-2 ml-12">
+        Review and manage the merchant onboarding information and business details.
+      </p>
+
+      <div className="pt-3">
+        {/* Store Onboarding Status */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
+          {/* <h2 className="text-[18px] sm:text-[18px] uppercase text-gray-700 font-semibold mb-5 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+              <Store className="w-4 h-4 text-yellow-600" />
+            </span>
             Store Onboarding Status
+          </h2> */}
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-stretch">
+            {/* Highlighted meta strip */}
+            <div className="lg:col-span-2 bg-amber-50 rounded-xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+              <div className="flex items-center gap-3">
+                <span className="bg-amber-100 text-amber-600 rounded-full p-2 flex items-center justify-center shrink-0">
+                  <User size={16} />
+                </span>
+                <label className="text-gray-700 text-[13px] sm:text-[15px] leading-tight">
+                  <span className="block text-gray-500 text-xs">Created By</span>
+                  {apiData?.createdBy}
+                </label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="bg-amber-100 text-amber-600 rounded-full p-2 flex items-center justify-center shrink-0">
+                  <CalendarDays size={16} />
+                </span>
+                <label className="text-gray-700 text-[13px] sm:text-[15px] leading-tight">
+                  <span className="block text-gray-500 text-xs">Created Date</span>
+                  {apiData?.createdDate}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Contact Person Details ───────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-6">
+          <h2 className="text-[18px] uppercase sm:text-[18px] text-gray-700 font-semibold mb-6 border-gray-200 pb-3 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+              <UserRound className="w-4 h-4 text-yellow-600" />
+            </span>
+            Contact Person Details
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-7">
+            {/* Full Name */}
             <div>
-              <label className="text-gray-700 text-[15px]">
-                Created By : {apiData?.createdBy}
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Full Name
               </label>
+              <div className="flex">
+                <input
+                  type="text"
+                  className="w-20 border border-gray-200 rounded-l-lg px-2 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                  value={apiData?.cpdNameTitle || ""}
+                  readOnly
+                />
+                <input
+                  type="text"
+                  className="w-full border border-l-0 border-gray-200 rounded-r-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                  value={apiData?.cpdName || ""}
+                  readOnly
+                />
+              </div>
             </div>
+
+            {/* Date of Birth */}
             <div>
-              <label className="text-gray-700 text-[15px] pe-5">
-                Created Date : {apiData?.createdDate}
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Date of Birth
               </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.cpdDateOfBirth || ""}
+                readOnly
+              />
             </div>
+
+
+            {/* Mobile */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Mobile No
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.cpdMobile || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Primary Email */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Primary Email Id
+              </label>
+
+              <input
+                type="email"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.cpdPrimaryEmailId || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Secondary Email */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Secondary Email Id
+              </label>
+
+              <input
+                type="email"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.cpdSecondaryEmailId || ""}
+                readOnly
+              />
+            </div>
+
             {/* Sourcing Channel */}
-            <div className="flex items-center gap-2">
-              <label className="w-49 text-gray-700 font-medium">
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-gray-700 font-medium text-sm">
                 Sourcing Channel<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.basicSrcChannel || ""}
                 readOnly
               />
             </div>
           </div>
-          {/* Store Information */}
-          <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
-            Store Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Store Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                Store Type
-              </label>
-              <div className="flex items-center gap-5">
-                {["Physical", "Web Store"].map((type) => (
-                  <label key={type} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      checked={apiData?.storeType === type}
-                      readOnly
-                    />
-                    {type}
-                  </label>
-                ))}
-              </div>
-            </div>
-            {/* Channel */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                Channel
-              </label>
+        </div>
 
-              <div className="flex items-center gap-5">
-                {["IPG", "POS"].map((ch) => (
-                  <label key={ch} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      checked={apiData?.storeChannel === ch}
-                      readOnly
-                    />
-                    {ch}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Turnover Category */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Turnover Category
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.storeTurnoverCategory || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Partner Logo Check */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Partner Logo Check
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.partnerLogoCheck || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Partner Logo */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Partner Logo
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.partnerLogoPath || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Store Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Store Name (Business Name)
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.storeDbaName || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Legal Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Legal Name
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.storeLegalName || ""}
-                readOnly
-              />
-            </div>
-          </div>
-
-          {/* ── Basic Document Details ───────────────────────────────────── */}
-          <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
+        {/* ── Basic Document Details ───────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-8">
+          <h2 className="text-lg uppercase sm:text-[20px] text-gray-700 font-semibold mb-6 border-gray-200 pb-3 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-yellow-600" />
+            </span>
             Basic Document Details
           </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-7">
             {/* Documents radio */}
             <div>
-              <label className="block text-gray-700 font-medium mb-3">
+              <label className="block text-gray-700 font-medium mb-3 text-sm">
                 Documents
               </label>
-              <div className="flex items-center gap-5">
+              <div className="border border-gray-200 rounded-full px-4 sm:px-5 py-3 flex flex-wrap items-center gap-4 sm:gap-6 bg-white">
                 {documentOptions.map((doc) => (
-                  <label key={doc.value} className="flex items-center gap-2">
+                  <label key={doc.value} className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="radio"
+                      className="accent-orange-500"
                       checked={apiData?.bddDocument === doc.value}
                       readOnly
                     />
@@ -215,12 +228,12 @@ export default function VBasicDetails({
 
             {/* Aadhar No */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Aadhar No.
               </label>
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddAadharNo || ""}
                 readOnly
               />
@@ -228,15 +241,16 @@ export default function VBasicDetails({
 
             {/* SEZ Detail */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 SEZ Detail
               </label>
 
-              <div className="border border-gray-300 rounded-full px-5 py-4 flex items-center gap-6 bg-white">
+              <div className="border border-gray-200 rounded-full px-4 sm:px-5 py-3 flex flex-wrap items-center gap-4 sm:gap-6 bg-white">
                 {sezOptions.map((item) => (
-                  <label key={item.value} className="flex items-center gap-2">
+                  <label key={item.value} className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="radio"
+                      className="accent-orange-500"
                       checked={apiData?.bddSez === item.value}
                       readOnly
                     />
@@ -248,12 +262,12 @@ export default function VBasicDetails({
 
             {/* GSTN No */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 GSTN No.
               </label>
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddGstnNO || ""}
                 readOnly
               />
@@ -261,12 +275,12 @@ export default function VBasicDetails({
 
             {/* Pan No */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Pan No
               </label>
-             <input
+              <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddPanNo || ""}
                 readOnly
               />
@@ -274,13 +288,13 @@ export default function VBasicDetails({
 
             {/* Risk Check */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Risk Check
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.riskCheck || ""}
                 readOnly
               />
@@ -288,13 +302,13 @@ export default function VBasicDetails({
 
             {/* Category */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Category
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddCategory || ""}
                 readOnly
               />
@@ -302,41 +316,27 @@ export default function VBasicDetails({
 
             {/* MCC */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 MCC
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddAgpMcc || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Premises Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Premises Type
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddPremisesType || ""}
                 readOnly
               />
             </div>
 
             {/* Vintage Type */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Vintage Type
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddVintageType || ""}
                 readOnly
               />
@@ -344,13 +344,13 @@ export default function VBasicDetails({
 
             {/* Merchant Business Type */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Merchant Business Type
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddMerchantBusinessType || ""}
                 readOnly
               />
@@ -358,472 +358,294 @@ export default function VBasicDetails({
 
             {/* Merchant Website URL */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
                 Merchant Website URL
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
                 value={apiData?.bddMerchantWebsiteURL || ""}
                 readOnly
               />
             </div>
 
-            {/* Registration Date */}
+            {/* Partner Logo Check */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Registration Date
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Partner Logo Check
               </label>
 
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddRegistrationDate || ""}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.partnerLogoCheck || ""}
                 readOnly
               />
             </div>
-
-            {/* Application No */}
+            {/* Partner Logo */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Application No
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Partner Logo
               </label>
-
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddApplicationNo || ""}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.partnerLogoPath || ""}
                 readOnly
               />
             </div>
-
-            {/* Corporate Identification Number(CIN) */}
+            {/* Store Name */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Corporate Identification Number(CIN)
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                  Company Name (Business Name)
               </label>
-
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddCorporateNo || ""}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.storeDbaName || ""}
                 readOnly
               />
             </div>
-            {/* Years in Business */}
+            {/* Legal Name */}
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Years in Business
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+               Company Legal Name
               </label>
-
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddYearsInBusiness || ""}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.storeLegalName || ""}
                 readOnly
               />
             </div>
-
-            {/* Closest Competitor */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Who is your closest competitor?
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddClosestCompetitor || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Shops Count */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                How many shops do you have in the country?
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddShopsInCountry || ""}
-                readOnly
-              />
-            </div>
-            {/* Average Ticket Size */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Average Ticket Size
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddAverageTicketSize || ""}
-                readOnly
-              />
-            </div>
-
-            {/* Business Define */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                How do you define your Business
-              </label>
-
-              <div className="flex items-center gap-5">
-                {["Fast Growing", "Mature"].map((b) => (
-                  <label key={b} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      checked={apiData?.bddDefineBusiness === b}
-                      readOnly
-                    />
-                    {b}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3 pt-5">
-              Store Address
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-              {/* Address 1 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 1
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addStoreAddress1 || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Address 2 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 2
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addStoreAddress2 || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Address 3 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 3
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addStoreAddress3 || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Country */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Country
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addCountry || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* State */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  State
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addState || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  City
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addCity || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Zip Code */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Zip Code
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addZipcode || ""}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-
-
-          {/* ── Contact Person Details ───────────────────────────────────── */}
-          <div className="rounded-md mt-8">
-            <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3">
-              Contact Person Details
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-
-              {/* Full Name */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Full Name
-                </label>
-
-                <div className="flex">
-                  <input
-                    type="text"
-                    className="w-24 border border-gray-300 rounded-l px-3 py-2 bg-gray-100"
-                    value={apiData?.cpdNameTitle || ""}
-                    readOnly
-                  />
-
-                  <input
-                    type="text"
-                    className="w-full border border-l-0 border-gray-300 rounded-r px-3 py-2 bg-gray-100"
-                    value={apiData?.cpdName || ""}
-                    readOnly
-                  />
-                </div>
-              </div>
-
-              {/* Date of Birth */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Date of Birth
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.cpdDateOfBirth || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Phone No. with STD Code
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.cpdPhoneNo || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Mobile */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Mobile
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.cpdMobile || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Fax */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Fax
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.cpdFax || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Primary Email */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Primary Email Id
-                </label>
-
-                <input
-                  type="email"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.cpdPrimaryEmailId || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Secondary Email */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Secondary Email Id
-                </label>
-
-                <input
-                  type="email"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.cpdSecondaryEmailId || ""}
-                  readOnly
-                />
-              </div>
-
-            </div>
-          </div>
-
-          {/* ── Billing Address ──────────────────────────────────────────── */}
-          <div className="rounded-md mt-2 pb-4">
-            <h2 className="text-[20px] text-gray-700 mb-2 border-b border-gray-300 pb-3">
-              Billing Address
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-              {/* Address 1 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 1
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baAddress1 || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Address 2 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 2
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baAddress2 || ""}
-                  readOnly
-                />
-              </div>
-              {/* Address 3 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 3
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baAddress3 || ""}
-                  readOnly
-                />
-              </div>
-              {/* Country */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baCountry || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* State */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  State
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baState || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  City
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baCity || ""}
-                  readOnly
-                />
-              </div>
-
-              {/* Zip Code */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Zip Code
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.baZipcode || ""}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SAVE BUTTON */}
-          <div className="flex justify-end mb-15">
-            <button
-              type="button"
-              onClick={handleNext}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded"
-            >
-              Next
-            </button>
           </div>
         </div>
+
+        {/* ── Store Address ─────────────────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-8">
+          <h2 className="text-[18px] sm:text-[20px] text-gray-700 font-semibold pb-3 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+              <MapPin className="w-4 h-4 text-yellow-600" />
+            </span>
+            Store Address
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-7">
+            {/* Address 1 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 1
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addStoreAddress1 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Address 2 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 2
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addStoreAddress2 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Address 3 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 3
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addStoreAddress3 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Country
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addCountry || ""}
+                readOnly
+              />
+            </div>
+
+            {/* State */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                State
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addState || ""}
+                readOnly
+              />
+            </div>
+
+            {/* City */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                City
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addCity || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Zip Code */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Zip Code
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addZipcode || ""}
+                readOnly
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Billing Address ──────────────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-8 mb-8">
+          <h2 className="text-[18px] sm:text-[20px] text-gray-700 font-semibold mb-6  border-gray-200 pb-3 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+              <Receipt className="w-4 h-4 text-yellow-600" />
+            </span>
+            Billing Address
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-7">
+            {/* Address 1 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 1
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baAddress1 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Address 2 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 2
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baAddress2 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Address 3 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 3
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baAddress3 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Country
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baCountry || ""}
+                readOnly
+              />
+            </div>
+
+            {/* State */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                State
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baState || ""}
+                readOnly
+              />
+            </div>
+
+            {/* City */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                City
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baCity || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Zip Code */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Zip Code
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.baZipcode || ""}
+                readOnly
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* SAVE BUTTON */}
+        <div className="flex justify-end gap-3 mb-10 sm:mb-15">
+          <button
+            type="button"
+            onClick={handleNext}
+            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+          >
+            Next
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
+

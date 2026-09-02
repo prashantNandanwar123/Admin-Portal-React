@@ -42,6 +42,7 @@ export default function Login() {
           "user",
           JSON.stringify({ userName, role_function }),
         );
+        
         setTimeout(() => {
           toast.success(res.respMsg);
           navigate("/app/dashboard");
@@ -82,12 +83,12 @@ export default function Login() {
                 src={logo1}
                 alt="HelloPe"
                 className="h-32 xl:h-20 object-contain
-            ml-[-80px]
-            sm:ml-[-120px]
-            md:ml-[-150px]
-            lg:ml-[-180px]
-            xl:ml-[-120px]
-          "
+                ml-[-80px]
+                sm:ml-[-120px]
+                md:ml-[-150px]
+                lg:ml-[-180px]
+                xl:ml-[-120px]
+              "
               />
               {/* Heading */}
               <div>

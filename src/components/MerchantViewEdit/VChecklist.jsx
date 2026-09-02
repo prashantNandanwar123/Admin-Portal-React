@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
+import { FileCheck2, ClipboardList, ListChecks } from "lucide-react";
+
 
 
 export default function VChecklist({
@@ -17,20 +19,15 @@ export default function VChecklist({
 
     const fetchData = async () => {
       try {
-
         const response = await axiosInstance.post(
           `viewMerchantChecklist/${refId}`
-
         );
-        console.log("API RESPONSE:", response);
-
         if (response?.respCode === 0) {
           const res = response?.respData;
           setApiData(res || {});
         }
-
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
+        toast.error(error);
       }
     };
 
@@ -41,24 +38,37 @@ export default function VChecklist({
     "h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-[14px] text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
   const labelClass =
     "mb-1 block text-[15px] font-medium text-gray-700";
-  return (
 
-    <>
-      <div>
-        {/* Header */}
-        <div className="flex items-center gap-3 border-b border-gray-300 pr-4 py-3">          
-          <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-1 pb-1">
-          View Check List
+
+  return (
+    <div className="m-2">
+      {/* Header */}
+      <div className="pr-4 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+            <FileCheck2 className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-700" />
+          </div>
+          <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold">
+            View Check List
           </h2>
         </div>
+        <p className="text-sm text-blue-900 ml-12 sm:ml-14">
+          Review the merchant's underwriting and compliance checklist along with document verification status.
+        </p>
+      </div>
 
-        <div className="pt-5">
-          <h2 className="my-3 text-[26px] font-light text-gray-500 text-5xl">
-            Check List
-          </h2>
-
-          {/* Top Form */}
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 text-5xl">
+      <div className="pt-5">
+        {/* Top Form */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+              <ClipboardList className="w-4 h-4 sm:w-6 sm:h-6 text-amber-600" />
+            </div>
+            <h2 className="text-lg sm:text-[20px] font-light text-gray-800 uppercase">
+              Check List
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
             {/* Column 1 */}
             <div className="space-y-5">
               <div>
@@ -73,6 +83,7 @@ export default function VChecklist({
                   className={`${inputClass} bg-gray-100`}
                 />
               </div>
+
               {/* Existing/New Relationship */}
               <div>
                 <label className={labelClass}>
@@ -101,9 +112,9 @@ export default function VChecklist({
                     />
                     New Relationship
                   </label>
-
                 </div>
               </div>
+
               {/* Cross Border */}
               <div>
                 <label className={labelClass}>
@@ -344,15 +355,27 @@ export default function VChecklist({
               </div>
             </div>
           </div>
-          {/* Table Title */}
-          <h2 className="my-5 text-[26px] font-light text-gray-500 text-5xl">
-            Merchant Check List
-          </h2>
+        </div>
+
+        {/* Table Title */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-6">
+          <div className="flex items-center gap-3 my-2">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+              <ListChecks className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
+            </div>
+            <h2 className="text-lg sm:text-[21px] font-light text-gray-800">
+              Merchant Check List
+            </h2>
+          </div>
+          <p className="text-sm text-gray-500 -mt-2 mb-4 ml-11 sm:ml-12">
+            Verification checklist items with status and remarks captured during merchant onboarding review.
+          </p>
+
           {/* Table */}
-          <div className="overflow-x-auto text-5xl">
-            <table className="w-full  border-collapse text-4xl">
+          <div className="overflow-x-auto">
+            <table className="w-full  border-collapse">
               <thead>
-                <tr className="border-y border-gray-300 bg-[#fafafa]">
+                <tr className="border-y border-gray-200 bg-[#fafafa]">
                   <th className="px-2 py-2 text-left text-[15px] font-bold text-gray-700">
                     Item
                   </th>
@@ -364,8 +387,8 @@ export default function VChecklist({
                   </th>
                 </tr>
               </thead>
-              <tbody>
 
+              <tbody>
                 {/* ROW 1 */}
                 <tr className="border-b border-gray-200">
                   <td className="px-2 py-2 text-[15px]">
@@ -629,10 +652,8 @@ export default function VChecklist({
                   <td className="px-2 py-2 text-[15px]">
                     KYC documents verified and confirmed *
                   </td>
-
                   <td className="px-2 py-2">
                     <div className="flex gap-3 text-[15px]">
-
                       <label className="flex items-center gap-1">
                         <input
                           type="radio"
@@ -657,7 +678,6 @@ export default function VChecklist({
 
                     </div>
                   </td>
-
                   <td className="px-2 py-2">
                     <input
                       type="text"
@@ -666,31 +686,30 @@ export default function VChecklist({
                       className="h-6 w-full border border-gray-400 bg-gray-100 px-2 text-xs outline-none"
                     />
                   </td>
-                </tr>
+                </tr>                
               </tbody>
             </table>
           </div>
         </div>
-
-        {/*BACK &  NEXT BUTTON */}
-        <div className="flex gap-4 mt-10 d-flex justify-between align-items-center">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="bg-gray-500 text-white px-6 py-2 rounded"
-          >
-            Back
-          </button>
-
-          <button
-            type="button"
-            onClick={handleNext}
-            className="bg-orange-500 text-white px-6 py-2 rounded"
-          >
-            Next
-          </button>
-        </div>
       </div>
-    </>
+
+      {/*BACK &  NEXT BUTTON */}
+      <div className="flex gap-4 mt-10 justify-between items-center">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="bg-gray-500 text-white px-6 py-2 rounded"
+        >
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleNext}
+            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+        >
+          Next
+        </button>
+      </div>
+    </div>
   );
 }

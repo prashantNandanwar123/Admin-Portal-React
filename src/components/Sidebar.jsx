@@ -243,7 +243,8 @@ export default function Sidebar({ open, onClose, isMobile }) {
           className={`px-4 py-5 flex items-center justify-between border-b ${isLightSidebar ? "border-black/10" : "border-white/10"
             }`}
         >
-          <div className="flex items-center ml-2 gap-0 h-10">
+          <div className="flex items-center ml-2 gap-0 h-10 cursor-pointer"
+          onClick={() => navigate("dashboard")}>
             <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e] shrink-0">
               H
             </div>

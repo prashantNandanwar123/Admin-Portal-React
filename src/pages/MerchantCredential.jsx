@@ -91,15 +91,16 @@ export default function MerchantCredential() {
     <div className="min-h-screen p-4 md:p-6">
       {/* ================= HEADER ================= */}
       <div className="mb-6">
-        <h2 className="text-4xl uppercase pb-3 text-blue-900 font-extrabold">
+        <h2 className="text-3xl uppercase pb-1 text-black-900 font-bold">
           Merchant Credential
         </h2>
-        <p className="pb-3 text-lg text-blue-900">
+        <p className="pb-1 text-sm text-black-100 font-normal">
           Manage merchant API credentials, secret keys, authentication details, and integration settings securely.
         </p>
       </div>
+
       {/* ================= SEARCH BOX ================= */}
-      <div className="mb-6">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
         <div className="flex flex-col md:flex-row gap-4 items-end">
           {/* MID */}
           <div className="w-full md:w-96">
@@ -131,11 +132,11 @@ export default function MerchantCredential() {
       </div>
 
       {/* ================= TABLE ================= */}
-      <div className="mt-10">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      <div className="mt-8">
+        <div className="overflow-x-auto shadow-lg">
+          <table className="w-full text-sm bg-white border border-gray-300 rounded-xl shadow-lg p-5 sm:p-6 ">
             <thead>
-              <tr className="bg-orange-600 text-white">
+              <tr className="bg-gray-100 text-black">
                 <th className="px-4 py-4 text-left">
                   Merchant Name
                 </th>

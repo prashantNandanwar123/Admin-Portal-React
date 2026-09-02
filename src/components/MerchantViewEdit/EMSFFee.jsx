@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
+import { Percent } from "lucide-react";
 
 export default function EMSFFee({
   refId,
@@ -91,11 +92,6 @@ export default function EMSFFee({
 
   // fetch Mid List
   const fetchMIDList = async (AcqBankName) => {
-    console.log(
-      "----AcqBankName-------->",
-      AcqBankName
-    );
-
     try {
       const response =
         await axiosInstance.post(
@@ -114,13 +110,8 @@ export default function EMSFFee({
         ([key, value]) =>
           `${key}-${value}`
       );
-
       setMidList(list);
     } catch (error) {
-      console.error(
-        "MID API Error:",
-        error
-      );
       setMidList([]);
     }
   };
@@ -143,7 +134,6 @@ export default function EMSFFee({
       [field]: value,
     }));
   };
-
 
   // ADD ROW
   const handleAddRow = () => {
@@ -203,12 +193,8 @@ export default function EMSFFee({
     const updatedRows = [
       ...tableData,
     ];
-
-    updatedRows[index][field] =
-      value;
-
+    updatedRows[index][field] = value;
     setTableData(updatedRows);
-
   };
 
   // This Api Are Save Edited Data
@@ -224,11 +210,8 @@ export default function EMSFFee({
         }
         setShowSaveError(false);
 
-        console.log("Data print-->>", refId);
-
         const payload = {
           ref_id: refId,
-
           upiAcquirerBankName:
             tableData
               .map(
@@ -340,7 +323,6 @@ export default function EMSFFee({
               )
               .join(","),
         };
-        console.log("payload print-->>", payload);
 
         const response =
           await axiosInstance.post(
@@ -354,10 +336,6 @@ export default function EMSFFee({
             }
           );
 
-        console.log(
-          "PAYMENT RESPONSE =>",
-          response
-        );
         const resData = response;
         if (
           resData?.respCode === 0
@@ -385,8 +363,6 @@ export default function EMSFFee({
           }
         }
       } catch (error) {
-        console.error(
-          "SAVE MSF ERROR =>", error);
         toast.error(error);
       }
     };
@@ -398,323 +374,342 @@ export default function EMSFFee({
 
   const req =
     <span className="text-red-500">*</span>;
+
   return (
     <>
       <div>
-        <h2 className="text-2xl uppercase border-b border-gray-300 text-blue-900 font-extrabold py-3">
-          Edit MSF / Convenience Fee
-        </h2>
+        <div className="flex items-center gap-3 pt-3">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+            <Percent className="w-5 h-5 text-yellow-600" />
+          </div>
+          <h2 className="text-2xl uppercase text-blue-900 font-bold">
+            Edit MSF / Convenience Fee
+          </h2>
+        </div>
+        <p className="mt-1 ml-12 text-sm text-blue-900 pb-5">
+          Configure and update the applicable MSF and convenience fee settings.
+        </p>
+
         {/* ALL FIELDS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-5">
-          {/* Acquirer Bank */}
-          <div>
-            <label className={labelClass}>
-              Acquirer Bank {req}
-            </label>
-            <select
-              className={inputClass}
-              value={form.acquirerBank}
-              onChange={(e) => {
-                const value = e.target.value;
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-3">
+            {/* Acquirer Bank */}
+            <div>
+              <label className={labelClass}>
+                Acquirer Bank {req}
+              </label>
+              <select
+                className={inputClass}
+                value={form.acquirerBank}
+                onChange={(e) => {
+                  const value = e.target.value;
 
-                u("acquirerBank", value);
-                fetchMIDList(value);
-              }}
-            >
-              <option value="">-- Select --</option>
-              {data?.selectedAcquirer && (
-                <option value={data.selectedAcquirer}>
-                  {data.selectedAcquirer}
+                  u("acquirerBank", value);
+                  fetchMIDList(value);
+                }}
+              >
+                <option value="">-- Select --</option>
+                {data?.selectedAcquirer && (
+                  <option value={data.selectedAcquirer}>
+                    {data.selectedAcquirer}
+                  </option>
+                )}
+              </select>
+            </div>
+            {/* Processor MID */}
+            <div>
+              <label className={labelClass}>
+                Processor MID {req}
+              </label>
+              <select
+                className={inputClass}
+                value={form.processorMID}
+                onChange={(e) =>
+                  u("processorMID", e.target.value)
+                }
+              >
+                <option value="">-- Select --</option>
+                {midList.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Slab Upto */}
+            <div>
+              <label className={labelClass}>
+                Slab Upto {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                value={form.slabUpto}
+                maxLength={8}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (/^\d*$/.test(value)) {
+                    u("slabUpto", value);
+                  }
+                }}
+              />
+            </div>
+            {/* Effective From */}
+            <div>
+              <label className={labelClass}>
+                Effective From {req}
+              </label>
+
+              <input
+                type="date"
+                className={inputClass}
+                value={form.effectiveFrom}
+                onChange={(e) =>
+                  u("effectiveFrom", e.target.value)
+                }
+              />
+            </div>
+            {/* Effective To */}
+            <div>
+              <label className={labelClass}>
+                Effective To {req}
+              </label>
+
+              <input
+                type="date"
+                className={inputClass}
+                value={form.effectiveTo}
+                onChange={(e) =>
+                  u("effectiveTo", e.target.value)
+                }
+              />
+            </div>
+            {/* International Fixed */}
+            <div>
+              <label className={labelClass}>
+                International Fixed {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                maxLength={3}
+                value={form.internationalFixed}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (/^\d*$/.test(value)) {
+                    u("internationalFixed", value);
+                  }
+                }}
+              />
+            </div>
+            {/* International Per */}
+            <div>
+              <label className={labelClass}>
+                International Per(%) {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                value={form.internationalPer}
+                maxLength={6}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  if (!/^\d*\.?\d*$/.test(value)) return;
+
+                  if (value === "") {
+                    u("internationalPer", value);
+                    return;
+                  }
+
+                  const num = parseFloat(value);
+
+                  if (!isNaN(num) && num <= 100) {
+                    u("internationalPer", value);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Domestic Onus Fixed */}
+            <div>
+              <label className={labelClass}>
+                Domestic Onus Fixed {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                maxLength={3}
+                value={form.domesticOnusFixed}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (/^\d*$/.test(value)) {
+                    u("domesticOnusFixed", value);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Domestic Onus Per */}
+            <div>
+              <label className={labelClass}>
+                Domestic Onus Per (%) {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                value={form.domesticOnusPer}
+                maxLength={6}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  if (!/^\d*\.?\d*$/.test(value)) return;
+
+                  if (value === "") {
+                    u("domesticOnusPer", value);
+                    return;
+                  }
+
+                  const num = parseFloat(value);
+
+                  if (!isNaN(num) && num <= 100) {
+                    u("domesticOnusPer", value);
+                  }
+                }}
+              />
+            </div>
+            {/* Domestic Offus Fixed */}
+            <div>
+              <label className={labelClass}>
+                Domestic Offus Fixed {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                maxLength={3}
+                value={form.domesticOffusFixed}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (/^\d*$/.test(value)) {
+                    u("domesticOffusFixed", value);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Domestic Offus Per */}
+            <div>
+              <label className={labelClass}>
+                Domestic Offus Per (%) {req}
+              </label>
+
+              <input
+                type="text"
+                className={inputClass}
+                value={form.domesticOffusPer}
+                maxLength={6}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  if (!/^\d*\.?\d*$/.test(value)) return;
+
+                  if (value === "") {
+                    u("domesticOffusPer", value);
+                    return;
+                  }
+
+                  const num = parseFloat(value);
+
+                  if (!isNaN(num) && num <= 100) {
+                    u("domesticOffusPer", value);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Charge Type */}
+            <div>
+              <label className={labelClass}>
+                Charge Type
+              </label>
+
+              <select
+                className={inputClass}
+                value={form.chargeType}
+                onChange={(e) =>
+                  u("chargeType", e.target.value)
+                }
+              >
+                <option value="Both">Both</option>
+                <option value="Whichever Higher">
+                  Whichever Higher
                 </option>
-              )}
-            </select>
-          </div>
-          {/* Processor MID */}
-          <div>
-            <label className={labelClass}>
-              Processor MID {req}
-            </label>
-            <select
-              className={inputClass}
-              value={form.processorMID}
-              onChange={(e) =>
-                u("processorMID", e.target.value)
-              }
-            >
-              <option value="">-- Select --</option>
-              {midList.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
+                <option value="Whichever Lower">
+                  Whichever Lower
                 </option>
-              ))}
-            </select>
-          </div>
-          {/* Slab Upto */}
-          <div>
-            <label className={labelClass}>
-              Slab Upto {req}
-            </label>
+              </select>
+            </div>
 
-            <input
-              type="text"
-              className={inputClass}
-              value={form.slabUpto}
-              maxLength={8}
-              onChange={(e) => {
-                const value = e.target.value;
+            {/* GST */}
+            <div>
+              <label className={labelClass}>
+                Enter GST in Percentage(%) {req}
+              </label>
 
-                if (/^\d*$/.test(value)) {
-                  u("slabUpto", value);
+              <input
+                type="text"
+                className={inputClass}
+                value={form.enterGST}
+                maxLength={3}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  if (!/^\d*$/.test(value)) return;
+
+                  if (value === "") {
+                    u("enterGST", value);
+                    return;
+                  }
+
+                  const num = Number(value);
+
+                  if (num <= 100) {
+                    u("enterGST", value);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Fee Type */}
+            <div>
+              <label className={labelClass}>
+                Fee Type {req}
+              </label>
+
+              <select
+                className={inputClass}
+                value={form.feeType}
+                onChange={(e) =>
+                  u("feeType", e.target.value)
                 }
-              }}
-            />
-          </div>
-          {/* Effective From */}
-          <div>
-            <label className={labelClass}>
-              Effective From {req}
-            </label>
+              >
+                <option value="MSF">MSF</option>
+                <option value="Convenience">
+                  Convenience
+                </option>
+              </select>
+            </div>
 
-            <input
-              type="date"
-              className={inputClass}
-              value={form.effectiveFrom}
-              onChange={(e) =>
-                u("effectiveFrom", e.target.value)
-              }
-            />
-          </div>
-          {/* Effective To */}
-          <div>
-            <label className={labelClass}>
-              Effective To {req}
-            </label>
-
-            <input
-              type="date"
-              className={inputClass}
-              value={form.effectiveTo}
-              onChange={(e) =>
-                u("effectiveTo", e.target.value)
-              }
-            />
-          </div>
-          {/* International Fixed */}
-          <div>
-            <label className={labelClass}>
-              International Fixed {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              maxLength={3}
-              value={form.internationalFixed}
-              onChange={(e) => {
-                const value = e.target.value;
-
-                if (/^\d*$/.test(value)) {
-                  u("internationalFixed", value);
-                }
-              }}
-            />
-          </div>
-          {/* International Per */}
-          <div>
-            <label className={labelClass}>
-              International Per(%) {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              value={form.internationalPer}
-              maxLength={6}
-              onChange={(e) => {
-                let value = e.target.value;
-
-                if (!/^\d*\.?\d*$/.test(value)) return;
-
-                if (value === "") {
-                  u("internationalPer", value);
-                  return;
-                }
-
-                const num = parseFloat(value);
-
-                if (!isNaN(num) && num <= 100) {
-                  u("internationalPer", value);
-                }
-              }}
-            />
-          </div>
-          {/* Domestic Onus Fixed */}
-          <div>
-            <label className={labelClass}>
-              Domestic Onus Fixed {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              maxLength={3}
-              value={form.domesticOnusFixed}
-              onChange={(e) => {
-                const value = e.target.value;
-
-                if (/^\d*$/.test(value)) {
-                  u("domesticOnusFixed", value);
-                }
-              }}
-            />
-          </div>
-          {/* Domestic Onus Per */}
-          <div>
-            <label className={labelClass}>
-              Domestic Onus Per (%) {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              value={form.domesticOnusPer}
-              maxLength={6}
-              onChange={(e) => {
-                let value = e.target.value;
-
-                if (!/^\d*\.?\d*$/.test(value)) return;
-
-                if (value === "") {
-                  u("domesticOnusPer", value);
-                  return;
-                }
-
-                const num = parseFloat(value);
-
-                if (!isNaN(num) && num <= 100) {
-                  u("domesticOnusPer", value);
-                }
-              }}
-            />
-          </div>
-          {/* Domestic Offus Fixed */}
-          <div>
-            <label className={labelClass}>
-              Domestic Offus Fixed {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              maxLength={3}
-              value={form.domesticOffusFixed}
-              onChange={(e) => {
-                const value = e.target.value;
-
-                if (/^\d*$/.test(value)) {
-                  u("domesticOffusFixed", value);
-                }
-              }}
-            />
-          </div>
-          {/* Domestic Offus Per */}
-          <div>
-            <label className={labelClass}>
-              Domestic Offus Per (%) {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              value={form.domesticOffusPer}
-              maxLength={6}
-              onChange={(e) => {
-                let value = e.target.value;
-
-                if (!/^\d*\.?\d*$/.test(value)) return;
-
-                if (value === "") {
-                  u("domesticOffusPer", value);
-                  return;
-                }
-
-                const num = parseFloat(value);
-
-                if (!isNaN(num) && num <= 100) {
-                  u("domesticOffusPer", value);
-                }
-              }}
-            />
-          </div>
-          {/* Charge Type */}
-          <div>
-            <label className={labelClass}>
-              Charge Type
-            </label>
-
-            <select
-              className={inputClass}
-              value={form.chargeType}
-              onChange={(e) =>
-                u("chargeType", e.target.value)
-              }
-            >
-              <option value="Both">Both</option>
-              <option value="Whichever Higher">
-                Whichever Higher
-              </option>
-              <option value="Whichever Lower">
-                Whichever Lower
-              </option>
-            </select>
-          </div>
-          {/* GST */}
-          <div>
-            <label className={labelClass}>
-              Enter GST in Percentage(%) {req}
-            </label>
-
-            <input
-              type="text"
-              className={inputClass}
-              value={form.enterGST}
-              maxLength={3}
-              onChange={(e) => {
-                let value = e.target.value;
-
-                if (!/^\d*$/.test(value)) return;
-
-                if (value === "") {
-                  u("enterGST", value);
-                  return;
-                }
-
-                const num = Number(value);
-
-                if (num <= 100) {
-                  u("enterGST", value);
-                }
-              }}
-            />
-          </div>
-          {/* Fee Type */}
-          <div>
-            <label className={labelClass}>
-              Fee Type {req}
-            </label>
-
-            <select
-              className={inputClass}
-              value={form.feeType}
-              onChange={(e) =>
-                u("feeType", e.target.value)
-              }
-            >
-              <option value="MSF">MSF</option>
-              <option value="Convenience">
-                Convenience
-              </option>
-            </select>
           </div>
         </div>
       </div>
@@ -730,341 +725,345 @@ export default function EMSFFee({
           </div>
         </div>
       )}
+
+
       {/* ADD ROW BUTTON */}
-      <div className="flex justify-center mt-6 mb-4">
-        <button
-          type="button"
-          onClick={handleAddRow}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Add Row
-        </button>
-      </div>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-5">
+        <div className="flex justify-center mb-4">
+          <button
+            type="button"
+            onClick={handleAddRow}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Add Row
+          </button>
+        </div>
 
-      {/* TABLE */}
-      <div className="mt-4 overflow-auto">
-        <table className="min-w-full border border-gray-300 text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border p-2">
-                Acquirer Bank
-              </th>
-              <th className="border p-2">
-                Processor MID
-              </th>
-              <th className="border p-2">
-                Slab Upto
-              </th>
-              <th className="border p-2">
-                Effective From
-              </th>
-              <th className="border p-2">
-                Effective To
-              </th>
-              <th className="border p-2">
-                International Fixed
-              </th>
-              <th className="border p-2">
-                International Per
-              </th>
-              <th className="border p-2">
-                Domestic Onus Fixed
-              </th>
-              <th className="border p-2">
-                Domestic Onus Per
-              </th>
-              <th className="border p-2">
-                Domestic Offus Fixed
-              </th>
-              <th className="border p-2">
-                Domestic Offus Per
-              </th>
-              <th className="border p-2">
-                Charge Type
-              </th>
-              <th className="border p-2">
-                GST %
-              </th>
-              <th className="border p-2">
-                Fee Type
-              </th>
-              <th className="border p-2">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.length >
-              0 ? (
-              tableData.map(
-                (row, index) => (
-                  <tr key={index}>
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.acquirerBank
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "acquirerBank",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.processorMID
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "processorMID",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.slabUpto
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "slabUpto",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.effectiveFrom
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "effectiveFrom",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.effectiveTo
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "effectiveTo",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.internationalFixed
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "internationalFixed",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.internationalPer
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "internationalPer",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.domesticOnusFixed
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "domesticOnusFixed",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.domesticOnusPer
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "domesticOnusPer",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.domesticOffusFixed
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "domesticOffusFixed",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.domesticOffusPer
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "domesticOffusPer",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.chargeType
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "chargeType",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.enterGST
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "enterGST",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2">
-                      <input
-                        type="text"
-                        value={
-                          row.feeType
-                        }
-                        onChange={(e) =>
-                          handleRowChange(
-                            index,
-                            "feeType",
-                            e.target.value
-                          )
-                        }
-                        className="w-full outline-none"
-                      />
-                    </td>
-
-                    <td className="border p-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleDeleteRow(
-                            index
-                          )
-                        }
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                )
-              )
-            ) : (
+        {/* TABLE */}
+        <div className="mt-4 overflow-auto">
+          <table className="min-w-full border border-gray-300 text-sm">
+            <thead className="bg-gray-100">
               <tr>
-                <td
-                  colSpan="15"
-                  className="text-center py-4 text-gray-400"
-                >
-                  No Records Added
-                </td>
+                <th className="border p-2">
+                  Acquirer Bank
+                </th>
+                <th className="border p-2">
+                  Processor MID
+                </th>
+                <th className="border p-2">
+                  Slab Upto
+                </th>
+                <th className="border p-2">
+                  Effective From
+                </th>
+                <th className="border p-2">
+                  Effective To
+                </th>
+                <th className="border p-2">
+                  International Fixed
+                </th>
+                <th className="border p-2">
+                  International Per
+                </th>
+                <th className="border p-2">
+                  Domestic Onus Fixed
+                </th>
+                <th className="border p-2">
+                  Domestic Onus Per
+                </th>
+                <th className="border p-2">
+                  Domestic Offus Fixed
+                </th>
+                <th className="border p-2">
+                  Domestic Offus Per
+                </th>
+                <th className="border p-2">
+                  Charge Type
+                </th>
+                <th className="border p-2">
+                  GST %
+                </th>
+                <th className="border p-2">
+                  Fee Type
+                </th>
+                <th className="border p-2">
+                  Action
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tableData.length >
+                0 ? (
+                tableData.map(
+                  (row, index) => (
+                    <tr key={index}>
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.acquirerBank
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "acquirerBank",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.processorMID
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "processorMID",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.slabUpto
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "slabUpto",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.effectiveFrom
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "effectiveFrom",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.effectiveTo
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "effectiveTo",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.internationalFixed
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "internationalFixed",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.internationalPer
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "internationalPer",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.domesticOnusFixed
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOnusFixed",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.domesticOnusPer
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOnusPer",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.domesticOffusFixed
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOffusFixed",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.domesticOffusPer
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOffusPer",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.chargeType
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "chargeType",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.enterGST
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "enterGST",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.feeType
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "feeType",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDeleteRow(
+                              index
+                            )
+                          }
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )
+              ) : (
+                <tr>
+                  <td
+                    colSpan="15"
+                    className="text-center py-4 text-gray-400"
+                  >
+                    No Records Added
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* BACK & NEXT BUTTON */}
@@ -1091,7 +1090,7 @@ export default function EMSFFee({
           <button
             type="button"
             onClick={handleNext}
-            className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2 rounded"
+            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
           >
             Next
           </button>

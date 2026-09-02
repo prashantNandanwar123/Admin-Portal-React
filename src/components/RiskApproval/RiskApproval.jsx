@@ -49,6 +49,7 @@ export default function RiskApproval() {
         "/riskApproval",
         {}
       );
+      console.log("response Data::--",res);
       const response = res?.data ?? res;
       if (response?.respCode === 0) {
         setData(response?.respData || []);
@@ -157,22 +158,26 @@ export default function RiskApproval() {
                 <th className="px-4 py-3">
                   ID
                 </th>
-                <th className="px-4 py-3">
-                  Legal Name
-                </th>
-                <th className="px-4 py-3">
-                  Contact Person Name
-                </th>
-                <th className="px-4 py-3">
-                  Email Address
-                </th>
-                <th className="px-4 py-3">
-                  Mobile Number
-                </th>
-                <th className="px-4 py-3">
-                  REF ID
+                <th className="px-4 py-3 text-center">
+                  Created Date
                 </th>
                 <th className="px-4 py-3 text-center">
+                  Legal Name
+                </th>
+                <th className="px-4 py-3 text-center">
+                  Contact Person Name
+                </th>
+                <th className="px-4 py-3 text-center">
+                  Email Address
+                </th>
+                <th className="px-4 py-3 text-center">
+                  Mobile Number
+                </th>
+                
+                <th className="px-4 py-3 text-center">
+                  Created By
+                </th>
+                <th className="px-4 py-3 text-center text-center">
                   Action
                 </th>
               </tr>
@@ -187,32 +192,39 @@ export default function RiskApproval() {
                     className="hover:bg-gray-50 transition"
                   >
                     {/* ID */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       {item[0]}
                     </td>
+
+                    {/* Created Date */}
+                    <td className="px-4 py-3 font-semibold text-blue-600 text-center">
+                      {item[6]}
+                    </td>
+
                     {/* Legal Name */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       {item[1]}
                     </td>
                     {/* Contact Person */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       {item[2]}
                     </td>
 
                     {/* Email */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       {item[3]}
                     </td>
 
                     {/* Mobile */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       {item[4]}
                     </td>
-
-                    {/* REF ID */}
-                    <td className="px-4 py-3 font-semibold text-blue-600">
-                      {item[5]}
+                    
+                    {/* Created By */}
+                    <td className="px-4 py-3 font-semibold text-blue-600 text-center">
+                      {item[7]}
                     </td>
+
                     {/* Action */}
                     <td className="px-4 py-3 text-center">
                       <button
@@ -228,7 +240,7 @@ export default function RiskApproval() {
               ) : (
                 <tr>
                   <td
-                    colSpan="7"
+                    colSpan="8"
                     className="text-center py-6 text-gray-400"
                   >
                     No data found
@@ -238,6 +250,7 @@ export default function RiskApproval() {
 
             </tbody>
           </table>
+
           {/* Bottom */}
           <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-t border-slate-300">
             {/* Showing */}

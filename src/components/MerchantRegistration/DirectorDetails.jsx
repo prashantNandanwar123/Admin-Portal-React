@@ -1,4 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import axiosInstance from "../../api/axios";
+
+
 import {
     UserRound,
     Info,
@@ -9,54 +13,31 @@ import {
     Upload,
     FileText,
     CreditCard,
-    RotateCcw,
-    Save,
     ShieldCheck,
 } from "lucide-react";
 
-import axiosInstance from "../../api/axios";
 
 const EMPTY_DIRECTOR = {
     name: "",
     designation: "",
     photograph: null,
-    addressProof: null,
-    pan: "",
-    aadhaar: "",
-
+    panCard: "",
+    panNo: "",
+    aadhaarCard: "",
+    aadhaarNo: "",
 };
 
-const DirectorDetail = {
-    director1Name: "",
-    director1Designation: "",
-    director1PanNo: "",
-    director1AadharNo: "",
-    director1Selfie: "",
-    director1Pan: "",
-    director1Aadhar: "",
+export default function DirectorDetails({ data, setData, handleNext,
+    handleBack }) {
 
-    director2Name: "",
-    director2Designation: "",
-    director2PanNo: "",
-    director2AadharNo: "",
-    director2Selfie: "",
-    director2Pan: "",
-    director2Aadhar: ""
-};
 
-const DirectorDetails = () => {
     const [openDirector, setOpenDirector] = useState(1);
-
     const [directors, setDirectors] = useState({
         1: { ...EMPTY_DIRECTOR }, // Make Copy In Object
         2: { ...EMPTY_DIRECTOR },
     });
 
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
-
-
     // ACCORDION
     const toggleDirector = (directorNumber) => {
         setOpenDirector((prev) =>
@@ -89,48 +70,78 @@ const DirectorDetails = () => {
                     ...EMPTY_DIRECTOR,
                 },
             }));
-        } catch (err) {
-            console.error("Reset error:", err);
+        } catch (error) {
+            toast.error(error);
         }
     };
 
     // SAVE DIRECTORS
     const handleSave = async () => {
         try {
-            setSaving(true);
             setError("");
-            console.log("director1Name : ", director1Name);
+            if (!data?.refId) {
+                return;
+            }
+            if (!directors[1].name) {
+                toast.error("Director Name is required");
+                return;
+            }
+             
+            if (!directors[1].designation) {
+                toast.error("Director Designation is required");
+                return;
+            }
+             
+            if (!directors[1].aadhaarNo) {
+                toast.error("Director Aadhar No is required");
+                return;
+            }
+             
+            if (!directors[1].panNo) {
+                toast.error("Director Pan No is required");
+                return;
+            }
             const formData = new FormData();
-            formData.append("refId", "10001")
+            formData.append("refId", data?.refId);
             formData.append("uploadedBy", "administrator"),
-            formData.append("director1Name", director1Name);
-            formData.append("director1Designation", director1Designation);
-            formData.append("director1AadharNo", director1AadharNo);
-            formData.append("director1Selfie", director1Selfie);
-            formData.append("director1Pan", director1Pan);
-            formData.append("director1Aadhar", director1Aadhar);
-            formData.append("director2Name", director2Name);
-            formData.append("director2Designation", director2Designation);
-            formData.append("director2AadharNo", director2AadharNo);
-            formData.append("director2Selfie", director2Selfie);
-            formData.append("director2Pan", director2Pan);
-            formData.append("director2Aadhar", director2Aadhar);
+            formData.append("director1Name", directors[1].name);
+            formData.append("director1Designation", directors[1].designation);
+            formData.append("director1AadharNo", directors[1].aadhaarNo);
+            formData.append("director1Selfie", directors[1].photograph);
+            formData.append("director1Pan", directors[1].panCard);
+            formData.append("director1PanNo", directors[1].panNo);
+            formData.append("director1Aadhar", directors[1].aadhaarCard);
 
+            formData.append("director2Name", directors[2].name);
+            formData.append("director2Designation", directors[2].designation);
+            formData.append("director2AadharNo", directors[2].aadhaarNo);
+            formData.append("director2Selfie", directors[2].photograph);
+            formData.append("director2Pan", directors[2].panCard);
+            formData.append("director2PanNo", directors[2].panNo);
+            formData.append("director2Aadhar", directors[2].aadhaarCard);
 
-            const response = await axiosInstance.post("/merchant/kyc/director", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await axiosInstance.post(
+                "/merchant/kyc/director",
+                formData
+            );
+            if (response?.respCode === 0) {
+                toast.success(response?.respMsg);
+                setData((prev) => ({
+                    ...prev,
+                    refId: response?.respData?.ref_id,
+                }));
+                handleNext();
+            } else {
+                toast.error(response?.respMsg);
+                if (response?.respData && typeof response.respData === "object") {
+                    Object.values(response.respData).forEach((msg) => {
+                        toast.error(msg);
+                    });
+                }
+            }
 
-            console.log("Director save response:", response);
-
-            alert("Director details saved successfully.");
-        } catch (err) {
-            console.error("Save director error:", err);
-            setError("Unable to save director details.");
-        } finally {
-            setSaving(false);
+        } catch (error) {
+            setError(error);
         }
     };
 
@@ -190,14 +201,16 @@ const DirectorDetails = () => {
                                         <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                         <input
                                             type="text"
-                                            value={DirectorDetail.director1Name}
+                                            value={director.name}
                                             onChange={(e) =>
                                                 handleChange(
-                                                    "director1Name",
+                                                    directorNumber,
+                                                    "name",
                                                     e.target.value
                                                 )
                                             }
                                             placeholder="Enter director name"
+                                            required
                                             className="w-full h-10 pl-9 pr-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
                                         />
                                     </div>
@@ -213,11 +226,10 @@ const DirectorDetails = () => {
                                     <div className="relative">
                                         <BriefcaseBusiness className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1169ad] pointer-events-none" />
                                         <select
-                                            value={DirectorDetail.director1Designation}
-                                            onChange={(e) =>
+                                            value={director.designation} onChange={(e) =>
                                                 handleChange(
-                                                    
-                                                    "director1Designation",
+                                                    directorNumber,
+                                                    "designation",
                                                     e.target.value
                                                 )
                                             }
@@ -246,7 +258,6 @@ const DirectorDetails = () => {
                                 </div>
                             </div>
 
-
                             {/* Second Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                                 {/* PAN */}
@@ -261,11 +272,11 @@ const DirectorDetails = () => {
                                         <input
                                             type="text"
                                             maxLength={10}
-                                            value={director.pan}
+                                            value={director.panNo}
                                             onChange={(e) =>
                                                 handleChange(
                                                     directorNumber,
-                                                    "pan",
+                                                    "panNo",
                                                     e.target.value
                                                         .toUpperCase()
                                                         .replace(/[^A-Z0-9]/g, "")
@@ -291,11 +302,11 @@ const DirectorDetails = () => {
                                         <input
                                             type="text"
                                             maxLength={12}
-                                            value={director.aadhaar}
+                                            value={director.aadhaarNo}
                                             onChange={(e) =>
                                                 handleChange(
                                                     directorNumber,
-                                                    "aadhaar",
+                                                    "aadhaarNo",
                                                     e.target.value.replace(/\D/g, "")
                                                 )
                                             }
@@ -343,7 +354,7 @@ const DirectorDetails = () => {
                                     </label>
                                 </div>
 
-                                {/* Address Proof */}
+                                {/* Pan Card */}
                                 <div>
                                     <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
                                         Director {directorNumber} Pan Card
@@ -352,11 +363,12 @@ const DirectorDetails = () => {
                                     <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
                                         <FileText className="w-4 h-4 ml-3 text-gray-300" />
                                         <span className="ml-2 text-xs text-gray-400 truncate pr-12">
-                                            {director.addressProof
-                                                ? director.addressProof.name ||
+                                            {director.panCard
+                                                ? director.panCard.name ||
                                                 "Document uploaded"
                                                 : "Upload Director Pan Card"}
                                         </span>
+
                                         <div className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-md border border-[#9cc9ee] bg-[#f7fbff]">
                                             <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
                                         </div>
@@ -367,7 +379,7 @@ const DirectorDetails = () => {
                                             onChange={(e) =>
                                                 handleFileChange(
                                                     directorNumber,
-                                                    "addressProof",
+                                                    "panCard",
                                                     e.target.files?.[0] || null
                                                 )
                                             }
@@ -384,8 +396,8 @@ const DirectorDetails = () => {
                                     <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
                                         <FileText className="w-4 h-4 ml-3 text-gray-300" />
                                         <span className="ml-2 text-xs text-gray-400 truncate pr-12">
-                                            {director.addressProof
-                                                ? director.addressProof.name ||
+                                            {director.aadhaarCard
+                                                ? director.aadhaarCard.name ||
                                                 "Document uploaded"
                                                 : "Upload Director Aadhar Card"}
                                         </span>
@@ -399,7 +411,7 @@ const DirectorDetails = () => {
                                             onChange={(e) =>
                                                 handleFileChange(
                                                     directorNumber,
-                                                    "addressProof",
+                                                    "aadhaarCard",
                                                     e.target.files?.[0] || null
                                                 )
                                             }
@@ -413,17 +425,6 @@ const DirectorDetails = () => {
             </div>
         );
     };
-
-    // LOADING
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-sm text-gray-500">
-                    Loading director details...
-                </div>
-            </div>
-        );
-    }
 
     // MAIN UI
     return (
@@ -439,7 +440,6 @@ const DirectorDetails = () => {
                             <h2 className="text-xl font-semibold text-[#173875]">
                                 Add Director Details
                             </h2>
-
                             <p className="mt-0.5 text-[10px] text-gray-400">
                                 Director information
                             </p>
@@ -470,18 +470,18 @@ const DirectorDetails = () => {
                 </div>
 
                 {/* BUTTONS */}
-                <div className="flex justify-end gap-2 mt-4">
+                <div className="flex justify-between gap-2 mt-4">
                     <button
                         type="button"
-                        // onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
+                        onClick={handleBack}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
                     >
                         Back
                     </button>
                     <button
                         type="button"
-
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded"
+                        onClick={handleSave}
+                        className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
                     >
                         Save & Next
                     </button>
@@ -489,6 +489,5 @@ const DirectorDetails = () => {
             </div>
         </div>
     );
-};
+}
 
-export default DirectorDetails;

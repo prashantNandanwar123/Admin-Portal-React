@@ -2,14 +2,23 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-import { User, CalendarDays } from "lucide-react";
+import { Eye, User, CalendarDays } from "lucide-react";
 
 export default function ResellerViewDetails() {
+
     const [apiData, setData] = useState({});
+    const [passportPhoto, setPassportPhoto] = useState(null);
+    const [aadharCard, setAadharCard] = useState(null);
+    const [panCard, setPanCard] = useState(null);
+    const [addressProof, setAddressProof] = useState(null);
     const location = useLocation();
     const resellerId = location.state?.resellerId;
-
-    console.log("Reseller Id", resellerId);
+    const [documents, setDocuments] = useState({
+        PASSPORT_PHOTO: null,
+        AADHAAR_CARD: null,
+        PAN_CARD: null,
+        ADDRESS_PROOF: null,
+    });
 
     useEffect(() => {
         viewResellers();
@@ -20,10 +29,28 @@ export default function ResellerViewDetails() {
             const response = await axiosInstance.post(
                 `/reseller/viewReseller/${resellerId}`
             );
-            console.log("FULL RESPONSE-->>>:", response);
 
             if (response?.respCode === 0) {
-                setData(response?.respData?.[0] || {});
+                setData(response?.respData || {});
+                // Documents
+                const apiDocuments = response?.respData?.documents || [];
+
+                const documentMap = {
+                    PASSPORT_PHOTO: null,
+                    AADHAAR_CARD: null,
+                    PAN_CARD: null,
+                    ADDRESS_PROOF: null,
+                };
+
+                apiDocuments.forEach((doc) => {
+                    documentMap[doc.documentType] = {
+                        id: doc.id,
+                        originalFileName: doc.originalFileName,
+                        downloadUrl: doc.downloadUrl,
+                    };
+                });
+
+                setDocuments(documentMap);
             } else {
                 toast.error(response?.respMsg);
                 setData({});
@@ -31,6 +58,56 @@ export default function ResellerViewDetails() {
         } catch (error) {
             toast.error(error);
             setData({});
+        }
+    };
+
+        const documentList = [
+        {
+            title: "Reseller Photograph",
+            documentType: "PASSPORT_PHOTO",
+        },
+        {
+            title: "Aadhar Card",
+            documentType: "AADHAAR_CARD",
+        },
+        {
+            title: "Pan Card",
+            documentType: "PAN_CARD",
+        },
+        {
+            title: "Address Proof",
+            documentType: "ADDRESS_PROOF",
+        },
+    ];
+
+        // View document
+    const viewFile = async (documentId) => {
+        try {
+            if (!documentId) {
+                toast.error("Document ID is missing");
+                return;
+            }
+
+            console.log("Downloading document ID:", documentId);
+
+            const response = await axiosInstance.get(
+                `/reseller/reDownloadDocs/${documentId}`,
+                {
+                    responseType: "blob",
+                }
+            );
+
+            console.log("BLOB RESPONSE --->>>", response);
+
+            const blobUrl = URL.createObjectURL(response);
+            window.open(blobUrl, "_blank");
+            // Optional: free memory after some time
+            setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+            }, 5000);
+
+        } catch (error) {
+            toast.error(error);
         }
     };
 
@@ -156,7 +233,7 @@ export default function ResellerViewDetails() {
                                 >
                                     <input
                                         type="radio"
-                                        checked={apiData?.RSS_SettlementType === type}
+                                        checked={apiData?.rssSettlementType === type}
                                         readOnly
                                         className="accent-amber-500 w-4 h-4"
                                     />
@@ -168,9 +245,9 @@ export default function ResellerViewDetails() {
 
                     <ViewField
                         label="Settlement Cycle (If Automated)"
-                        value={apiData?.RSS_SettlementCycle}
+                        value={apiData?.rssSettlementCycle}
                     />
-                    <ViewField label="Payment By" value={apiData?.RSS_PaymentBy} />
+                    <ViewField label="Payment By" value={apiData?.rssPaymentBy} />
                     <ViewField label="Payment Advice" value={apiData?.RSS_PaymentAdvice} />
                 </div>
             </SectionCard>
@@ -181,17 +258,17 @@ export default function ResellerViewDetails() {
                     <ViewField
                         label="Beneficiary Account Name"
                         required
-                        value={apiData?.RE_BeneficiaryAccountName}
+                        value={apiData?.reBeneficiaryAccountName}
                     />
                     <ViewField
                         label="Beneficiary Account No"
                         required
-                        value={apiData?.RE_BeneficiaryAccountNo}
+                        value={apiData?.reBeneficiaryAccountNo}
                     />
                     <ViewField
                         label="Beneficiary Bank Name"
                         required
-                        value={apiData?.RE_BeneficiaryBankName}
+                        value={apiData?.reBeneficiaryBankName}
                     />
                 </div>
 
@@ -199,25 +276,141 @@ export default function ResellerViewDetails() {
                     <ViewField
                         label="Beneficiary Branch Name"
                         required
-                        value={apiData?.RE_BeneficiaryBranchName}
+                        value={apiData?.reBeneficiaryBranchName}
                     />
-                    <ViewField label="IFSC Code" required value={apiData?.RE_IFSCCode} />
+                    <ViewField label="IFSC Code" required value={apiData?.reIFSCCode} />
                 </div>
             </SectionCard>
 
             {/* Status */}
-            <SectionCard title="Status">
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
-                    <ViewField
-                        label="Status"
-                        value={apiData?.status}
-                    />
+            <SectionCard title="Documents Details">
+                        {/* Upload Documents Details */}
+                    <div className="w-full">
+             
+                        <p className="border-t border-gray-300 py-3"></p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            {documentList.map((document, index) => {
+                                const existingDocument =
+                                    documents[document.documentType];
+                                const hasDocument = !!existingDocument;
+                                return (
+                                    <div
+                                        key={index}
+                                        className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
+                                            ? "border-2 border-green-500 bg-[#f9fbfd]"
+                                            : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
+                                            }`}
+                                    >
 
-                    <ViewField
-                        label="Rejection Reason"
-                        value={apiData?.rejectionReason}
-                    />
-                </div>
+                                        {/* Green Tick */}
+                                        {hasDocument && (
+                                            <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-3 w-3 text-white"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth="3"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M5 13l4 4L19 7"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
+
+                                        {/* Hidden File Input */}
+                                        <input
+                                            id={`document-${index}`}
+                                            type="file"
+                                            accept=".pdf,.jpg,.jpeg,.png,.jfif"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file =
+                                                    e.target.files?.[0];
+
+                                                if (!file) return;
+
+                                                if (
+                                                    file.size >
+                                                    5 * 1024 * 1024
+                                                ) {
+                                                    toast.error(
+                                                        "File size must be less than 5 MB"
+                                                    );
+
+                                                    e.target.value = "";
+                                                    return;
+                                                }
+
+                                                // For now only UI update
+                                                setDocuments((prev) => ({
+                                                    ...prev,
+                                                    [document.documentType]: {
+                                                        id: null,
+                                                        originalFileName:
+                                                            file.name,
+                                                        downloadUrl: null,
+                                                        file: file,
+                                                    },
+                                                }));
+                                            }}
+                                        />
+
+                                        {/* Document Name */}
+                                        <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
+                                            {document.title}
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </p>
+
+                                        {/* Existing File Name */}
+                                        {hasDocument ? (
+                                            <p
+                                                className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
+                                                title={
+                                                    existingDocument.originalFileName
+                                                }
+                                            >
+                                                {existingDocument.originalFileName}
+                                            </p>
+                                        ) : (
+                                            <p className="mt-1 text-[9px] text-[#94a3b8]">
+                                                PDF / JPG / PNG - max 5 MB
+                                            </p>
+                                        )}
+
+                                        {/* Icons */}
+                                        <div className="mt-2 flex items-center gap-3">
+                                            {/* Eye Icon - First */}
+                                            {hasDocument && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        viewFile(
+                                                            existingDocument.id
+                                                        )
+                                                    }
+                                                    title="View document"
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Eye
+                                                        className="h-5 w-5 text-blue-500"
+                                                        strokeWidth={1.8}
+                                                    />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                
             </SectionCard>
         </div>
     );

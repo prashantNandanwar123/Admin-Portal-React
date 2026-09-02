@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import { CircleDollarSign, Landmark, WalletCards, MoreHorizontal, Settings2 } from "lucide-react";
 
 export default function ERAcquiringBank({
   refId,
@@ -22,7 +23,6 @@ export default function ERAcquiringBank({
         const response = await axiosInstance.post(
           `/rMerchantAcquiringBank/${refId}`
         );
-        console.log("API RESPONSE:", response);
         if (response?.respCode === 0) {
           const res = response?.respData || {};
           // IMPORTANT
@@ -35,14 +35,8 @@ export default function ERAcquiringBank({
               res?.refId ||
               refId,
           }));
-
-          console.log(
-            "FINAL REF ID =====>",
-            res?.ref_id || res?.refId || refId
-          );
-
         }
-      } catch (err) {
+      } catch (error) {
         toast.error(error);
       }
     };
@@ -110,13 +104,9 @@ export default function ERAcquiringBank({
 
       };
 
-
       const response = await axiosInstance.post("/saveEditMeAcquiringBank", payload);
-
       if (response?.respCode === 0) {
-        console.log("----->", response?.respCode)
         toast.success(response?.respMsg);
-
         setData((prev) => ({
           ...prev,
           refId: response?.respData?.ref_id,
@@ -133,10 +123,17 @@ export default function ERAcquiringBank({
   return (
     <>
       <div>
-        <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-2">
-          Edited  Acquiring Bank Setup Details
-        </h2>
-        <p className="text-sm text-blue-900 leading-relaxed font-noraml pb-3">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+              <Landmark className="w-5 h-5 text-yellow-700" />
+            </div>
+            <h2 className="text-2xl uppercase text-blue-900 font-bold py-2">
+              Edited Acquiring Bank Setup Details
+            </h2>
+          </div>
+        </div>
+        <p className="text-sm ml-12 text-blue-900 leading-relaxed font-noraml pb-3">
           Configure and manage all essential merchant acquiring bank information including
           settlement details, transaction settings for secure and
           seamless banking operations.
@@ -144,94 +141,108 @@ export default function ERAcquiringBank({
       </div>
 
       {/* ── Fee Setup ─────────────────────────────────────────────────── */}
-      <div className="py-5 border-t border-gray-300">
-          <h2 className="text-[18px] text-[#5c5c5c] mb-5">
-            Fee Setup
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-7 gap-y-5">
-            {[
-              {
-                label: "One Time Fixed Fee",
-                field: "FS_OneTimeFixedFee",
-              },
-              {
-                label: "Statement Fee",
-                field: "FS_StatementFee",
-              },
-              {
-                label: "Terminal Fee",
-                field: "FS_TerminalFee",
-              },
-              {
-                label: "Minimum Usage (in Days)",
-                field: "FS_MiniUsageDays",
-              },
-              {
-                label: "Minimum Transaction Amount",
-                field: "FS_MiniTranAmount",
-              },
-              {
-                label: "Minimum Usage Fee",
-                field: "FS_MiniUsageFee",
-              },
-              {
-                label: "AMC Amount",
-                field: "FS_AMCAmount",
-              },
-              {
-                label: "Non Usage (in Days)",
-                field: "FS_NonUsageDays",
-              },
-              {
-                label: "Non Usage Fee",
-                field: "FS_NonUsageFee",
-              },
-            ].map(({ label, field }, index) => (
-              <div key={index}>
-                <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                  {label}
-                </label>
-
-                <input
-                  type="text"
-                  value={data?.[field] || ""}
-                  onChange={(e) =>
-                    handleChange(field, e.target.value)
-                  }
-                  className="w-full h-8 border border-gray-400 rounded-sm px-3 outline-none"
-                />
-              </div>
-            ))}
-
-            {/* AMC Type */}
-            <div>
-              <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                AMC Type
-              </label>
-              <select
-                type="text"
-                value={data?.FS_AMCType || ""}
-                onChange={(e) =>
-                  handleChange("FS_AMCType", e.target.value)
-                }
-                className="w-full h-8 border border-gray-400 rounded-sm px-3 outline-none"
-              >
-
-                <option value="">-- Select --</option>
-                <option value="Monthly">Monthly</option>
-                <option value="Quarterly">Quarterly</option>
-                <option value="Half Yearly">Half Yearly</option>
-                <option value="Annually">Annually</option>
-              </select>
+      <div className="py-5 bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+              <CircleDollarSign className="w-5 h-5 text-yellow-600" />
             </div>
+            <h2 className="text-xl font-medium text-gray-700">
+              Fee Setup
+            </h2>
           </div>
         </div>
 
+        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-x-7 gap-y-5">
+          {[
+            {
+              label: "One Time Fixed Fee",
+              field: "FS_OneTimeFixedFee",
+            },
+            {
+              label: "Statement Fee",
+              field: "FS_StatementFee",
+            },
+            {
+              label: "Terminal Fee",
+              field: "FS_TerminalFee",
+            },
+            {
+              label: "Minimum Usage (in Days)",
+              field: "FS_MiniUsageDays",
+            },
+            {
+              label: "Minimum Transaction Amount",
+              field: "FS_MiniTranAmount",
+            },
+            {
+              label: "Minimum Usage Fee",
+              field: "FS_MiniUsageFee",
+            },
+            {
+              label: "AMC Amount",
+              field: "FS_AMCAmount",
+            },
+            {
+              label: "Non Usage (in Days)",
+              field: "FS_NonUsageDays",
+            },
+            {
+              label: "Non Usage Fee",
+              field: "FS_NonUsageFee",
+            },
+          ].map(({ label, field }, index) => (
+            <div key={index}>
+              <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
+                {label}
+              </label>
+
+              <input
+                type="text"
+                value={data?.[field] || ""}
+                onChange={(e) =>
+                  handleChange(field, e.target.value)
+                }
+                className="w-full h-8 border border-gray-400 rounded-sm px-3 outline-none"
+              />
+            </div>
+          ))}
+
+          {/* AMC Type */}
+          <div>
+            <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
+              AMC Type
+            </label>
+            <select
+              type="text"
+              value={data?.FS_AMCType || ""}
+              onChange={(e) =>
+                handleChange("FS_AMCType", e.target.value)
+              }
+              className="w-full h-8 border border-gray-400 rounded-sm px-3 outline-none"
+            >
+
+              <option value="">-- Select --</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Quarterly">Quarterly</option>
+              <option value="Half Yearly">Half Yearly</option>
+              <option value="Annually">Annually</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
       {/* ── Settlement Setup ──────────────────────────────────────────── */}
-      <div className="border-t border-gray-300 pt-4">
-        <h2 className="text-[18px] text-[#5c5c5c] mb-5">
-          Settlement Setup
-        </h2>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8 pt-4">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+            <Landmark className="w-5 h-5 text-yellow-600" />
+          </div>
+          <h2 className="text-xl  font-medium text-gray-700">
+            Settlement Setup
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
           {/* Settlement Type */}
           <div>
@@ -296,10 +307,15 @@ export default function ERAcquiringBank({
       </div>
 
       {/* ── Beneficiary Account Details ───────────────────────────────── */}
-      <div className="border-t border-gray-300 pt-4 mt-5">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-          Beneficiary Account Details
-        </h2>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8 pt-4 mt-5">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+            <WalletCards className="w-5 h-5 text-yellow-600" />
+          </div>
+          <h2 className="text-xl font-medium text-gray-700">
+            Beneficiary Account Details
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
@@ -349,10 +365,16 @@ export default function ERAcquiringBank({
         </div>
       </div>
       {/* ── Miscellaneous ─────────────────────────────────────────────── */}
-      <div className="border-t border-gray-300 pt-4 mt-5">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-          Miscellaneous
-        </h2>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8 pt-4 mt-5">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+            <Settings2 className="w-5 h-5 text-yellow-600" />
+          </div>
+
+          <h2 className="text-xl font-medium text-gray-700">
+            Miscellaneous
+          </h2>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Text Inputs */}
@@ -541,7 +563,7 @@ export default function ERAcquiringBank({
           <button
             type="button"
             onClick={handleNext}
-            className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2 rounded"
+            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
           >
             Next
           </button>

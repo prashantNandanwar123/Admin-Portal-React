@@ -9,8 +9,6 @@ import PUploadDocuments from "./PUploadDocuments";
 import PIPGConfig from "./PIPGConfig";
 
 
-
-
 export default function MerchantRegistrationPendingForm({
   merchantData,
   onBack
@@ -20,7 +18,7 @@ export default function MerchantRegistrationPendingForm({
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
-  // ✅ STEP CONFIG
+  //  STEP CONFIG
   const steps = [
     {
       title: "Basic Details",
@@ -52,17 +50,17 @@ export default function MerchantRegistrationPendingForm({
     },
   ];
 
-  
+
   const CurrentComponent = steps[currentStep].component;
 
-  // ✅ NEXT STEP
+  //  NEXT STEP
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     }
   };
 
-  // ✅ PREVIOUS STEP
+  //  PREVIOUS STEP
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
@@ -76,10 +74,8 @@ export default function MerchantRegistrationPendingForm({
 
   return (
     <div className="p-5">
-
-      {/* ✅ STEP PROGRESS BAR */}
+      {/*  STEP PROGRESS BAR */}
       <div className="flex items-center justify-between mb-10 overflow-x-auto">
-
         {steps.map((step, index) => {
           const isCompleted = index < currentStep;
           const isActive = index === currentStep;
@@ -91,7 +87,6 @@ export default function MerchantRegistrationPendingForm({
             >
               {/* STEP CIRCLE */}
               <div className="flex flex-col items-center min-w-[120px]">
-
                 <div
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center
@@ -139,7 +134,7 @@ export default function MerchantRegistrationPendingForm({
         })}
       </div>
 
-      {/* ✅ CURRENT STEP COMPONENT */}
+      {/*  CURRENT STEP COMPONENT */}
       <CurrentComponent
         data={formData}
         setData={setFormData}
@@ -148,7 +143,6 @@ export default function MerchantRegistrationPendingForm({
         handleBack={handleBack}
         refId={merchantData}
       />
-
     </div>
   );
 }

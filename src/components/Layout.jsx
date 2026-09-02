@@ -75,11 +75,12 @@ export default function Layout() {
 
         {/* Page Content */}
         <main
-          className="
-    pt-16
-    h-screen
-    overflow-y-auto
-  "
+           className="
+           pt-16
+           h-screen
+           overflow-y-auto
+           hide-scrollbar
+          "
         >
           <Outlet />
         </main>

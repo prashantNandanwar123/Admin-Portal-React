@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   Upload,
   Settings,
+  Check
 } from "lucide-react";
 
 
@@ -87,69 +88,75 @@ export default function MerchantsEditForm({
   return (
     <div className="max-h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar p-5">
       {/*  STEP PROGRESS BAR */}
-      <div
-        className="sticky top-0 z-20 flex items-center bg-[#dde3ab] rounded-full justify-between mb-10 overflow-x-auto py-4">
+      <div className="sticky top-0 z-20 bg-white rounded-2xl shadow-sm mb-10 px-8 pt-6 pb-5">
 
-        {steps.map((step, index) => {
-          const isCompleted = index < currentStep;
-          const isActive = index === currentStep;
-          const Icon = step.icon;
+        <div
+          className="relative grid items-start"
+          style={{
+            gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))`,
+          }}
+        >
 
-          return (
-            <div
-              key={index}
-              className="flex items-center w-full">
-              {/* STEP CIRCLE */}
-              <div className="flex flex-col items-center min-w-[120px]">
+          {/* CONNECTING LINES ONLY */}
+          <div
+            className="absolute top-4 left-[7%] right-[7%] h-[2px] bg-gray-300 z-0"
+          />
+
+          {steps.map((step, index) => {
+            const isCompleted = index < currentStep;
+            const isActive = index === currentStep;
+            const Icon = step.icon;
+            const isFilled = isCompleted || isActive;
+
+            return (
+              <div
+                key={step.title}
+                className="relative z-10 flex flex-col items-center flex-1 min-w-0 px-1"
+              >
+                {/* Circle */}
                 <div
                   className={`
-                    w-10 h-10 rounded-full flex items-center justify-center
-                    font-bold border-2 border-slate-300 transition-all duration-300
-                    ${isCompleted
-                      ? "bg-green-500 border-green-500 text-white"
-                      : isActive
-                        ? "bg-white border-black text-black"
-                        : "bg-white border-black text-black"
+              w-8 h-8 rounded-full flex items-center justify-center
+              text-xs font-semibold border transition-all duration-300
+              ${isFilled
+                      ? "text-white"
+                      : "bg-white border-gray-300 text-gray-400"
                     }
-                  `}
+            `}
+                  style={
+                    isFilled
+                      ? {
+                        backgroundColor: "#fbbf24",
+                        borderColor: "#fbbf24",
+                      }
+                      : undefined
+                  }
                 >
                   {isCompleted ? (
-                    "✓"
+                    <Check className="w-4 h-4" />
                   ) : (
-                    <Icon size={18} />)
-                  }
+                    <Icon size={16} strokeWidth={1.75} />
+                  )}
                 </div>
 
+                {/* Label */}
                 <p
                   className={`
-                    text-sm mt-2 text-center font-medium
-                    ${isCompleted
-                      ? "text-green-600"
-                      : isActive
-                        ? "text-black"
-                        : "text-black"
+              mt-1.5 text-[11px] sm:text-xs text-center leading-tight
+              ${isActive
+                      ? "text-gray-900 font-semibold"
+                      : isCompleted
+                        ? "text-black font-medium"
+                        : "text-gray-400"
                     }
-                  `}
+            `}
                 >
                   {step.title}
                 </p>
               </div>
-
-              {/* LINE */}
-              {index !== steps.length - 1 && (
-                <div
-                  className={`
-                    flex-1 h-1 mx-2 rounded
-                    ${index < currentStep
-                      ? "bg-green-500"
-                      : "bg-black"
-                    }
-                  `}
-                />
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* CURRENT STEP COMPONENT */}

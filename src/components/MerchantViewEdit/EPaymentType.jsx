@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
+import { Pencil } from "lucide-react";
 
 const initForm = {
   processor: "",
@@ -36,8 +37,6 @@ export default function EPaymentType({
           `rMerchantPaymentType/${refId}`
         );
 
-        console.log("API RESPONSE:", response);
-
         // Adjust according to your API structure
         const res = response?.data || response;
 
@@ -60,8 +59,7 @@ export default function EPaymentType({
           }));
           setTableData([formattedRow]);
         }
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
         toast.error(error);
       }
     };
@@ -109,9 +107,7 @@ export default function EPaymentType({
       const apiData =
         response?.respData || response?.respData || {};
       setAcquirerList(apiData?.upiName || []);
-
     }
-
     catch (error) {
       console.error(
         "[BasicDetails] fetchDetailsCollection → API Error:",
@@ -125,7 +121,6 @@ export default function EPaymentType({
       const response = await axiosInstance.post(
         `/getMSFUpiMerchantName/${AcqBankName}`
       );
-
       const apiData =
         response?.respData || response?.respData || {};
       setMerchantList(apiData?.merchantList || []);
@@ -135,8 +130,7 @@ export default function EPaymentType({
     }
   };
 
-
-  // ✅ Add row
+  //  Add row
   const handleAdd = () => {
     if (
       !form.processor ||
@@ -277,125 +271,130 @@ export default function EPaymentType({
   return (
     <div>
       {/* Header */}
-      <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-3">
-        Edit Payment Type Form (UPI)
-      </h2>
-
-      <p className="pb-4 border-b border-gray-300 text-sm text-gray-600">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+          <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
+        </div>
+        <h2 className="text-2xl uppercase text-blue-900 font-extrabold">
+          Edit Payment Type Form (UPI)
+        </h2>
+      </div>
+      <p className="ml-12 text-sm text-blue-900">
         Payment Type Form collects transaction method details for setup.
       </p>
 
-      <div className="pt-6">
+      <div className="pt-2">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+          {/* UPI header */}
+          <div className="bg-blue-500 text-white px-4 py-3 rounded-md mb-6">
+            <h2 className="text-lg font-semibold">UPI</h2>
+          </div>
 
-        {/* UPI header */}
-        <div className="bg-blue-500 text-white px-4 py-3 rounded-md mb-6">
-          <h2 className="text-lg font-semibold">UPI</h2>
+          {/* Form */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            <div>
+              <label className={labelClass}>Processor {req}</label>
+              <select
+                className={inputClass}
+                value={form.processor}
+                onChange={(e) => updateField("processor", e.target.value)}
+              >
+                <option value="">-- Select --</option>
+                <option value="TP">Payments Solutions</option>
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>Acquirer </label>
+              <select
+                className={inputClass}
+                value={form.acquirer}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateField("acquirer", value);
+
+                  //  AUTO CALL API
+                  fetchMerchantName(value);
+
+                  // optional reset
+                  updateField("merchantName", "");
+                }}
+              >
+                <option value="">-- Select --</option>
+                {acquirerList.map((item, index) => (
+                  <option key={index} value={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>Merchant Name {req}</label>
+              <select
+                className={inputClass}
+                value={form.merchantName}
+                onChange={(e) => updateField("merchantName", e.target.value)}
+              >
+                <option value="">-- Select --</option>
+                {merchantList.map((item, index) => (
+                  <option key={index} value={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>Effective Date {req}</label>
+              <input
+                type="date"
+                className={inputClass}
+                value={form.effectiveDate}
+                onChange={(e) => updateField("effectiveDate", e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Status {req}</label>
+              <select
+                className={inputClass}
+                value={form.status}
+                onChange={(e) => updateField("status", e.target.value)}
+              >
+                <option value="">-- Select --</option>
+                <option value="Active">Active</option>
+                <option value="Deactive">Deactive</option>
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>Sort Order {req}</label>
+              <input
+                className={inputClass}
+                value={form.sortOrder}
+                maxLength={10}
+                onChange={(e) => {
+                  if (/^\d*$/.test(e.target.value)) {
+                    updateField("sortOrder", e.target.value);
+                  }
+                }}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Per Transaction Limit {req}</label>
+              <input
+                className={inputClass}
+                value={form.perTransactionLimit}
+                maxLength={7}
+                onChange={(e) => {
+                  if (/^\d*$/.test(e.target.value)) {
+                    updateField("perTransactionLimit", e.target.value);
+                  }
+                }}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Form */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-          <div>
-            <label className={labelClass}>Processor {req}</label>
-            <select
-              className={inputClass}
-              value={form.processor}
-              onChange={(e) => updateField("processor", e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              <option value="TP">Payments Solutions</option>
-            </select>
-          </div>
-
-          <div>
-            <label className={labelClass}>Acquirer </label>
-            <select
-              className={inputClass}
-              value={form.acquirer}
-              onChange={(e) => {
-                const value = e.target.value;
-
-                updateField("acquirer", value);
-
-                // ✅ AUTO CALL API
-                fetchMerchantName(value);
-
-                // optional reset
-                updateField("merchantName", "");
-              }}
-            >
-              <option value="">-- Select --</option>
-              {acquirerList.map((item, index) => (
-                <option key={index} value={item}>{item}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className={labelClass}>Merchant Name {req}</label>
-            <select
-              className={inputClass}
-              value={form.merchantName}
-              onChange={(e) => updateField("merchantName", e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              {merchantList.map((item, index) => (
-                <option key={index} value={item}>{item}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className={labelClass}>Effective Date {req}</label>
-            <input
-              type="date"
-              className={inputClass}
-              value={form.effectiveDate}
-              onChange={(e) => updateField("effectiveDate", e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Status {req}</label>
-            <select
-              className={inputClass}
-              value={form.status}
-              onChange={(e) => updateField("status", e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              <option value="Active">Active</option>
-              <option value="Deactive">Deactive</option>
-            </select>
-          </div>
-
-          <div>
-            <label className={labelClass}>Sort Order {req}</label>
-            <input
-              className={inputClass}
-              value={form.sortOrder}
-              maxLength={10}
-              onChange={(e) => {
-                if (/^\d*$/.test(e.target.value)) {
-                  updateField("sortOrder", e.target.value);
-                }
-              }}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Per Transaction Limit {req}</label>
-            <input
-              className={inputClass}
-              value={form.perTransactionLimit}
-              maxLength={7}
-              onChange={(e) => {
-                if (/^\d*$/.test(e.target.value)) {
-                  updateField("perTransactionLimit", e.target.value);
-                }
-              }}
-            />
-          </div>
-        </div>
         {/* ADD ERROR */}
         {showAddError && (
           <div className="flex justify-center mb-4 mt-5 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded text-sm">
@@ -408,65 +407,67 @@ export default function EPaymentType({
             </div>
           </div>
         )}
+
         {/* Add Button */}
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={handleAdd}
-            className="bg-green-500 text-white px-6 py-2 rounded"
-          >
-            Add NEW UPI
-          </button>
-        </div>
-
-        {/* TABLE ERROR */}
-        {showSaveError && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4 text-sm">
-            Please add a row | Fill the mandatory fields
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+          <div className="mt-2 flex justify-center">
+            <button
+              onClick={handleAdd}
+              className="bg-green-500 text-white px-6 py-2 rounded"
+            >
+              Add NEW UPI
+            </button>
           </div>
-        )}
 
-        {/* Table */}
-        {tableData.length > 0 && (
-          <div className="mt-6 overflow-x-auto">
-            <table className="w-full border text-sm">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="border p-2">Processor</th>
-                  <th className="border p-2">Acquirer</th>
-                  <th className="border p-2">Merchant</th>
-                  <th className="border p-2">Status</th>
-                  <th className="border p-2">Sort</th>
-                  <th className="border p-2">Limit</th>
-                  <th className="border p-2">Date</th>
-                  <th className="border p-2">Action</th>
-                </tr>
-              </thead>
+          {/* TABLE ERROR */}
+          {showSaveError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4 text-sm">
+              Please add a row | Fill the mandatory fields
+            </div>
+          )}
 
-              <tbody>
-                {tableData.map((item, index) => (
-                  <tr key={index}>
-                    <td className="border p-2">{item.processor}</td>
-                    <td className="border p-2">{item.acquirer}</td>
-                    <td className="border p-2">{item.merchantName}</td>
-                    <td className="border p-2">{item.status}</td>
-                    <td className="border p-2">{item.sortOrder}</td>
-                    <td className="border p-2">{item.perTransactionLimit}</td>
-                    <td className="border p-2">{item.effectiveDate}</td>
-                    <td className="border p-2 text-center">
-                      <button
-                        onClick={() => handleRemove(index)}
-                        className="bg-red-500 text-white px-3 py-1 rounded"
-                      >
-                        ✕
-                      </button>
-                    </td>
+          {/* Table */}
+          {tableData.length > 0 && (
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full border text-sm">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="border p-2">Processor</th>
+                    <th className="border p-2">Acquirer</th>
+                    <th className="border p-2">Merchant</th>
+                    <th className="border p-2">Status</th>
+                    <th className="border p-2">Sort</th>
+                    <th className="border p-2">Limit</th>
+                    <th className="border p-2">Date</th>
+                    <th className="border p-2">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
 
-          </div>
-        )}
+                <tbody>
+                  {tableData.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border p-2">{item.processor}</td>
+                      <td className="border p-2">{item.acquirer}</td>
+                      <td className="border p-2">{item.merchantName}</td>
+                      <td className="border p-2">{item.status}</td>
+                      <td className="border p-2">{item.sortOrder}</td>
+                      <td className="border p-2">{item.perTransactionLimit}</td>
+                      <td className="border p-2">{item.effectiveDate}</td>
+                      <td className="border p-2 text-center">
+                        <button
+                          onClick={() => handleRemove(index)}
+                          className="bg-red-500 text-white px-3 py-1 rounded"
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
         {/* Buttons */}
         <div className="flex justify-between mt-10">
@@ -492,7 +493,7 @@ export default function EPaymentType({
             <button
               type="button"
               onClick={handleNext}
-              className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2 rounded"
+              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
             >
               Next
             </button>

@@ -64,6 +64,7 @@ export default function ResellerBasicDetails() {
     const [aadharCard, setAadharCard] = useState(null);
     const [panCard, setPanCard] = useState(null);
     const [addressProof, setAddressProof] = useState(null);
+    
     // ─── Handle Save Api ─────────────────────────────────────────────────────────────
     const saveResellerDetails = async () => {
         try {

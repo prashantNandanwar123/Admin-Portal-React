@@ -39,6 +39,7 @@ const exportToExcel = (data) => {
   URL.revokeObjectURL(url);
 };
 
+
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 const StatusBadge = ({ msg }) => {
   const lower = (msg || "").toLowerCase();
@@ -80,7 +81,6 @@ export default function Reports() {
     )
   );
 
-
   // Pagination
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
@@ -96,7 +96,8 @@ export default function Reports() {
 
   useEffect(() => {
     fetchData();
-  }, [fromDate, toDate]);
+  }, [page, size]);
+
 
   // ─── Search API ─────────────────────────────────────────────────────────────
   const fetchData = async (currentPage = 0, currentSize = size) => {
@@ -106,7 +107,6 @@ export default function Reports() {
     }
     try {
       setLoading(true);
-      // Interceptor unwraps response.data — resData IS the JSON body
       const resData = await axiosInstance.post(
         `/TxnReport?page=${currentPage}&size=${currentSize}`,
         {
@@ -114,7 +114,6 @@ export default function Reports() {
           toDate: formatDate(toDate),
         }
       );
-
       if (resData?.respCode === 0) {
         setData(resData.data || []);
         setTotalPages(resData.totalPages || 0);
@@ -127,7 +126,6 @@ export default function Reports() {
       }
       setSearched(true);
     } catch (error) {
-      console.error("TXN REPORT ERROR :", error);
       setData([]);
     } finally {
       setLoading(false);

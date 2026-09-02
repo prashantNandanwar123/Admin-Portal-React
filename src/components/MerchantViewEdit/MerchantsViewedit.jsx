@@ -129,7 +129,7 @@ export default function MerchantsViewedit() {
     return (
       <MerchantsViewEditForm
         merchantData={selectedMerchant}
-        onBack={() => setShowViewForm(false)}  
+        onBack={() => setShowViewForm(false)}
       />
     );
   }
@@ -144,18 +144,22 @@ export default function MerchantsViewedit() {
   }
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-4 bg-slate-50">
       {/* Heading */}
-      <h2 className="text-4xl uppercase pb-3 text-blue-900 font-extrabold">
-        Merchant View / Edit
-      </h2>
-      <p className="pb-3 text-lg text-blue-900">
-        View, update, and manage merchant details, business information, account status, and service configurations efficiently.
-      </p>
+      <div className="ml-2 flex flex-col md:flex-row md:items-start md:justify-between gap-3 pt-5">
+        <div>
+          <h2 className="text-3xl font-bold text-slate-00 uppercase pb-2">
+            Merchant View / Edit
+          </h2>
+          <p className="pb-8 text-sm text-slate-500">
+            View, update, and manage merchant details, business information, account status, and service configurations efficiently.
+          </p>
+        </div>
+      </div>
 
       {/* Table */}
-      <div>
-        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-b border-slate-300">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-b border-slate-200">
           {/* Entries */}
           <div className="flex items-center gap-3 text-sm">
             <span className="text-slate-600 font-medium">Show</span>
@@ -165,9 +169,7 @@ export default function MerchantsViewedit() {
                 setSize(Number(e.target.value));
                 setPage(0);
               }}
-              className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-
-            >
+              className="border border-slate-200 bg-slate-50 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400">
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -175,41 +177,42 @@ export default function MerchantsViewedit() {
             <span className="text-slate-600 font-medium">entries</span>
           </div>
 
-
           {/* Search */}
-          <div className="relative w-full lg:w-80 pb-5 float-end">
-            <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
-            <input
-              type="text"
-              placeholder="Search merchant..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(0);
-              }}
-              className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="flex items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full lg:w-80">
+              <FaSearch className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 text-sm" />
+              <input
+                type="text"
+                placeholder="Search merchant by name, MID, TID..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(0);
+                }}
+                className="w-full border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 focus:bg-white transition-all"
+              />
+            </div>
           </div>
         </div>
 
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-orange-600 text-white text-left">
-              <th className="border px-3 py-3">ID</th>
-              <th className="border px-3 py-3">
+            <tr className="bg-slate-50 text-slate-900 text-left uppercase text-xs tracking-wide">
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">ID</th>
+              <th className="border-b border-slate-200 px-4 py-3 font-bold text-center">
                 Merchant Legal Name
               </th>
-              <th className="border px-3 py-3">MID</th>
-              <th className="border px-3 py-3">TID</th>
-              <th className="border px-3 py-3">
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">MID</th>
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">TID</th>
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">
                 Contact Number
               </th>
-              <th className="border px-3 py-3">
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">
                 Email Address
               </th>
-              <th className="border px-3 py-3">MCC</th>
-              <th className="border px-3 py-3">Status</th>
-              <th className="border px-3 py-3 text-center">
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">MCC</th>
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">Status</th>
+              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">
                 Action
               </th>
             </tr>
@@ -220,7 +223,7 @@ export default function MerchantsViewedit() {
               <tr>
                 <td
                   colSpan="9"
-                  className="text-center py-6"
+                  className="text-center py-6 text-slate-400"
                 >
                   Loading...
                 </td>
@@ -229,71 +232,78 @@ export default function MerchantsViewedit() {
               filteredData.map((item, index) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-gray-50"
+                  className="hover:bg-slate-50 border-b border-slate-100 last:border-b-0"
                 >
                   {/* Serial Number */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-slate-500 text-center">
                     {page * size + index + 1}
                   </td>
 
                   {/* Merchant Name */}
-                  <td className="border px-3 py-3">
-                    {item.store_dba_name || "-"}
+                  <td className="px-4 py-4 text-center">
+                    <div className="font-semibold text-slate-800">
+                      {item.store_dba_name || "-"}
+                    </div>
+                    {/* <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  Verified
+                </span> */}
                   </td>
 
                   {/* MID */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-slate-600 text-center">
                     {item.midnumber || "-"}
                   </td>
 
                   {/* TID */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-slate-600 text-center">
                     {item.tidnumber || "-"}
                   </td>
 
                   {/* Contact */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-slate-600 text-center">
                     {item.cpd_mobile || "-"}
                   </td>
 
                   {/* Email */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-slate-600 text-center">
                     {item.cpd_primary_email_id || "-"}
                   </td>
 
                   {/* MCC */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-slate-600 text-center">
                     {item.bdd_agp_mcc || "-"}
                   </td>
 
                   {/* Status */}
-                  <td className="border px-3 py-3">
+                  <td className="px-4 py-4 text-center">
                     <button onClick={() => handleStatusChange(
                       item.midnumber,
                       item.status
                     )
                     }
-                      className={`px-3 py-1 rounded text-white text-xs ${item.status === "Active"
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-red-600 hover:bg-red-700"
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Active"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
                         }`}
                     >
+                      <span className={`w-1.5 h-1.5 rounded-full ${item.status === "Active" ? "bg-green-500" : "bg-red-500"}`} />
                       {item.status}
                     </button>
                   </td>
 
                   {/* Action */}
-                  <td className="border px-3 py-3 text-center">
+                  <td className="px-4 py-4 text-center">
                     <div className="flex justify-center gap-2">
                       <button
                         onClick={() => handleViewClick(item.ref_id)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
+                        className="border  bg-yellow-500 border-none text-white border-slate-300 text-slate-600 hover:bg-yellow-600 px-3 py-1.5 rounded-lg text-xs font-medium"
                       >
                         VIEW
                       </button>
                       <button
                         onClick={() => handleEditClick(item.ref_id)}
-                        className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs">
+                        className="bg-slate-800 hover:bg-slate-900 border-none text-white px-3 py-1.5 rounded-lg text-xs font-medium">
                         EDIT
                       </button>
                     </div>
@@ -312,68 +322,68 @@ export default function MerchantsViewedit() {
             )}
           </tbody>
         </table>
-      </div >
 
-      {/* Bottom Pagination */}
-      < div className="flex flex-col md:flex-row justify-between items-center mt-4 gap-4" >
-        {/* Records Info */}
-        < div className="text-sm text-gray-700" >
-          Showing Page{" "}
-          <span className="font-semibold">
-            {page + 1}
-          </span>{" "}
-          of{" "}
-          <span className="font-semibold">
-            {totalPages}
-          </span>{" "}
-          | Total Records: {" "}
-          <span className="font-semibold">
-            {totalRecords}
-          </span>
-        </div >
+        {/* Bottom Pagination */}
+        <div className="flex flex-col md:flex-row justify-between items-center p-5 gap-4 border-t border-slate-200">
+          {/* Records Info */}
+          <div className="text-sm text-slate-500">
+            Showing Page{" "}
+            <span className="font-semibold text-slate-700">
+              {page + 1}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-slate-700">
+              {totalPages}
+            </span>{" "}
+            | Total Records: {" "}
+            <span className="font-semibold text-slate-700">
+              {totalRecords}
+            </span>
+          </div>
 
-        {/* Pagination Controls */}
-        < div className="flex items-center gap-2" >
-          {/* Previous */}
-          < button
-            onClick={handlePrevious}
-            disabled={page === 0
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-2">
+            {/* Previous */}
+            <button
+              onClick={handlePrevious}
+              disabled={page === 0
+              }
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${page === 0
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "border border-slate-300 text-slate-600 hover:bg-slate-50"
+                }`}
+            >
+              Previous
+            </button>
+
+            {/* Page Numbers */}
+            {
+              [...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPage(index)}
+                  className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium ${page === index
+                    ? "bg-yellow-400 text-slate-900"
+                    : "border border-slate-300 text-slate-600 hover:bg-slate-50"
+                    }`}
+                >
+                  {index + 1}
+                </button>
+              ))
             }
-            className={`px-4 py-2 rounded text-white ${page === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-700 hover:bg-blue-800"
-              }`}
-          >
-            Previous
-          </button >
 
-          {/* Page Numbers */}
-          {
-            [...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setPage(index)}
-                className={`px-4 py-2 rounded ${page === index
-                  ? "bg-orange-600 text-white"
-                  : "bg-white border"
-                  }`}
-              >
-                {index + 1}
-              </button>
-            ))
-          }
-
-          {/* Next */}
-          <button
-            onClick={handleNext}
-            disabled={page === totalPages - 1}
-            className={`px-4 py-2 rounded text-white ${page === totalPages - 1
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-700 hover:bg-blue-800"
-              }`}
-          >
-            Next
-          </button>
+            {/* Next */}
+            <button
+              onClick={handleNext}
+              disabled={page === totalPages - 1}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${page === totalPages - 1
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "border border-slate-300 text-slate-600 hover:bg-slate-50"
+                }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

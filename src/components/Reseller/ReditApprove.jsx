@@ -38,7 +38,6 @@ export default function ResellerEditDetails() {
         createdBy: "",
         createdAt: "",
     });
-
     const [userData, setUserData] = useState(null);
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -74,7 +73,6 @@ export default function ResellerEditDetails() {
 
     const location = useLocation();
     const resellerId = location.state?.resellerId;
-
     // Selected Country
     const selectedCountry = statecity.find(
         (item) => item.country === data?.country
@@ -90,6 +88,8 @@ export default function ResellerEditDetails() {
             [field]: value,
         }));
     };
+
+
     useEffect(() => {
         viewResellers();
     }, []);
@@ -104,6 +104,7 @@ export default function ResellerEditDetails() {
             const response = await axiosInstance.post(
                 `/reseller/viewReseller/${resellerId}`
             );
+
             if (response.respCode === 0) {
                 const resellerData = response?.respData || {};
                 // Set all reseller data into form state
@@ -124,8 +125,10 @@ export default function ResellerEditDetails() {
                 apiDocuments.forEach((doc) => {
                     documentMap[doc.documentType] = {
                         id: doc.id,
-                        originalFileName: doc.originalFileName,                       
-                        file: null,                      
+                        originalFileName: doc.originalFileName,
+                        // Existing document ke paas File object nahi hai
+                        file: null,
+                        // Important
                         isNew: false,
                     };
                 });
@@ -152,11 +155,10 @@ export default function ResellerEditDetails() {
                 }
             );
             const blobUrl = URL.createObjectURL(response);
-            window.open(blobUrl, "_blank");           
+            window.open(blobUrl, "_blank");
             setTimeout(() => {
                 window.URL.revokeObjectURL(blobUrl);
             }, 5000);
-
         } catch (error) {
             toast.error(error);
         }
@@ -187,74 +189,48 @@ export default function ResellerEditDetails() {
             toast.error("Reseller ID is missing");
             return;
         }
-        if (!data?.status) {
-            toast.error("Please select Approve or Reject");
-            return;
-        }
-        if (!data?.RSS_Remark?.trim()) {
-            toast.error("Please enter remark");
-            return;
-        }
         try {
             setSubmitLoading(true);
-            const status = data.status;
             const formData = new FormData();
-
-            // =====================================================
-            // IMPORTANT:
-            // ONLY NEWLY UPLOADED FILES WILL BE SENT
-            // =====================================================
-
             if (
                 documents?.PASSPORT_PHOTO?.isNew &&
                 documents?.PASSPORT_PHOTO?.file
             ) {
-
                 formData.append(
                     "passportPhoto",
                     documents.PASSPORT_PHOTO.file
                 );
             }
-
             if (
                 documents?.AADHAAR_CARD?.isNew &&
                 documents?.AADHAAR_CARD?.file
             ) {
-
                 formData.append(
                     "aadharCard",
                     documents.AADHAAR_CARD.file
                 );
             }
-
             if (
                 documents?.PAN_CARD?.isNew &&
                 documents?.PAN_CARD?.file
             ) {
-
                 formData.append(
                     "panCard",
                     documents.PAN_CARD.file
                 );
             }
-
             if (
                 documents?.ADDRESS_PROOF?.isNew &&
                 documents?.ADDRESS_PROOF?.file
             ) {
-
                 formData.append(
                     "addressProof",
                     documents.ADDRESS_PROOF.file
                 );
             }
 
-            // =====================================================
             // Reseller JSON
-            // =====================================================
-
             const resellerPayload = {
-
                 approvedBy: userData?.userName,
                 firstName: data?.firstName,
                 lastName: data?.lastName,
@@ -270,18 +246,16 @@ export default function ResellerEditDetails() {
                 gstNo: data?.gstNo,
                 panNo: data?.panNo,
                 // Correct field names according to View API
-                RE_BeneficiaryAccountName:data?.reBeneficiaryAccountName,
-                RE_BeneficiaryAccountNo:data?.reBeneficiaryAccountNo,
-                RE_BeneficiaryBankName:data?.reBeneficiaryBankName,
-                RE_BeneficiaryBranchName:data?.reBeneficiaryBranchName,
-                RE_IFSCCode:data?.reIFSCCode,
-                RSS_SettlementType:data?.rssSettlementType,
-                RSS_SettlementCycle:data?.rssSettlementCycle,
-                RSS_PaymentBy:data?.rssPaymentBy,
-                RSS_PaymentAdvice:data?.RSS_PaymentAdvice,
-                rejectionReason:data?.RSS_Remark,
+                RE_BeneficiaryAccountName: data?.reBeneficiaryAccountName,
+                RE_BeneficiaryAccountNo: data?.reBeneficiaryAccountNo,
+                RE_BeneficiaryBankName: data?.reBeneficiaryBankName,
+                RE_BeneficiaryBranchName: data?.reBeneficiaryBranchName,
+                RE_IFSCCode: data?.reIFSCCode,
+                RSS_SettlementType: data?.rssSettlementType,
+                RSS_SettlementCycle: data?.rssSettlementCycle,
+                RSS_PaymentBy: data?.rssPaymentBy,
+                RSS_PaymentAdvice: data?.RSS_PaymentAdvice,
             };
-
 
             formData.append(
                 "reseller",
@@ -296,19 +270,8 @@ export default function ResellerEditDetails() {
                     }
                 )
             );
-
-
-            // =====================================================
-            // Debug FormData
-            // =====================================================
-
-            console.log(
-                "RESELLER PAYLOAD --->>>",
-                resellerPayload
-            );
-
             const response = await axiosInstance.post(
-                `/reseller/admin/${resellerId}/${status}`,
+                `/reseller/update/${resellerId}`,
                 formData, {
                 headers: {
                     "content-type": "multipart/form-data",
@@ -316,56 +279,9 @@ export default function ResellerEditDetails() {
             }
             );
 
-            console.log(
-                "UPDATE API RESPONSE --->>>",
-                response
-            );
-
             if (response?.respCode === 0) {
-                const resData =
-                    response?.respData || {};
-
-                if (status === "REJECTED") {
-                    toast.success(
-                        response?.respMsg ||
-                        "Reseller rejected successfully"
-                    );
-
-                    setTimeout(() => {
-                        navigate("/app/reseller");
-                    }, 500);
-
-                    return;
-                }
-
-                if (status === "APPROVED") {
-
-                    console.log(
-                        "Reseller approved successfully",
-                        resData
-                    );
-                    setResponsePopup({
-                        show: true,
-                        message:
-                            response?.respMsg ||
-                            "Reseller approved successfully",
-
-                        success: true,
-
-                        resellerId:
-                            resData?.resellerId ||
-                            resellerId,
-
-                        firstName:
-                            resData?.firstName ||
-                            data?.firstName,
-
-                        lastName:
-                            resData?.lastName ||
-                            data?.lastName,
-                    });
-                    return;
-                }
+                toast.success(response?.respMsg);
+                viewResellers();
             }
             toast.error(response?.respMsg);
             if (
@@ -393,7 +309,7 @@ export default function ResellerEditDetails() {
                 {/* Header Section */}
                 <div>
                     <h2 className="text-xl xl:text-2xl sm:text-lg uppercase text-slate-800 font-bold tracking-tight">
-                        Edit Reseller
+                        Edit Approve Reseller
                     </h2>
                     <p className="pt-2 pb-1 text-sm sm:text-base text-[#0D47A1] font-medium">
                         Edit and update reseller details securely, including profile
@@ -417,6 +333,7 @@ export default function ResellerEditDetails() {
                             </p>
                         </div>
                     </div>
+
                     <div className="flex items-center gap-3">
                         <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
                             <CalendarDays className="w-4 h-4 text-[#8a6d1a]" />
@@ -438,7 +355,6 @@ export default function ResellerEditDetails() {
                         Basic Reseller Details
                     </h2>
                     <div className="border-t border-gray-200 mt-3 mb-5" />
-
                     {/* Row-1 */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                         {/* First Name */}
@@ -501,9 +417,8 @@ export default function ResellerEditDetails() {
                         </div>
                     </div>
 
-                    {/* Row-2 */}
+                    {/* Mobile */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
-                        {/* Mobile */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
                                 Mobile<span className="text-red-500">*</span>
@@ -545,9 +460,8 @@ export default function ResellerEditDetails() {
                         </div>
                     </div>
 
-                    {/* Row-3 */}
+                    {/* Aadhar No */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
-                        {/* Aadhar No */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
                                 Aadhar No.<span className="text-red-500">*</span>
@@ -570,6 +484,7 @@ export default function ResellerEditDetails() {
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNo}</p>
                             )}
                         </div>
+
                         {/* GSTN No */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
@@ -584,13 +499,10 @@ export default function ResellerEditDetails() {
                                 value={data?.gstNo || ""}
                                 onChange={(e) => {
                                     const value = e.target.value.toUpperCase();
-
                                     if (/^[A-Z0-9]*$/.test(value)) {
                                         handleChange("gstNo", value);
-
                                         const gstRegex =
                                             /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-
                                         if (value.length === 15) {
                                             if (!gstRegex.test(value)) {
                                                 setErrors((prev) => ({
@@ -616,6 +528,7 @@ export default function ResellerEditDetails() {
                                 <p className="text-red-500 text-xs mt-1">{errors.gstNo}</p>
                             )}
                         </div>
+
                         {/* Pan No */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
@@ -630,13 +543,10 @@ export default function ResellerEditDetails() {
                                 required
                                 onChange={(e) => {
                                     const value = e.target.value.toUpperCase();
-
                                     if (/^[A-Z0-9]*$/.test(value)) {
                                         handleChange("panNo", value);
-
                                         if (value.length === 10) {
                                             const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-
                                             if (!panRegex.test(value)) {
                                                 setErrors((prev) => ({
                                                     ...prev,
@@ -670,7 +580,6 @@ export default function ResellerEditDetails() {
                         Address Details
                     </h2>
                     <div className="border-t border-gray-200 mt-3 mb-5" />
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7">
                         {/* Address */}
                         <div>
@@ -787,7 +696,6 @@ export default function ResellerEditDetails() {
                                 }}
                             />
                         </div>
-
                     </div>
                 </div>
 
@@ -797,7 +705,6 @@ export default function ResellerEditDetails() {
                         Settlement Setup
                     </h2>
                     <div className="border-t border-gray-200 mt-3 mb-5" />
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-6 xl:gap-x-7 gap-y-5">
                         <div>
                             <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
@@ -870,8 +777,7 @@ export default function ResellerEditDetails() {
                     <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
                         Beneficiary Account Details
                     </h2>
-                    <div className="border-t border-gray-200 mt-3 mb-5" />
-
+                    <div clssName="border-t border-gray-200 mt-3 mb-5" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                         {[
                             {
@@ -960,26 +866,19 @@ export default function ResellerEditDetails() {
                 </div>
 
                 {/* Upload Documents Details */}
-                {/* Upload Documents Details */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm sm:p-6 overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 space-y-5 sm:space-y-6">
                     <div className="w-full">
                         <h2 className="text-[20px] text-gray-700 pb-2">
-                            Upload Documents Details
+                            Documents Details
                         </h2>
-
                         <p className="border-t border-gray-300 py-3"></p>
-
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                             {documentList.map((document, index) => {
-
                                 const existingDocument =
                                     documents?.[document.documentType];
-
                                 const hasDocument = !!existingDocument;
-
                                 const isNewDocument =
                                     existingDocument?.isNew === true;
-
                                 const canView =
                                     hasDocument &&
                                     !isNewDocument &&
@@ -989,11 +888,10 @@ export default function ResellerEditDetails() {
                                     <div
                                         key={document.documentType}
                                         className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
-                                                ? "border-2 border-green-500 bg-[#f9fbfd]"
-                                                : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
+                                            ? "border-2 border-green-500 bg-[#f9fbfd]"
+                                            : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
                                             }`}
                                     >
-
                                         {/* Green Tick */}
                                         {hasDocument && (
                                             <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
@@ -1021,15 +919,11 @@ export default function ResellerEditDetails() {
                                             accept=".pdf,.jpg,.jpeg,.png,.jfif"
                                             className="hidden"
                                             onChange={(e) => {
-
                                                 const file =
                                                     e.target.files?.[0];
-
                                                 if (!file) {
                                                     return;
                                                 }
-
-                                                // 5 MB validation
                                                 if (
                                                     file.size >
                                                     5 * 1024 * 1024
@@ -1037,7 +931,6 @@ export default function ResellerEditDetails() {
                                                     toast.error(
                                                         "File size must be less than 5 MB"
                                                     );
-
                                                     e.target.value = "";
                                                     return;
                                                 }
@@ -1045,7 +938,6 @@ export default function ResellerEditDetails() {
                                                 // New document
                                                 setDocuments((prev) => ({
                                                     ...prev,
-
                                                     [document.documentType]: {
                                                         id: null,
                                                         originalFileName:
@@ -1055,14 +947,12 @@ export default function ResellerEditDetails() {
                                                         isNew: true,
                                                     },
                                                 }));
-
                                             }}
                                         />
 
                                         {/* Document Name */}
                                         <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
                                             {document.title}
-
                                             <span className="text-red-500">
                                                 *
                                             </span>
@@ -1071,11 +961,10 @@ export default function ResellerEditDetails() {
 
                                         {/* File Name */}
                                         {hasDocument ? (
-
                                             <p
                                                 className={`mt-1 max-w-[150px] truncate text-[10px] font-medium ${isNewDocument
-                                                        ? "text-blue-600"
-                                                        : "text-green-600"
+                                                    ? "text-blue-600"
+                                                    : "text-green-600"
                                                     }`}
                                                 title={
                                                     existingDocument.originalFileName
@@ -1085,18 +974,14 @@ export default function ResellerEditDetails() {
                                             </p>
 
                                         ) : (
-
                                             <p className="mt-1 text-[9px] text-[#94a3b8]">
                                                 PDF / JPG / PNG - max 5 MB
                                             </p>
-
                                         )}
 
 
                                         {/* Icons */}
                                         <div className="mt-2 flex items-center gap-3">
-
-                                            {/* Eye - ONLY EXISTING API DOCUMENT */}
                                             {canView && (
                                                 <button
                                                     type="button"
@@ -1127,9 +1012,7 @@ export default function ResellerEditDetails() {
                                                     strokeWidth={1.7}
                                                 />
                                             </label>
-
                                         </div>
-
                                     </div>
                                 );
                             })}
@@ -1137,53 +1020,6 @@ export default function ResellerEditDetails() {
                     </div>
                 </div>
 
-                {/* ── Risk Status & Remark ─────────────────────────────────── */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 xl:gap-8">
-                        {/* Approve / Reject */}
-                        <div>
-                            <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
-                                Risk Status <span className="text-red-500">*</span>
-                            </label>
-                            <div className="flex items-center gap-6 mt-2">
-                                {[
-                                    { label: "Approve", value: "APPROVED" },
-                                    { label: "Reject", value: "REJECTED" },
-                                ].map((type) => (
-                                    <label
-                                        key={type.value}
-                                        className="flex items-center gap-2 text-[13px] sm:text-sm text-gray-700 cursor-pointer"
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="status"
-                                            value={type.value}
-                                            checked={data?.status === type.value}
-                                            onChange={(e) => handleChange("status", e.target.value)}
-                                            className="w-4 h-4 accent-[#FDB913] cursor-pointer"
-                                        />
-                                        <span>{type.label}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Remark */}
-                        <div>
-                            <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
-                                Remark <span className="text-red-500">*</span>
-                            </label>
-                            <textarea
-                                name="RSS_Remark"
-                                required
-                                rows={1}
-                                placeholder="Enter remark..."
-                                onChange={(e) => handleChange("RSS_Remark", e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none resize-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 placeholder:text-gray-400"
-                            />
-                        </div>
-                    </div>
-                </div>
 
                 {/* ── Submit ───────────────────────────────────────────────── */}
                 <div className="flex justify-center pt-2">
@@ -1191,12 +1027,12 @@ export default function ResellerEditDetails() {
                         onClick={resellerAdminUpdate}
                         type="button"
                         disabled={submitLoading}
-                        className={`bg-green-600 text-white px-8 py-2.5 rounded-lg font-medium transition ${submitLoading
+                        className={`bg-yellow-600 text-white px-8 py-2.5 rounded-lg font-medium transition ${submitLoading
                             ? "opacity-60 cursor-not-allowed"
                             : "hover:bg-green-700 cursor-pointer"
                             }`}
                     >
-                        {submitLoading ? "Submitting..." : "Submit"}
+                        {submitLoading ? "Submitting..." : "Update"}
                     </button>
                 </div>
             </div>
@@ -1257,7 +1093,6 @@ export default function ResellerEditDetails() {
                     </div>
                 </div>
             )}
-
         </>
     );
 }
