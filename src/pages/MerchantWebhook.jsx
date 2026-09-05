@@ -274,10 +274,10 @@ export default function MerchantCredential() {
       {/* ================= HEADER ================= */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-4xl uppercase pb-3 text-blue-900 font-extrabold">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Webhook Management
-          </h2>
-          <p className="pb-3 text-lg text-blue-900">
+          </h1>
+          <p className="pb-3 text-sm text-blue-900">
             Manage merchant webhook URLs and status.
           </p>
         </div>
@@ -285,7 +285,7 @@ export default function MerchantCredential() {
         {/* ADD BUTTON */}
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-3 rounded-lg shadow"
+          className="bg-yellow-500  text-black px-5 py-3 rounded-lg shadow"
         >
           + Add Webhook
         </button>
@@ -534,10 +534,10 @@ export default function MerchantCredential() {
           <div className="bg-white rounded-3xl p-8 w-full max-w-lg border-t-2 border-[#AF0606] shadow-2xl">
             {/* TITLE */}
             <div className="text-center mb-6">
-              <h1 className="text-3xl font-bold text-[#AF0606] mb-2 uppercase">
+              <h1 className="text-2xl font-semibold text-black mb-2 uppercase">
                 Add Payin Webhook URL
               </h1>
-              <p className="text-sm text-[#21759B]">
+              <p className="text-sm text-yellow-500">
                 Only one webhook URL can be added at a time
               </p>
             </div>
@@ -596,7 +596,7 @@ export default function MerchantCredential() {
               <button
                 onClick={handleSaveWebhook}
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-60 transition"
+                className="px-5 py-2.5 rounded-xl bg-yellow-500 text-black font-medium transition"
               >
                 {loading ? "Saving..." : "Save"}
               </button>

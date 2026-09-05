@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../api/axios";
-
-
 import {
     UserRound,
     Info,
@@ -15,7 +13,6 @@ import {
     CreditCard,
     ShieldCheck,
 } from "lucide-react";
-
 
 const EMPTY_DIRECTOR = {
     name: "",
@@ -30,13 +27,26 @@ const EMPTY_DIRECTOR = {
 export default function DirectorDetails({ data, setData, handleNext,
     handleBack }) {
 
-
     const [openDirector, setOpenDirector] = useState(1);
     const [directors, setDirectors] = useState({
         1: { ...EMPTY_DIRECTOR }, // Make Copy In Object
         2: { ...EMPTY_DIRECTOR },
     });
+    const [userData, setUserData] = useState(null);
 
+    // Get logged-in user
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+
+        if (storedUser) {
+            try {
+                setUserData(JSON.parse(storedUser));
+            } catch (error) {
+                console.error("Invalid user data in localStorage", error);
+            }
+        }
+    }, []);
+    
     const [error, setError] = useState("");
     // ACCORDION
     const toggleDirector = (directorNumber) => {
@@ -86,24 +96,25 @@ export default function DirectorDetails({ data, setData, handleNext,
                 toast.error("Director Name is required");
                 return;
             }
-             
+
             if (!directors[1].designation) {
                 toast.error("Director Designation is required");
                 return;
             }
-             
+
             if (!directors[1].aadhaarNo) {
                 toast.error("Director Aadhar No is required");
                 return;
             }
-             
+
             if (!directors[1].panNo) {
                 toast.error("Director Pan No is required");
                 return;
             }
+
             const formData = new FormData();
             formData.append("refId", data?.refId);
-            formData.append("uploadedBy", "administrator"),
+            formData.append("uploadedBy", userData?.userName || ""),
             formData.append("director1Name", directors[1].name);
             formData.append("director1Designation", directors[1].designation);
             formData.append("director1AadharNo", directors[1].aadhaarNo);
@@ -481,7 +492,7 @@ export default function DirectorDetails({ data, setData, handleNext,
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                        className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
                     >
                         Save & Next
                     </button>

@@ -493,7 +493,7 @@ export default function EPaymentType({
             <button
               type="button"
               onClick={handleNext}
-              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
+              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
             >
               Next
             </button>

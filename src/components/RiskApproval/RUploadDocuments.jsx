@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import toast from "react-hot-toast";
 
 export default function RUploadDocuments({
-  refId,
-  data,
-  setData,
-  errors,
+  refId, 
   handleNext,
   handleBack,
 }) {
@@ -102,15 +99,12 @@ export default function RUploadDocuments({
           `rMerchantUploadDocument/${refId}`
         );
 
-        console.log("API RESPONSE:", response);
-
         if (response?.respCode === 0) {
-          console.log("upload Documents status", response);
           const res = response?.respData;
           setApiData(res || {});
         }
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
+        toast.error(error);
       }
     };
 

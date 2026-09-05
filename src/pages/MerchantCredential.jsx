@@ -91,9 +91,9 @@ export default function MerchantCredential() {
     <div className="min-h-screen p-4 md:p-6">
       {/* ================= HEADER ================= */}
       <div className="mb-6">
-        <h2 className="text-3xl uppercase pb-1 text-black-900 font-bold">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
           Merchant Credential
-        </h2>
+        </h1>
         <p className="pb-1 text-sm text-black-100 font-normal">
           Manage merchant API credentials, secret keys, authentication details, and integration settings securely.
         </p>
@@ -123,7 +123,7 @@ export default function MerchantCredential() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center gap-2 shadow"
+            className="bg-yellow-500 text-black px-6 py-2 rounded-lg flex items-center gap-2 shadow"
           >
             <FaSearch />
             {loading ? "Searching..." : "Search"}

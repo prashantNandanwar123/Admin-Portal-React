@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import {
-  User, CalendarDays, Clock, Store, UserRound, FileText, MapPin, Building2,
-  Receipt
+  User, CalendarDays,
+  UserPlus, UserRound, FileText, MapPin
 } from "lucide-react";
 
-export default function BasicDetails({ refId, data, setData, errors, handleNext }) {
+export default function BasicDetails({ refId, handleNext }) {
   const [apiData, setApiData] = useState({});
- 
+
 
   useEffect(() => {
     if (!refId) return;
@@ -19,8 +19,8 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
           `/rMerchantBasicDetails/${refId}`
         );
         if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
+          toast.success(response?.respMsg);         
+          setApiData(response?.respData || {});
         }
       } catch (error) {
         toast.error(error);
@@ -28,7 +28,6 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
     };
     fetchData();
   }, [refId]);
-
 
 
   const documentOptions = [
@@ -43,23 +42,23 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
   return (
     <>
-      <div>
-        <h1 className="text-2xl uppercase pb-3 text-blue-900 font-extrabold">
-          Review Basic Details Form
-        </h1>
-        <div className="border-t border-gray-300 pt-4">
-          {/* Store Onboarding Status */}
-          <h2 className="text-[20px] text-gray-700 mb-6">
-            Store Onboarding Status
-          </h2>
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
-          {/* <h2 className="text-[18px] sm:text-[18px] uppercase text-gray-700 font-semibold mb-5 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
-              <Store className="w-4 h-4 text-yellow-600" />
-            </span>
-            Store Onboarding Status
-          </h2> */}
+      <div className="p-2">
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[40px]">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500">
+            <div className="flex items-center gap-3 mt-2 ml-3">
+              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+                <UserPlus size={18} 
+                />
+              </span>
+              <h2 className="text-xl sm:text-xl text-blue-900 font-semibold">
+                Review Merchant Onboarding Details
+              </h2>
+            </div>
+            <p className="ml-15 text-md text-blue-900 mb-4">Review and approve merchant risk details</p>
+          </div>
+        </div>
 
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-stretch">
             {/* Highlighted meta strip */}
             <div className="lg:col-span-2 bg-amber-50 rounded-xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
@@ -85,29 +84,39 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
             </div>
           </div>
         </div>
-          {/* ── Contact Person Details ───────────────────────────────────── */}
-          <div className="p-5 rounded-md mt-8">
-            <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3">
-              Contact Person Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+
+        {/* ── Contact Person Details ───────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 pb-4 mt-3">
+          <div className="rounded-md mt-5">
+            {/* Heading */}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-yellow-100 text-yellow-600">
+                <UserRound size={15} />
+              </span>
+              <h2 className="text-sm font-semibold text-gray-900 uppercase">
+                Contact Person Details
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
               {/* Full Name */}
               <div>
-                <label className="block text-gray-700 font-medium mb-2">
+                <label className="block text-gray-700 font-medium text-xs mb-1">
                   Full Name
                 </label>
 
                 <div className="flex">
                   <input
                     type="text"
-                    className="w-24 border border-gray-300 rounded-l px-3 py-2 bg-gray-100"
+                    className="w-12 h-8 border border-gray-300 rounded-l px-2 py-1.5 text-[11px] bg-gray-100"
                     value={apiData?.cpdNameTitle || ""}
                     readOnly
                   />
 
                   <input
                     type="text"
-                    className="w-full border border-l-0 border-gray-300 rounded-r px-3 py-2 bg-gray-100"
+                    className="w-70 h-8 border border-l-0 border-gray-300 rounded-r px-2 py-1 text-[11px] bg-gray-100"
                     value={apiData?.cpdName || ""}
                     readOnly
                   />
@@ -116,13 +125,13 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
               {/* Date of Birth */}
               <div>
-                <label className="block text-gray-700 font-medium mb-2">
+                <label className="block text-gray-700 font-medium text-xs mb-1">
                   Date of Birth
                 </label>
 
                 <input
                   type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
                   value={apiData?.cpdDateOfBirth || ""}
                   readOnly
                 />
@@ -130,13 +139,13 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
               {/* Mobile */}
               <div>
-                <label className="block text-gray-700 font-medium mb-2">
+                <label className="block text-gray-700 font-medium text-xs mb-1">
                   Mobile No
                 </label>
 
                 <input
                   type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
                   value={apiData?.cpdMobile || ""}
                   readOnly
                 />
@@ -144,12 +153,13 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
               {/* Primary Email */}
               <div>
-                <label className="block text-gray-700 font-medium mb-2">
+                <label className="block text-gray-700 font-medium text-xs mb-1">
                   Primary Email Id
                 </label>
+
                 <input
                   type="email"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
                   value={apiData?.cpdPrimaryEmailId || ""}
                   readOnly
                 />
@@ -157,37 +167,47 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
 
               {/* Secondary Email */}
               <div>
-                <label className="block text-gray-700 font-medium mb-2">
+                <label className="block text-gray-700 font-medium text-xs mb-1">
                   Secondary Email Id
                 </label>
 
                 <input
                   type="email"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
                   value={apiData?.cpdSecondaryEmailId || ""}
                   readOnly
                 />
               </div>
 
-               {/* Sourcing Channel */}
-            <div className="flex flex-col justify-center gap-2">
-              <label className="text-gray-700 font-medium text-sm">
-               Reseller Partner<span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
-                value={apiData?.basicSrcChannel || ""}
-                readOnly
-              />
-            </div>
+              {/* Sourcing Channel */}
+              <div className="flex flex-col justify-center gap-1">
+                <label className="text-gray-700 font-medium text-xs">
+                  Reseller Partner<span className="text-red-500">*</span>
+                </label>
+
+                <input
+                  type="text"
+                  className="w-full h-8 border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-700 text-[11px] focus:outline-none"
+                  value={apiData?.basicSrcChannel || ""}
+                  readOnly
+                />
+              </div>
+
             </div>
           </div>
+        </div>
 
-          {/* ── Basic Document Details ───────────────────────────────────── */}
-          <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
-            Basic Document Details
-          </h2>
+
+        {/* ── Basic Document Details ───────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-yellow-500" />
+            </div>
+            <h2 className="text-base font-semibold text-gray-900 uppercase">
+              Basic Document Details
+            </h2>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Documents radio */}
@@ -339,18 +359,14 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 Merchant Website URL
-              </label>              
+              </label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
                 value={apiData?.bddMerchantWebsiteURL || ""}
                 readOnly
               />
-              {errors?.bddMerchantWebsiteURL && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.bddMerchantWebsiteURL}
-                </p>
-              )}
+
             </div>
 
             {/* Partner Logo Check */}
@@ -382,7 +398,7 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
             {/* Store Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                  Company Name (Business Name)
+                Company Name (Business Name)
               </label>
               <input
                 type="text"
@@ -405,12 +421,19 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               />
             </div>
           </div>
+        </div>
 
-          {/*  Store Address */}
+        {/*  Company Address */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
           <div>
-            <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3 pt-5">
-              Company Address
-            </h2>
+            <div className="flex items-center gap-2 pb-3">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                <MapPin size={18} />
+              </span>
+              <h2 className="text-base font-semibold text-gray-900 uppercase">
+                Company Address
+              </h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
               {/* Address 1 */}
               <div>
@@ -504,12 +527,20 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               </div>
             </div>
           </div>
+        </div>
 
-          {/* ── Billing Address ──────────────────────────────────────────── */}
-          <div className="p-5 rounded-md mt-2 pb-4">
-            <h2 className="text-[20px] text-gray-700 mb-2 border-b border-gray-300 pb-3">
-              Billing Address
-            </h2>
+
+        {/* ── Billing Address ──────────────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
+          <div className="rounded-md pb-4">
+            <div className="flex items-center gap-2 pb-4">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                <MapPin size={18} />
+              </span>
+              <h2 className="text-base font-semibold text-gray-900 uppercase">
+                Billing Address
+              </h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
               {/* Address 1 */}
               <div>
@@ -603,17 +634,18 @@ export default function BasicDetails({ refId, data, setData, errors, handleNext 
               </div>
             </div>
           </div>
+        </div>
 
-          {/* SAVE BUTTON */}
-          <div className="flex justify-end mt-10">
-            <button
-              type="button"
-              onClick={handleNext}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded"
-            >
-              Next
-            </button>
-          </div>
+
+        {/* SAVE BUTTON */}
+        <div className="flex justify-end mt-10">
+          <button
+            type="button"
+            onClick={handleNext}
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+          >
+            Next
+          </button>
         </div>
       </div>
     </>

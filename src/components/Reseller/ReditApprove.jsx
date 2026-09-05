@@ -4,7 +4,8 @@ import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
-import { Eye, Upload, User, CalendarDays } from "lucide-react";
+import { Eye, Upload, User, CalendarDays, UserPlus } from "lucide-react";
+
 
 export default function ResellerEditDetails() {
 
@@ -307,11 +308,17 @@ export default function ResellerEditDetails() {
         <>
             <div className="overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
                 {/* Header Section */}
-                <div>
-                    <h2 className="text-xl xl:text-2xl sm:text-lg uppercase text-slate-800 font-bold tracking-tight">
-                        Edit Approve Reseller
-                    </h2>
-                    <p className="pt-2 pb-1 text-sm sm:text-base text-[#0D47A1] font-medium">
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-5 py-2 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-500 via-yellow-500 to-yellow-500"></div>
+                    <div className="flex items-center gap-3 mt-2">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+                            <UserPlus size={18} />
+                        </span>
+                        <h2 className="text-xl text-blue-900 font-semibold">
+                            Edit Reseller
+                        </h2>
+                    </div>
+                    <p className="ml-12 pb-1 text-sm text-blue-900">
                         Edit and update reseller details securely, including profile
                         information, business data, and account settings with
                         controlled validation.

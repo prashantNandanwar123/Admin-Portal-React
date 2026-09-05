@@ -234,11 +234,10 @@ export default function VUploadDocuments({
         <button
           type="button"
           onClick={handleNext}
-          className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+          className="inline-flex items-center gap-2 bg-amber-400 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
         >
           Next
         </button>
-        
       </div>
     </div>
   );

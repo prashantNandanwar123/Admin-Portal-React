@@ -16,8 +16,10 @@ import DirectorDetails from "./MerchantRegistration/DirectorDetails";
 import AcquiringBank from "./MerchantRegistration/AcquiringBank";
 import RPaymentType from "./MerchantRegistration/PaymentType";
 import RMSFFee from "./MerchantRegistration/MSFFee";
-import Checklist from "./MerchantRegistration/Checklist";
-import UploadDocuments from "./MerchantRegistration/UploadDocuments";
+// import Checklist from "./MerchantRegistration/Checklist";
+// import UploadDocuments from "./MerchantRegistration/UploadDocuments";
+import CompanyDocuments from "./MerchantRegistration/CompanyDocuments";
+
 import IPGConfig from "./MerchantRegistration/IPGConfig";
 
 export default function MerchantRegistrationForm({
@@ -39,8 +41,10 @@ export default function MerchantRegistrationForm({
     { title: "Acquiring Bank", component: AcquiringBank, icon: Landmark },
     { title: "Payment Type", component: RPaymentType, icon: CreditCard },
     { title: "MSF Fee", component: RMSFFee, icon: IndianRupee },
-    { title: "Checklist", component: Checklist, icon: ClipboardCheck },
-    { title: "Upload Documents", component: UploadDocuments, icon: Upload },
+    // { title: "Checklist", component: Checklist, icon: ClipboardCheck },
+    // { title: "Upload Documents", component: UploadDocuments, icon: Upload },
+    { title: "Company Documents", component: CompanyDocuments, icon: Upload },
+
     { title: "IPG Config", component: IPGConfig, icon: Settings },
   ];
 

@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { BadgeIndianRupee } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 export default function VMSFFee({
   refId,
-  data,
-  setData,
-  errors,
   handleNext,
   handleBack
 }) {
@@ -23,9 +22,8 @@ export default function VMSFFee({
           `/viewMerchantMsfConvenience/${refId}`
         );
 
-        console.log("API RESPONSE:", response);
-
         if (response?.respCode === 0) {
+          toast.success(response.respMsg);
 
           const formattedData = (response?.respData || []).map((item) => ({
             acquirerBank: item.upiAcquirerBankName,
@@ -43,13 +41,13 @@ export default function VMSFFee({
             enterGST: item.upiGstper,
             feeType: item.upiFeeType,
           }));
+
           setTableData(formattedData);
         }
       } catch (error) {
         toast.error(error);
       }
     };
-
     fetchData();
   }, [refId]);
 
@@ -66,7 +64,7 @@ export default function VMSFFee({
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-yellow-100 flex items-center justify-center">
               <BadgeIndianRupee className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
             </div>
-            <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-extrabold">
+            <h2 className="text-xl sm:text-2xl text-blue-900 font-semibold">
               View MSF / Convenience Fee
             </h2>
           </div>
@@ -108,7 +106,6 @@ export default function VMSFFee({
                 <label className={labelClass}>
                   Slab Upto
                 </label>
-
                 <input
                   type="text"
                   value={""}
@@ -145,7 +142,6 @@ export default function VMSFFee({
                 <label className={labelClass}>
                   International Fixed
                 </label>
-
                 <input
                   type="text"
                   value={""}
@@ -153,11 +149,11 @@ export default function VMSFFee({
                   className={inputClass}
                 />
               </div>
+
               <div>
                 <label className={labelClass}>
                   International Per
                 </label>
-
                 <input
                   type="text"
                   value={""}
@@ -165,11 +161,11 @@ export default function VMSFFee({
                   className={inputClass}
                 />
               </div>
+
               <div>
                 <label className={labelClass}>
                   Domestic Onus Fixed
                 </label>
-
                 <input
                   type="text"
                   value={""}
@@ -177,11 +173,11 @@ export default function VMSFFee({
                   className={inputClass}
                 />
               </div>
+
               <div>
                 <label className={labelClass}>
                   Domestic Onus Per
                 </label>
-
                 <input
                   type="text"
                   value={""}
@@ -189,11 +185,11 @@ export default function VMSFFee({
                   className={inputClass}
                 />
               </div>
+
               <div>
                 <label className={labelClass}>
                   Domestic Offus Fixed
                 </label>
-
                 <input
                   type="text"
                   value={""}
@@ -288,6 +284,18 @@ export default function VMSFFee({
                   className={inputClass}
                 />
               </div>
+              <div>
+                <label className={labelClass}>
+                  Recommission
+                </label>
+
+                <input
+                  type="text"
+                  value={""}
+                  readOnly
+                  className={inputClass}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -311,6 +319,7 @@ export default function VMSFFee({
                 <th className="border p-2">Charge Type</th>
                 <th className="border p-2">GST %</th>
                 <th className="border p-2">Fee Type</th>
+                <th className="border p-2">Recommission</th>
               </tr>
             </thead>
 
@@ -332,6 +341,8 @@ export default function VMSFFee({
                     <td className="border p-2">{row.chargeType}</td>
                     <td className="border p-2">{row.enterGST}</td>
                     <td className="border p-2">{row.feeType}</td>
+                    <td className="border p-2">{row.recommission}</td>
+
                   </tr>
                 ))
               ) : (
@@ -353,7 +364,7 @@ export default function VMSFFee({
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 text-white px-6 py-2 rounded"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
           >
             Back
           </button>
@@ -361,7 +372,7 @@ export default function VMSFFee({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
           </button>

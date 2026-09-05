@@ -142,16 +142,16 @@ export default function Dashboard() {
       : DEMO_RECENT_TRANSACTIONS;
 
   return (
-    <div className="min-h-screen bg-[#F5F7FB] p-4 sm:p-6 xl:py-3 xl:px-6 xl space-y-6 xl:space-y-2.5 hide-scrollbar">
+    <div className="min-h-screen p-4 sm:p-6 xl:py-3 xl:px-6 xl space-y-6 xl:space-y-2.5 hide-scrollbar">
       {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 xl:gap-2">
         <div className="pt-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-bold text-[#1A2233]">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Welcome back, {user.userName || "Administrator"}{" "}
             <span className="inline-block">👋</span>
           </h1>
           <p className="text-[#5B6478] text-sm sm:text-base xl:text-xs mt-1 xl:mt-0.5">
-            Your payment gateway is running at peak performance. Here's your
+            HelloPe Payment Gateway is running at Good performance. Here's your
             real-time financial overview for today.
           </p>
         </div>
@@ -261,7 +261,7 @@ export default function Dashboard() {
       </div>
 
       {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 xl:gap-3 xl:pt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 xl:gap-3 xl:pt-10">
         <Card
           title="Successful Transactions"
           amount={`₹${(data.success_amount / 100).toFixed(2)}`}
@@ -305,8 +305,9 @@ export default function Dashboard() {
       </div>
 
       {/* CHART + SUMMARY */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 xl:gap-2.5 xl:pt-4">
-        {/* CHART */}
+      
+      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 xl:gap-2.5 xl:pt-4">
+       
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-4 sm:p-6 xl:p-3">
           <div className="flex items-center justify-between mb-4 xl:mb-1.5">
             <h3 className="font-bold text-[#1A2233] text-base sm:text-lg xl:text-sm">
@@ -375,8 +376,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {/* SUMMARY */}
+       
         <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 xl:p-3">
           <div className="flex items-center justify-between mb-4 xl:mb-1.5">
             <h3 className="font-bold text-[#1A2233] text-base sm:text-lg xl:text-sm">Summary</h3>
@@ -420,10 +420,11 @@ export default function Dashboard() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* RECENT TRANSACTIONS */}
-      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 xl:p-3 xl:mt-4">
+
+      {/* <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 xl:p-3 xl:mt-4">
         <div className="flex items-center justify-between mb-4 xl:mb-1.5">
           <h3 className="font-bold text-[#1A2233] text-base sm:text-lg xl:text-sm">
             Recent Transactions
@@ -481,7 +482,8 @@ export default function Dashboard() {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
+
     </div>
   );
 }
@@ -494,7 +496,7 @@ function Card({ title, amount, count, trend, icon, iconBg, badgeColor, cardBg })
           <div className={`${iconBg} text-white rounded-xl w-10 h-10 xl:w-7 xl:h-7 flex items-center justify-center flex-shrink-0 [&>svg]:xl:!w-4 [&>svg]:xl:!h-4`}>
             {icon}
           </div>
-          <p className="text-sm xl:text-[11px] text-gray-500 font-medium leading-tight">{title}</p>
+          <p className="text-sm xl:text-sm text-gray-900 font-medium leading-tight">{title}</p>
         </div>
         {trend !== undefined && trend !== null && (
           <span className={`${badgeColor} text-xs xl:text-[9px] font-semibold px-2 xl:px-1 py-1 xl:py-0.5 rounded-full whitespace-nowrap`}>

@@ -31,12 +31,7 @@ export default function EIPGConfig({
     requestURL2: "",
     requestURL3: "",
     requestURL4: "",
-    requestURL5: "",
-    requestURL6: "",
-    requestURL7: "",
-    requestURL8: "",
-    requestURL9: "",
-    requestURL10: "",
+    requestURL5: "",    
     posTidCount: "",
   });
   const [isRiskEnabled, setIsRiskEnabled] = useState(false);
@@ -104,12 +99,7 @@ export default function EIPGConfig({
             requestURL3: res.requestURL3 || "",
             requestURL4: res.requestURL4 || "",
             requestURL5: res.requestURL5 || "",
-            requestURL6: res.requestURL6 || "",
-            requestURL7: res.requestURL7 || "",
-            requestURL8: res.requestURL8 || "",
-            requestURL9: res.requestURL9 || "",
-            requestURL10: res.requestURL10 || "",
-
+           
             posTidCount:
               res.posTidCount || "",
           });
@@ -148,12 +138,7 @@ export default function EIPGConfig({
         requestURL2: form.requestURL2,
         requestURL3: form.requestURL3,
         requestURL4: form.requestURL4,
-        requestURL5: form.requestURL5,
-        requestURL6: form.requestURL6,
-        requestURL7: form.requestURL7,
-        requestURL8: form.requestURL8,
-        requestURL9: form.requestURL9,
-        requestURL10: form.requestURL10,
+        requestURL5: form.requestURL5,       
         posTidCount: form.posTidCount,
       };
 
@@ -199,7 +184,7 @@ export default function EIPGConfig({
           <Settings2 className="w-5 h-5 text-yellow-600" />
         </div>
         <h2 className="text-2xl uppercase text-blue-900 font-bold">
-          Edited IPG Configuration
+          Edit IPG Configuration
         </h2>
       </div>
       <p className="text-blue-900 ml-12">
@@ -222,7 +207,6 @@ export default function EIPGConfig({
               onChange={(e) => {
                 const value = e.target.value;
                 if (!/^\d*$/.test(value)) return;
-
                 handleChange("IPG_ECIValueVisa", value);
               }}
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
@@ -468,7 +452,7 @@ export default function EIPGConfig({
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Array.from({ length: 10 }).map((_, index) => (
+          {Array.from({ length: 5 }).map((_, index) => (
             <div key={index}>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Request URL {index + 1}
@@ -520,7 +504,7 @@ export default function EIPGConfig({
           <button
             type="submit"
             onClick={handleSaveIPG}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded"
+            className="bg-green-500 hover:bg-green-300 text-white px-6 py-2 rounded"
           >
             Update
           </button>

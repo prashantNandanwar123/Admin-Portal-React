@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Calendar } from "lucide-react";
-import { Percent, Layers, BadgeIndianRupee } from "lucide-react";
+import { Layers, BadgeIndianRupee } from "lucide-react";
 
 const tabs = [
   "UPI"
@@ -23,6 +22,7 @@ const initForm = {
   chargeType: "Both",
   enterGST: "",
   feeType: "MSF",
+  resellerCommission: "",
 };
 
 export default function NSFFee({
@@ -74,7 +74,6 @@ export default function NSFFee({
     }
   }, [showAddError]);
 
-
   useEffect(() => {
     if (showSaveError) {
       const timer = setTimeout(() => {
@@ -100,6 +99,8 @@ export default function NSFFee({
       "domesticOffusPer",
       "enterGST",
       "feeType",
+      "resellerCommission",
+
     ];
 
     const isInvalid = requiredFields.some((key) => !form[key]);
@@ -195,6 +196,10 @@ export default function NSFFee({
 
         upiGstper: tableData
           .map((row) => row.enterGST)
+          .join(","),
+
+        recommission: tableData
+          .map((row) => row.resellerCommission)
           .join(","),
       };
 
@@ -621,6 +626,36 @@ export default function NSFFee({
                 </option>
               </select>
             </div>
+
+
+            <div>
+              <label className={labelClass}>
+                Enter Reseller Commission in Per(%) {req}
+              </label>
+              <input
+                type="text"
+                className={inputClass}
+                value={form.resellerCommission}
+                maxLength={4}
+                placeholder="0.20"
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  // Allow only numbers and one dot
+                  if (!/^\d*\.?\d*$/.test(value)) return;
+                  // allow empty
+                  if (value === "") {
+                    u("resellerCommission", value);
+                    return;
+                  }
+                  const num = Number(value);
+                  // allow only 0–100
+                  if (num <= 100) {
+                    u("resellerCommission", value);
+                  }
+                }}
+              />
+            </div>
           </div>
           {showAddError && (
             <div className="flex justify-center mb-4 mt-5 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded text-sm">
@@ -672,6 +707,7 @@ export default function NSFFee({
                     <th className="border p-2">Charge Type</th>
                     <th className="border p-2">GST %</th>
                     <th className="border p-2">Fee Type</th>
+                    <th className="border p-2">Reseller Commission %</th>
                     <th className="border p-2">Remove</th>
                   </tr>
                 </thead>
@@ -694,6 +730,7 @@ export default function NSFFee({
                         <td className="border p-2">{row.chargeType}</td>
                         <td className="border p-2">{row.enterGST}</td>
                         <td className="border p-2">{row.feeType}</td>
+                        <td className="border p-2">{row.resellerCommission}</td>
                         <td className="border p-2">
                           <button
                             type="button"
@@ -729,7 +766,7 @@ export default function NSFFee({
             <button
               type="button"
               onClick={saveMsfUPI}
-              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
             >
               Save & Next
             </button>

@@ -5,6 +5,8 @@ import statecity from "../../utils/statecity.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
 import { Eye, Upload, User, CalendarDays } from "lucide-react";
+import { UserPlus } from "lucide-react";
+
 
 export default function ResellerEditDetails() {
 
@@ -124,8 +126,8 @@ export default function ResellerEditDetails() {
                 apiDocuments.forEach((doc) => {
                     documentMap[doc.documentType] = {
                         id: doc.id,
-                        originalFileName: doc.originalFileName,                       
-                        file: null,                      
+                        originalFileName: doc.originalFileName,
+                        file: null,
                         isNew: false,
                     };
                 });
@@ -152,7 +154,7 @@ export default function ResellerEditDetails() {
                 }
             );
             const blobUrl = URL.createObjectURL(response);
-            window.open(blobUrl, "_blank");           
+            window.open(blobUrl, "_blank");
             setTimeout(() => {
                 window.URL.revokeObjectURL(blobUrl);
             }, 5000);
@@ -270,16 +272,16 @@ export default function ResellerEditDetails() {
                 gstNo: data?.gstNo,
                 panNo: data?.panNo,
                 // Correct field names according to View API
-                RE_BeneficiaryAccountName:data?.reBeneficiaryAccountName,
-                RE_BeneficiaryAccountNo:data?.reBeneficiaryAccountNo,
-                RE_BeneficiaryBankName:data?.reBeneficiaryBankName,
-                RE_BeneficiaryBranchName:data?.reBeneficiaryBranchName,
-                RE_IFSCCode:data?.reIFSCCode,
-                RSS_SettlementType:data?.rssSettlementType,
-                RSS_SettlementCycle:data?.rssSettlementCycle,
-                RSS_PaymentBy:data?.rssPaymentBy,
-                RSS_PaymentAdvice:data?.RSS_PaymentAdvice,
-                rejectionReason:data?.RSS_Remark,
+                RE_BeneficiaryAccountName: data?.reBeneficiaryAccountName,
+                RE_BeneficiaryAccountNo: data?.reBeneficiaryAccountNo,
+                RE_BeneficiaryBankName: data?.reBeneficiaryBankName,
+                RE_BeneficiaryBranchName: data?.reBeneficiaryBranchName,
+                RE_IFSCCode: data?.reIFSCCode,
+                RSS_SettlementType: data?.rssSettlementType,
+                RSS_SettlementCycle: data?.rssSettlementCycle,
+                RSS_PaymentBy: data?.rssPaymentBy,
+                RSS_PaymentAdvice: data?.RSS_PaymentAdvice,
+                rejectionReason: data?.RSS_Remark,
             };
 
 
@@ -390,16 +392,22 @@ export default function ResellerEditDetails() {
     return (
         <>
             <div className="overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
-                {/* Header Section */}
-                <div>
-                    <h2 className="text-xl xl:text-2xl sm:text-lg uppercase text-slate-800 font-bold tracking-tight">
-                        Edit Reseller
-                    </h2>
-                    <p className="pt-2 pb-1 text-sm sm:text-base text-[#0D47A1] font-medium">
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-5 py-2 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-500 via-yellow-500 to-yellow-500"></div>
+                    <div className="flex items-center gap-3 mt-2">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+                            <UserPlus size={18} />
+                        </span>
+                        <h2 className="text-xl text-blue-900 font-semibold">
+                          Review & Approve or Reject Reseller
+                        </h2>
+                    </div>
+                    <p className="ml-12 pb-1 text-sm text-blue-900">
                         Edit and update reseller details securely, including profile
                         information, business data, and account settings with
                         controlled validation.
                     </p>
+
                 </div>
 
                 {/* ── Status ─────────────────────────────────────────────────── */}
@@ -839,7 +847,7 @@ export default function ResellerEditDetails() {
                             },
                             {
                                 label: "Payment Advice",
-                                field: "RSS_PaymentAdvice",
+                                field: "rssPaymentAdvice",
                                 options: ["Daily", "Monthly", "Weekly"],
                             },
                         ].map(({ label, field, options }) => (
@@ -989,8 +997,8 @@ export default function ResellerEditDetails() {
                                     <div
                                         key={document.documentType}
                                         className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
-                                                ? "border-2 border-green-500 bg-[#f9fbfd]"
-                                                : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
+                                            ? "border-2 border-green-500 bg-[#f9fbfd]"
+                                            : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
                                             }`}
                                     >
 
@@ -1074,8 +1082,8 @@ export default function ResellerEditDetails() {
 
                                             <p
                                                 className={`mt-1 max-w-[150px] truncate text-[10px] font-medium ${isNewDocument
-                                                        ? "text-blue-600"
-                                                        : "text-green-600"
+                                                    ? "text-blue-600"
+                                                    : "text-green-600"
                                                     }`}
                                                 title={
                                                     existingDocument.originalFileName

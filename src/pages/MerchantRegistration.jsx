@@ -122,7 +122,7 @@ export default function MerchantRegistration() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Merchant Registration
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -131,7 +131,7 @@ export default function MerchantRegistration() {
         </div>
         <button
           onClick={handleAddClick}
-          className="flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 active:scale-[0.98] transition-all duration-150 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 bg-amber-400  active:scale-[0.98] transition-all duration-150 text-black font-normal px-5 py-2.5 rounded-xl shadow-sm w-full sm:w-auto"
         >
           <FaPlus size={13} />
           Add Merchant

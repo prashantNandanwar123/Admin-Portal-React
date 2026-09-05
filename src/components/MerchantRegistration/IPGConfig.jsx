@@ -30,12 +30,7 @@ export default function IPGConfigurationForm({
     requestURL2: "",
     requestURL3: "",
     requestURL4: "",
-    requestURL5: "",
-    requestURL6: "",
-    requestURL7: "",
-    requestURL8: "",
-    requestURL9: "",
-    requestURL10: "",
+    requestURL5: "",   
     posTidCount: "",
   });
   const [isRiskEnabled, setIsRiskEnabled] = useState(false);
@@ -69,12 +64,7 @@ export default function IPGConfigurationForm({
         requestURL2: form.requestURL2,
         requestURL3: form.requestURL3,
         requestURL4: form.requestURL4,
-        requestURL5: form.requestURL5,
-        requestURL6: form.requestURL6,
-        requestURL7: form.requestURL7,
-        requestURL8: form.requestURL8,
-        requestURL9: form.requestURL9,
-        requestURL10: form.requestURL10,
+        requestURL5: form.requestURL5,       
         posTidCount: form.posTidCount,
       };
 
@@ -409,7 +399,7 @@ export default function IPGConfigurationForm({
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {Array.from({ length: 10 }).map((_, index) => (
+            {Array.from({ length: 5 }).map((_, index) => (
               <div key={index}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Request URL {index + 1}
@@ -455,7 +445,7 @@ export default function IPGConfigurationForm({
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2 rounded-full shadow-sm transition">
+              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2 rounded-full shadow-sm transition">
               Save
             </button>
             <button

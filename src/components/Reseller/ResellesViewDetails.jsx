@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-import { Eye, User, CalendarDays } from "lucide-react";
+import { Eye, User, CalendarDays, UserPlus } from "lucide-react";
+
 
 export default function ResellerViewDetails() {
 
@@ -61,7 +62,7 @@ export default function ResellerViewDetails() {
         }
     };
 
-        const documentList = [
+    const documentList = [
         {
             title: "Reseller Photograph",
             documentType: "PASSPORT_PHOTO",
@@ -80,7 +81,7 @@ export default function ResellerViewDetails() {
         },
     ];
 
-        // View document
+    // View document
     const viewFile = async (documentId) => {
         try {
             if (!documentId) {
@@ -131,26 +132,36 @@ export default function ResellerViewDetails() {
             <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
                 {title}
             </h2>
-            <div className="border-t border-gray-200 mt-3 mb-5" />
+            <div className="mb-5" />
             {children}
         </div>
     );
 
     return (
         <div className="overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
-            <div>
-                <h2 className="text-xl xl:text-2xl sm:text-lg uppercase text-slate-800 font-bold tracking-tight">
-                    View Reseller
-                </h2>
-                <p className="pt-2 pb-1 text-sm sm:text-base text-[#0D47A1] font-medium">
-                    View and manage reseller onboarding details including profile
-                    information, verification status, and account configuration in a
-                    centralized dashboard.
-                </p>
+
+
+            <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-5 py-2 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-500 via-yellow-500 to-yellow-500"></div>
+                <div>
+                    <div className="flex items-center gap-3 mt-2">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+                            <UserPlus size={18} />
+                        </span>
+                        <h2 className="text-xl text-blue-900 font-semibold">
+                             Reseller Details
+                        </h2>
+                    </div>
+                    <p className="ml-12 pb-1 text-sm text-blue-900">
+                        View and manage reseller onboarding details including profile
+                        information, verification status, and account configuration in a
+                        centralized dashboard.
+                    </p>
+                </div>
             </div>
 
             {/* ── Onboarding Status ─────────────────────────────────────── */}
-            <SectionCard title="Reseller Onboarding Status">
+            <SectionCard>
                 <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#F3E3B0] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
                     <div className="flex items-center gap-3">
                         <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
@@ -171,7 +182,7 @@ export default function ResellerViewDetails() {
                         </span>
                         <div>
                             <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
-                                Created Date
+                                Created At
                             </p>
                             <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
                                 {apiData?.createdAt || "-"}
@@ -190,7 +201,7 @@ export default function ResellerViewDetails() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
-                    <ViewField label="Mobile" required value={apiData?.mobile} />
+                    <ViewField label="Mobile No" required value={apiData?.mobile} />
                     <ViewField label="Company Name" required value={apiData?.companyName} />
                 </div>
 
@@ -284,133 +295,132 @@ export default function ResellerViewDetails() {
 
             {/* Status */}
             <SectionCard title="Documents Details">
-                        {/* Upload Documents Details */}
-                    <div className="w-full">
-             
-                        <p className="border-t border-gray-300 py-3"></p>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                            {documentList.map((document, index) => {
-                                const existingDocument =
-                                    documents[document.documentType];
-                                const hasDocument = !!existingDocument;
-                                return (
-                                    <div
-                                        key={index}
-                                        className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
-                                            ? "border-2 border-green-500 bg-[#f9fbfd]"
-                                            : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
-                                            }`}
-                                    >
+                {/* Upload Documents Details */}
+                <div className="w-full">
+                    <p className="border-t border-gray-300 py-3"></p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {documentList.map((document, index) => {
+                            const existingDocument =
+                                documents[document.documentType];
+                            const hasDocument = !!existingDocument;
+                            return (
+                                <div
+                                    key={index}
+                                    className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
+                                        ? "border-2 border-green-500 bg-[#f9fbfd]"
+                                        : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
+                                        }`}
+                                >
 
-                                        {/* Green Tick */}
-                                        {hasDocument && (
-                                            <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-3 w-3 text-white"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                    strokeWidth="3"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M5 13l4 4L19 7"
-                                                    />
-                                                </svg>
-                                            </div>
-                                        )}
-
-                                        {/* Hidden File Input */}
-                                        <input
-                                            id={`document-${index}`}
-                                            type="file"
-                                            accept=".pdf,.jpg,.jpeg,.png,.jfif"
-                                            className="hidden"
-                                            onChange={(e) => {
-                                                const file =
-                                                    e.target.files?.[0];
-
-                                                if (!file) return;
-
-                                                if (
-                                                    file.size >
-                                                    5 * 1024 * 1024
-                                                ) {
-                                                    toast.error(
-                                                        "File size must be less than 5 MB"
-                                                    );
-
-                                                    e.target.value = "";
-                                                    return;
-                                                }
-
-                                                // For now only UI update
-                                                setDocuments((prev) => ({
-                                                    ...prev,
-                                                    [document.documentType]: {
-                                                        id: null,
-                                                        originalFileName:
-                                                            file.name,
-                                                        downloadUrl: null,
-                                                        file: file,
-                                                    },
-                                                }));
-                                            }}
-                                        />
-
-                                        {/* Document Name */}
-                                        <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
-                                            {document.title}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </p>
-
-                                        {/* Existing File Name */}
-                                        {hasDocument ? (
-                                            <p
-                                                className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
-                                                title={
-                                                    existingDocument.originalFileName
-                                                }
+                                    {/* Green Tick */}
+                                    {hasDocument && (
+                                        <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-3 w-3 text-white"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                strokeWidth="3"
                                             >
-                                                {existingDocument.originalFileName}
-                                            </p>
-                                        ) : (
-                                            <p className="mt-1 text-[9px] text-[#94a3b8]">
-                                                PDF / JPG / PNG - max 5 MB
-                                            </p>
-                                        )}
-
-                                        {/* Icons */}
-                                        <div className="mt-2 flex items-center gap-3">
-                                            {/* Eye Icon - First */}
-                                            {hasDocument && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        viewFile(
-                                                            existingDocument.id
-                                                        )
-                                                    }
-                                                    title="View document"
-                                                    className="cursor-pointer"
-                                                >
-                                                    <Eye
-                                                        className="h-5 w-5 text-blue-500"
-                                                        strokeWidth={1.8}
-                                                    />
-                                                </button>
-                                            )}
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M5 13l4 4L19 7"
+                                                />
+                                            </svg>
                                         </div>
+                                    )}
+
+                                    {/* Hidden File Input */}
+                                    <input
+                                        id={`document-${index}`}
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png,.jfif"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file =
+                                                e.target.files?.[0];
+
+                                            if (!file) return;
+
+                                            if (
+                                                file.size >
+                                                5 * 1024 * 1024
+                                            ) {
+                                                toast.error(
+                                                    "File size must be less than 5 MB"
+                                                );
+
+                                                e.target.value = "";
+                                                return;
+                                            }
+
+                                            // For now only UI update
+                                            setDocuments((prev) => ({
+                                                ...prev,
+                                                [document.documentType]: {
+                                                    id: null,
+                                                    originalFileName:
+                                                        file.name,
+                                                    downloadUrl: null,
+                                                    file: file,
+                                                },
+                                            }));
+                                        }}
+                                    />
+
+                                    {/* Document Name */}
+                                    <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
+                                        {document.title}
+                                        <span className="text-red-500">
+                                            *
+                                        </span>
+                                    </p>
+
+                                    {/* Existing File Name */}
+                                    {hasDocument ? (
+                                        <p
+                                            className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
+                                            title={
+                                                existingDocument.originalFileName
+                                            }
+                                        >
+                                            {existingDocument.originalFileName}
+                                        </p>
+                                    ) : (
+                                        <p className="mt-1 text-[9px] text-[#94a3b8]">
+                                            PDF / JPG / PNG - max 5 MB
+                                        </p>
+                                    )}
+
+                                    {/* Icons */}
+                                    <div className="mt-2 flex items-center gap-3">
+                                        {/* Eye Icon - First */}
+                                        {hasDocument && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    viewFile(
+                                                        existingDocument.id
+                                                    )
+                                                }
+                                                title="View document"
+                                                className="cursor-pointer"
+                                            >
+                                                <Eye
+                                                    className="h-5 w-5 text-blue-500"
+                                                    strokeWidth={1.8}
+                                                />
+                                            </button>
+                                        )}
                                     </div>
-                                );
-                            })}
-                        </div>
+                                </div>
+                            );
+                        })}
                     </div>
-                
+                </div>
+
             </SectionCard>
         </div>
     );

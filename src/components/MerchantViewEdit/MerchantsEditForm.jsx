@@ -4,8 +4,7 @@ import {
   User,
   Landmark,
   CreditCard,
-  IndianRupee,
-  ClipboardCheck,
+  IndianRupee,  
   Upload,
   Settings,
   Check
@@ -13,17 +12,19 @@ import {
 
 
 import EBasicDetails from "./EBasicDetails";
+import EDirector from "./EDirector";
 import EAcquiringBank from "./EAcquiringBank";
 import EPaymentType from "./EPaymentType";
 import EMSFFee from "./EMSFFee";
-import EChecklist from "./EChecklist";
-import EUploadDocuments from "./EUploadDocuments";
+// import EChecklist from "./EChecklist";
+// import EUploadDocuments from "./EUploadDocuments";
+import ECompanyDocs from "./ECompanyDocs";
 import EIPGConfig from "./EIPGConfig";
 
 
 export default function MerchantsEditForm({
   merchantData,
-  onBack
+  
 }) {
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -35,6 +36,11 @@ export default function MerchantsEditForm({
     {
       title: "Basic Details",
       component: EBasicDetails,
+      icon: User,
+    },
+    {
+      title: "Director Details",
+      component: EDirector,
       icon: User,
     },
     {
@@ -52,14 +58,19 @@ export default function MerchantsEditForm({
       component: EMSFFee,
       icon: IndianRupee,
     },
+    // {
+    //   title: "Checklist",
+    //   component: EChecklist,
+    //   icon: ClipboardCheck,
+    // },
+    // {
+    //   title: "Upload Documents",
+    //   component: EUploadDocuments,
+    //   icon: Upload,
+    // },
     {
-      title: "Checklist",
-      component: EChecklist,
-      icon: ClipboardCheck,
-    },
-    {
-      title: "Upload Documents",
-      component: EUploadDocuments,
+      title: "Company Documents",
+      component: ECompanyDocs,
       icon: Upload,
     },
     {
@@ -86,7 +97,7 @@ export default function MerchantsEditForm({
   };
 
   return (
-    <div className="max-h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar p-5">
+    <div className="max-h-screen overflow-y-auto hide-scrollbar p-5">
       {/*  STEP PROGRESS BAR */}
       <div className="sticky top-0 z-20 bg-white rounded-2xl shadow-sm mb-10 px-8 pt-6 pb-5">
 

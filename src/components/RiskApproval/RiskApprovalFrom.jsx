@@ -5,7 +5,6 @@ import {
   Landmark,
   CreditCard,
   IndianRupee,
-  ClipboardCheck,
   Upload,
   Settings,
   Check
@@ -15,32 +14,32 @@ import RBasicDetails from "./RBasicDetails";
 import RAcquiringBank from "./RAcquiringBank";
 import RPaymentType from "./RPaymentType";
 import RMSFFee from "./RMSFFee";
-import RChecklist from "./RChecklist";
-import RUploadDocuments from "./RUploadDocuments";
+// import RChecklist from "./RChecklist";
+// import RUploadDocuments from "./RUploadDocuments";
+import RCompanyDocs from "./RCompanyDocs";
 import RIPGConfig from "./RIPGConfig";
-import RDirector from "./RDirector"; 
+import RDirector from "./RDirector";
 
 export default function RiskApprovalFrom({
-  merchantData,
+  merchantData, // RefId
   onBack
 }) {
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState({});
+
 
   //  STEP CONFIG
   const steps = [
-    {
-      title: "Basic Details",
-      component: RBasicDetails,
-      icon: User,
-    },
-    {
-      title: "Director Details",
-      component: RDirector,
-      icon: User
-    },
+    // {
+    //   title: "Basic Details",
+    //   component: RBasicDetails,
+    //   icon: User,
+    // },
+    // {
+    //   title: "Director Details",
+    //   component: RDirector,
+    //   icon: User
+    // },
 
     {
       title: "Acquiring Bank",
@@ -57,16 +56,22 @@ export default function RiskApprovalFrom({
       component: RMSFFee,
       icon: IndianRupee,
     },
+    // {
+    //   title: "Checklist",
+    //   component: RChecklist,
+    //   icon: ClipboardCheck,
+    // },
+    // {
+    //   title: "Upload Documents",
+    //   component: RUploadDocuments,
+    //   icon: Upload,
+    // },
     {
-      title: "Checklist",
-      component: RChecklist,
-      icon: ClipboardCheck,
-    },
-    {
-      title: "Upload Documents",
-      component: RUploadDocuments,
+      title: "Company Documents",
+      component: RCompanyDocs,
       icon: Upload,
     },
+
     {
       title: "IPG Config",
       component: RIPGConfig,
@@ -93,7 +98,7 @@ export default function RiskApprovalFrom({
   };
 
   return (
-    <div className="max-h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar p-5">
+    <div className="max-h-screen overflow-y-auto hide-scrollbar p-5">
       {/*  STEP PROGRESS BAR */}
       <div className="sticky top-0 z-20 bg-white rounded-2xl shadow-sm mb-10 px-8 pt-6 pb-5">
 
@@ -166,12 +171,9 @@ export default function RiskApprovalFrom({
         </div>
       </div>
 
-
       {/*  CURRENT STEP COMPONENT */}
       <CurrentComponent
-        data={formData}
-        setData={setFormData}
-        errors={errors}
+
         handleNext={handleNext}
         handleBack={handleBack}
         refId={merchantData}

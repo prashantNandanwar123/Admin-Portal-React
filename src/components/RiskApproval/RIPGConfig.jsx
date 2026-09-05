@@ -1,28 +1,33 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Settings } from "lucide-react";
 
 export default function RIPGConfig({
   refId,
-  data,
-  setData,
-  errors,
-  handleNext,
   handleBack
 }) {
 
   const [apiData, setApiData] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState("");
+  const [userData, setUserData] = useState(null);
+
   const [modalData, setModalData] = useState({
     respMsg: "",
     user_id: "",
     mid_created: "",
   });
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    }
+  }, []);
+
+
+
   useEffect(() => {
     if (!refId) return;
     const fetchData = async () => {
@@ -31,6 +36,7 @@ export default function RIPGConfig({
           `rMerchantIpg/${refId}`
         );
         if (response?.respCode === 0) {
+          toast.success(response?.respMsg);
           const res = response?.respData;
           setApiData(res || {});
         }
@@ -38,7 +44,6 @@ export default function RIPGConfig({
         toast.error(err);
       }
     };
-
     fetchData();
   }, [refId]);
 
@@ -55,11 +60,12 @@ export default function RIPGConfig({
       [field]: value,
     }));
   };
+
   const submitRiskAprRject = async (status) => {
     try {
       const payload = {
-        ref_id: refId,
-        UserName: "",
+        refId: refId,
+        approvedBy: userData?.userName,
         rremark: form.rremark,
         rstatus: status,
       };
@@ -93,8 +99,8 @@ export default function RIPGConfig({
         }, 300);
       }
 
-    } catch (err) {
-      toast.error(err);
+    } catch (error) {
+      toast.error(error);
     }
   };
 
@@ -107,9 +113,21 @@ export default function RIPGConfig({
 
   return (
     <div className="relative">
-      <h2 className="text-2xl uppercase text-blue-900 font-extrabold border-b border-gray-300 py-3">
-        Review IPG Configuration
-      </h2>
+      <div className="mb-5">
+        {/* Main Heading */}
+        <div className="flex items-center gap-3 mb-2">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <Settings size={18} />
+          </span>
+          <h2 className="text-2xl text-blue-900 font-semibold">
+            Review IPG Configuration
+          </h2>
+        </div>
+        {/* Subheading */}
+        <p className="ml-12 text-sm text-blue-900 font-normal pb-5">
+          Review and verify the Internet Payment Gateway configuration and setup details.
+        </p>
+      </div>
       {/* ================= TOP SECTION VIEW ONLY ================= */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
         <div>
@@ -152,7 +170,6 @@ export default function RIPGConfig({
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Integration Approach
           </label>
-
           <input
             type="text"
             value={apiData?.ipg_IntegrationApproach || ""}
@@ -266,7 +283,7 @@ export default function RIPGConfig({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Array.from({ length: 10 }).map((_, index) => (
+        {Array.from({ length: 5 }).map((_, index) => (
           <div key={index}>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Request URL {index + 1}
@@ -345,7 +362,7 @@ export default function RIPGConfig({
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
           >
             Back
           </button>

@@ -193,16 +193,16 @@ export default function User() {
       {/* ── Header ── */}
       <div className="flex-shrink-0 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl uppercase pb-2 text-blue-900 font-extrabold">
-            ALL USER
-          </h2>
-          <p className="text-lg text-blue-900">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
+            All User
+          </h1>
+          <p className="text-sm text-blue-900">
             Manage user accounts, access permissions, profile details, activity status, and authentication settings efficiently.
           </p>
         </div>
         <button
           onClick={openAdd}
-          className="flex-shrink-0 bg-blue-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm shadow transition self-start md:self-auto"
+          className="flex-shrink-0 bg-yellow-500 text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto"
         >
           <FaPlus />
           Add User
@@ -412,11 +412,11 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-700 rounded-t-2xl">
-          <h2 className="text-white font-bold text-lg uppercase tracking-wide">
+        <div className="flex items-center justify-between px-6 py-2 bg-yellow-500 rounded-t-2xl">
+          <h2 className="text-black font-semibold text-lg uppercase tracking-wide">
             {isEdit ? "Edit User" : "Add User"}
           </h2>
-          <button onClick={onClose} className="text-white hover:text-blue-200 transition text-xl">
+          <button onClick={onClose} className="text-black font-base transition text-lg">
             <FaTimes />
           </button>
         </div>
@@ -457,7 +457,7 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
           <button
             onClick={onSubmit}
             disabled={loading}
-            className="bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
+            className="bg-yellow-500 text-black px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
           >
             <FaSave />
             {loading ? "Saving..." : isEdit ? "Update" : "Save"}

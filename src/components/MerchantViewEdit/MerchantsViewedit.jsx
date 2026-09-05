@@ -148,9 +148,9 @@ export default function MerchantsViewedit() {
       {/* Heading */}
       <div className="ml-2 flex flex-col md:flex-row md:items-start md:justify-between gap-3 pt-5">
         <div>
-          <h2 className="text-3xl font-bold text-slate-00 uppercase pb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Merchant View / Edit
-          </h2>
+          </h1>
           <p className="pb-8 text-sm text-slate-500">
             View, update, and manage merchant details, business information, account status, and service configurations efficiently.
           </p>

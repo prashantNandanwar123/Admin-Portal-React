@@ -1,40 +1,31 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
-import { useLocation } from "react-router-dom";
+import { Banknote } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 export default function RRAcquiringBank({
   refId,
-  data,
-  setData,
-  errors,
   handleNext,
   handleBack
 }) {
 
-  const location = useLocation();
   const [apiData, setApiData] = useState({});
-
 
   useEffect(() => {
     if (!refId) return;
 
     const fetchData = async () => {
       try {
-
         const response = await axiosInstance.post(
           `/rMerchantAcquiringBank/${refId}`
-
         );
-        console.log("API RESPONSE:", response);
-
-
         if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
+          toast.success(response?.respMsg);
+          setApiData(response?.respData || {});
         }
-
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
+        toast.error(error);
       }
     };
 
@@ -46,9 +37,19 @@ export default function RRAcquiringBank({
   return (
     <>
       <div>
-        <p className="text-2xl uppercase pb-3 text-blue-900 font-extrabold border-b border-gray-300">
-        Review Acquiring Bank Setup Details
-        </p>
+        <div className="pb-3 border-b border-gray-300">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+              <Banknote className="w-5 h-5 text-yellow-500" />
+            </div>
+            <p className="text-2xl text-blue-900 font-semibold">
+              Review Acquiring Bank Setup Details
+            </p>
+          </div>
+          <p className="text-sm text-gray-500 mt-1 ml-10">
+            Review and verify the acquiring bank configuration details before proceeding.
+          </p>
+        </div>
 
         {/* ── Fee Setup ─────────────────────────────────────────────────── */}
         <div className="pt-3">
@@ -56,7 +57,6 @@ export default function RRAcquiringBank({
             <h2 className="text-[18px] text-[#5c5c5c] mb-5">
               Fee Setup
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-7 gap-y-5">
               {[
                 {
@@ -115,7 +115,6 @@ export default function RRAcquiringBank({
                 <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
                   AMC Type
                 </label>
-
                 <input
                   type="text"
                   value={apiData?.FS_AMCType || ""}
@@ -123,7 +122,6 @@ export default function RRAcquiringBank({
                   className="w-full h-8 border border-gray-400 rounded-sm bg-gray-100 px-3 outline-none"
                 />
               </div>
-
             </div>
           </div>
         </div>
@@ -135,7 +133,6 @@ export default function RRAcquiringBank({
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
-
             {/* Settlement Type */}
             <div>
               <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
@@ -164,7 +161,6 @@ export default function RRAcquiringBank({
               <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
                 Settlement Cycle (If Automated)
               </label>
-
               <input
                 type="text"
                 value={apiData?.SS_SettlementCycle || ""}
@@ -178,7 +174,6 @@ export default function RRAcquiringBank({
               <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
                 Payment By
               </label>
-
               <input
                 type="text"
                 value={apiData?.SS_PaymentBy || ""}
@@ -192,7 +187,6 @@ export default function RRAcquiringBank({
               <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
                 Payment Advice
               </label>
-
               <input
                 type="text"
                 value={apiData?.SS_PaymentAdvice || ""}
@@ -200,7 +194,6 @@ export default function RRAcquiringBank({
                 className="w-full h-8 border border-gray-400 rounded-sm bg-gray-100 px-3 outline-none"
               />
             </div>
-
           </div>
         </div>
 
@@ -211,7 +204,6 @@ export default function RRAcquiringBank({
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
             {[
               {
                 label: "Beneficiary Account Name",
@@ -265,134 +257,250 @@ export default function RRAcquiringBank({
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Text Inputs */}
-            {[
-              {
-                label: "Daily Transaction Limit",
-                value: apiData?.misTransactionLimit,
-              },
-              {
-                label: "Per Transaction Limit",
-                value: apiData?.misPerTransactionLimit,
-              },
-              {
-                label: "Fuel Remark",
-                value: apiData?.VPA_Mis_FuelRemark,
-              },
-              {
-                label: "Call Charges",
-                value: apiData?.VPA_Mis_CallCharges,
-              },
-              {
-                label: "Secret Key",
-                value: apiData?.VPA_Mis_SecretKey,
-              },
-              {
-                label: "Merchant Reimbursement",
-                value: apiData?.VPA_Mis_MerchantReimbursement,
-              },
-              {
-                label: "Customer Id",
-                value: apiData?.VPA_Mis_CustomerId,
-              },
-              {
-                label: "VPA",
-                value: apiData?.VPA_Mis_VPA,
-              },
-            ].map(({ label, value }, index) => (
-              <div key={index}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {label}
-                </label>
+            {/* Row 1 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Daily Transaction Limit
+              </label>
+              <input
+                type="text"
+                value={apiData?.misTransactionLimit || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
 
-                <input
-                  type="text"
-                  value={value || ""}
-                  readOnly
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
-                />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Daily Transaction Limit Status
+              </label>
+              <input
+                type="text"
+                value={apiData?.misTransactionLimitStatus || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Application Mode
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_AppMode || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+
+            {/* Row 2 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Per Transaction Limit
+              </label>
+              <input
+                type="text"
+                value={apiData?.misPerTransactionLimit || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Per Transaction Limit Status
+              </label>
+              <input
+                type="text"
+                value={apiData?.misPerTransactionLimitStatus || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Transaction Mode
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_TranMode || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+
+            {/* Row 3 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                FIRC (Foreign Inward Remittance Certificate)
+              </label>
+
+              <div className="flex items-center gap-6 h-11">
+                {["Yes", "No"].map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 text-sm text-gray-700"
+                  >
+                    <input
+                      type="radio"
+                      checked={apiData?.VPA_Mis_FIRC === opt}
+                      readOnly
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
 
-            {/* Select Type Fields */}
-            {[
-              {
-                label: "Daily Transaction Limit Status",
-                value: apiData?.misTransactionLimitStatus,
-              },
-              {
-                label: "Application Mode",
-                value: apiData?.VPA_Mis_AppMode,
-              },
-              {
-                label: "Per Transaction Limit Status",
-                value: apiData?.misPerTransactionLimitStatus,
-              },
-              {
-                label: "Transaction Mode",
-                value: apiData?.VPA_Mis_TranMode,
-              },
-              {
-                label: "FIRC Frequency",
-                value: apiData?.VPA_Mis_FIRCFrequency,
-              },
-              {
-                label: "Fuel Association",
-                value: apiData?.VPA_Mis_FuelAssociation,
-              },
-            ].map(({ label, value }, index) => (
-              <div key={index}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {label}
-                </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                FIRC Frequency
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_FIRCFrequency || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
 
-                <input
-                  type="text"
-                  value={value || ""}
-                  readOnly
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
-                />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fuel Association
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_FuelAssociation || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+
+            {/* Row 4 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fuel Remark
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_FuelRemark || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Call Charges
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_CallCharges || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Secret Key
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_SecretKey || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+
+            {/* Row 5 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Document Required
+              </label>
+
+              <div className="flex items-center gap-6 h-11">
+                {["Yes", "No"].map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 text-sm text-gray-700"
+                  >
+                    <input
+                      type="radio"
+                      checked={apiData?.VPA_Mis_DocumentRequired === opt}
+                      readOnly
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
 
-            {/* Radio Fields */}
-            {[
-              {
-                label: "FIRC",
-                field: "VPA_Mis_FIRC",
-              },
-              {
-                label: "Document Required",
-                field: "VPA_Mis_DocumentRequired",
-              },
-              {
-                label: "Document Pending",
-                field: "VPA_Mis_DocumentPending",
-              },
-            ].map(({ label, field }, index) => (
-              <div key={index}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {label}
-                </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Document Pending
+              </label>
 
-                <div className="flex items-center gap-6 h-11">
-                  {["Yes", "No"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-2 text-sm text-gray-700"
-                    >
-                      <input
-                        type="radio"
-                        checked={apiData?.[field] === opt}
-                        readOnly
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
+              <div className="flex items-center gap-6 h-11">
+                {["Yes", "No"].map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 text-sm text-gray-700"
+                  >
+                    <input
+                      type="radio"
+                      checked={apiData?.VPA_Mis_DocumentPending === opt}
+                      readOnly
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Merchant Reimbursement
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_MerchantReimbursement || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+
+            {/* Row 6 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Customer Id
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_CustomerId || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                VPA
+              </label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_VPA || ""}
+                readOnly
+                className="w-full h-11 px-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+              />
+            </div>
           </div>
         </div>
 
@@ -401,15 +509,14 @@ export default function RRAcquiringBank({
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 text-white px-6 py-2 rounded"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
           >
             Back
           </button>
-
           <button
             type="button"
             onClick={handleNext}
-            className="bg-orange-500 text-white px-6 py-2 rounded"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
           </button>

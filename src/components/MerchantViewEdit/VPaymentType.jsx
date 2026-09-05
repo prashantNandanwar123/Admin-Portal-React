@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { QrCode } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 export default function VPaymentType({
   refId,
@@ -21,8 +23,10 @@ export default function VPaymentType({
           `viewMerchantPaymentType/${refId}`
         );
         if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
+          toast.success(response.respMsg);
+          setApiData(response?.respData || {});
+        } else{
+          toast.error(response?.respMsg);
         }
       } catch (error) {
         toast.error(error);
@@ -51,7 +55,7 @@ export default function VPaymentType({
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
               <QrCode className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
             </div>
-            <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold py-1">
+            <h2 className="text-xl sm:text-2xl text-blue-900 font-semibold py-1">
               View Payment Type (UPI)
             </h2>
           </div>
@@ -208,14 +212,14 @@ export default function VPaymentType({
         <button
           type="button"
           onClick={handleBack}
-          className="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium hover:bg-gray-50"
+          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
         >
           Back
         </button>
         <button
           type="button"
           onClick={handleNext}
-          className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+          className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
         >
           Next
         </button>

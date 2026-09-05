@@ -65,9 +65,8 @@ function StatusBadge({ status }) {
   const isActive = status === "Active";
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
-        isActive ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-      }`}
+      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${isActive ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
+        }`}
     >
       {status}
     </span>
@@ -87,23 +86,24 @@ export default function VirtualAccount() {
     <div className="bg-white min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-10 border-b border-gray-100">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Virtual Accounts
-        </h1>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
+            Virtual Accounts
+          </h1>
+
+          <p className="text-sm text-blue-900">
+            Create and manage virtual accounts for seamless collections, secure payments, and efficient transaction tracking.
+          </p>
+        </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setOpenModal(true)}
-            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 bg-yellow-500  text-black text-sm font-normal px-4 py-2.5 rounded-lg transition-colors"
           >
             <Plus size={16} strokeWidth={2.5} />
             New Virtual Account
-          </button>
-          <button className="p-2.5 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
-            <RefreshCw size={16} />
-          </button>
-          <button className="p-2.5 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
-            <ArrowUpDown size={16} />
-          </button>
+          </button>        
         </div>
       </div>
 
@@ -113,11 +113,10 @@ export default function VirtualAccount() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+            className={`py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
           >
             {tab}
           </button>

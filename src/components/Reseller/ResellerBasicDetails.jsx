@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import { UserPlus, UserRound } from "lucide-react";
 
 export default function ResellerBasicDetails() {
     const [userData, setUserData] = useState(null);
@@ -30,7 +31,7 @@ export default function ResellerBasicDetails() {
         pincode: "",
         aadharNo: "",
         gstNo: "",
-        RePanNo : "",
+        RePanNo: "",
         RE_BeneficiaryAccountName: "",
         RE_BeneficiaryAccountNo: "",
         RE_BeneficiaryBankName: "",
@@ -64,7 +65,7 @@ export default function ResellerBasicDetails() {
     const [aadharCard, setAadharCard] = useState(null);
     const [panCard, setPanCard] = useState(null);
     const [addressProof, setAddressProof] = useState(null);
-    
+
     // ─── Handle Save Api ─────────────────────────────────────────────────────────────
     const saveResellerDetails = async () => {
         try {
@@ -109,8 +110,6 @@ export default function ResellerBasicDetails() {
                     }
                 )
             );
-            console.log("Form Data payload : " + formData);
-
             const response = await axiosInstance.post(
                 `/reseller/admin/signup`,
                 formData, {
@@ -119,7 +118,6 @@ export default function ResellerBasicDetails() {
                 },
             }
             );
-
             if (response.success === true) {
                 toast.success(response.message);
                 // navigate after success
@@ -139,7 +137,6 @@ export default function ResellerBasicDetails() {
                 }
             }
         } catch (error) {
-            console.log(error);
             toast.error(error);
         }
     };
@@ -147,258 +144,276 @@ export default function ResellerBasicDetails() {
     return (
         <>
             <div className="overflow-y-auto hide-scrollbar p-6">
-                <div>
-                    <h2 className="text-2xl uppercase pb-2 text-blue-900 font-extrabold">
-                        Reseller Onboarding
-                    </h2>
-                    <p className="pb-3 text-lg text-blue-900">Streamlined reseller onboarding with secure registration, verification, and role-based access setup for faster activation.
-                    </p>
-                </div>
-
-                {/* ── Basic Document Details ───────────────────────────────────── */}
-                <h2 className="text-[20px] text-gray-700 mt-5 my-3">
-                    Basic Reseller Details
-                </h2>
-                <p className="border-t border-gray-300 py-3"></p>
-                {/* Row-1 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* First Name */}
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-5 py-2 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-500 via-yellow-500 to-yellow-500"></div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.firstName || ""}
-                            onChange={(e) =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    firstName: e.target.value.replace(/[^A-Za-z\s]/g, ""),
-                                }))
-                            }
-                        />
-                        {errors?.firstName && (
-                            <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
-                        )}
-                    </div>
-                    {/* Last Name */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.lastName || ""}
-                            onChange={(e) =>
-                                setData({
-                                    ...data,
-                                    lastName: e.target.value.replace(/[^A-Za-z\s]/g, ""),
-                                })
-                            }
-                        />
-                        {errors?.lastName && (
-                            <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
-                        )}
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Email Id<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            placeholder="Eg. example@example.com"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.email || ""}
-                            required
-                            onChange={(e) => handleChange("email", e.target.value)}
-                        />
-                        {errors?.email && (
-                            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                        )}
+                        <div className="flex items-center gap-3 mt-2">
+                            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+                                <UserPlus size={18} />
+                            </span>
+                            <h2 className="text-xl text-blue-900 font-semibold">
+                                Reseller Onboarding
+                            </h2>
+                        </div>
+                        <p className="ml-12 pb-1 text-sm text-blue-900">
+                            Streamlined reseller onboarding with secure registration, verification,
+                            and role-based access setup for faster activation.
+                        </p>
                     </div>
                 </div>
-                {/* Row-2 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    {/* Mobile */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Mobile<span className="text-red-500">*</span>
-                        </label>
 
-                        <input
-                            type="text"
-                            maxLength={10}
-                            required
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.mobile || ""}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, "");
-                                handleChange("mobile", value);
-                            }}
-                        />
-                    </div>
-                    {/* Last Name */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Comapny Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.companyName || ""}
-                            onChange={(e) =>
-                                setData({
-                                    ...data,
-                                    companyName: e.target.value.replace(/[^A-Za-z\s]/g, ""),
-                                })
-                            }
-                        />
-                        {errors?.companyName && (
-                            <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>
-                        )}
+                {/* ── Basic Document Details ─── */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div className="mb-3">
+                        <div className="flex items-center gap-3">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                                <UserRound size={15} />
+                            </span>
+                            <h2 className="text-base font-semibold text-gray-900 uppercase">
+                                Basic Reseller Details
+                            </h2>
+                        </div>
                     </div>
 
+                    {/* Row-1 */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* First Name */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                First Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.firstName || ""}
+                                onChange={(e) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        firstName: e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                                    }))
+                                }
+                            />
+                            {errors?.firstName && (
+                                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+                            )}
+                        </div>
+                        {/* Last Name */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                Last Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.lastName || ""}
+                                onChange={(e) =>
+                                    setData({
+                                        ...data,
+                                        lastName: e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                                    })
+                                }
+                            />
+                            {errors?.lastName && (
+                                <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+                            )}
+                        </div>
 
-                </div>
-                {/* Row-3 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                    {/* Aadhar No */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Aadhar No.<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="aadharNo"
-                            maxLength={12}
-                            required
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                            value={data?.aadharNo || ""}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, "");
-                                handleChange("aadharNo", value);
-                            }}
-                        />
-                        {errors?.aadharNo && (
-                            <p className="text-red-500 text-xs mt-1">{errors.aadharNo}</p>
-                        )}
+                        {/* Email */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                Email Id<span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                placeholder="Eg. example@example.com"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.email || ""}
+                                required
+                                onChange={(e) => handleChange("email", e.target.value)}
+                            />
+                            {errors?.email && (
+                                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                            )}
+                        </div>
                     </div>
-                    {/* GSTN No */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            GSTN No.<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            maxLength={15}
-                            required
-                            placeholder="Eg. 27AAPFU0939F1ZV"
-                            className="w-full border border-gray-300 rounded px-3 py-2 uppercase"
-                            value={data?.gstNo || ""}
-                            onChange={(e) => {
-                                const value = e.target.value.toUpperCase();
 
-                                // Allow only A-Z and 0-9
-                                if (/^[A-Z0-9]*$/.test(value)) {
-                                    handleChange("gstNo", value);
+                    {/* Row-2 */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        {/* Mobile */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                Mobile No<span className="text-red-500">*</span>
+                            </label>
 
-                                    // GST Validation
-                                    const gstRegex =
-                                        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+                            <input
+                                type="text"
+                                maxLength={10}
+                                required
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.mobile || ""}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    handleChange("mobile", value);
+                                }}
+                            />
+                        </div>
+                        {/* Last Name */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                Comapny Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.companyName || ""}
+                                onChange={(e) =>
+                                    setData({
+                                        ...data,
+                                        companyName: e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                                    })
+                                }
+                            />
+                            {errors?.companyName && (
+                                <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>
+                            )}
+                        </div>
 
-                                    if (value.length === 15) {
-                                        if (!gstRegex.test(value)) {
-                                            setErrors((prev) => ({
-                                                ...prev,
-                                                gstNo: "Invalid GST format",
-                                            }));
+
+                    </div>
+                    {/* Row-3 */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        {/* Aadhar No */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                Aadhar No.<span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="aadharNo"
+                                maxLength={12}
+                                required
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.aadharNo || ""}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    handleChange("aadharNo", value);
+                                }}
+                            />
+                            {errors?.aadharNo && (
+                                <p className="text-red-500 text-xs mt-1">{errors.aadharNo}</p>
+                            )}
+                        </div>
+                        {/* GSTN No */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                GSTN No.<span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                maxLength={15}
+                                required
+                                placeholder="Eg. 27AAPFU0939F1ZV"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.gstNo || ""}
+                                onChange={(e) => {
+                                    const value = e.target.value.toUpperCase();
+
+                                    // Allow only A-Z and 0-9
+                                    if (/^[A-Z0-9]*$/.test(value)) {
+                                        handleChange("gstNo", value);
+
+                                        // GST Validation
+                                        const gstRegex =
+                                            /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+                                        if (value.length === 15) {
+                                            if (!gstRegex.test(value)) {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    gstNo: "Invalid GST format",
+                                                }));
+                                            } else {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    gstNo: "",
+                                                }));
+                                            }
                                         } else {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                gstNo: "",
+                                                gstNo: "GST must be 15 characters",
                                             }));
                                         }
-                                    } else {
-                                        setErrors((prev) => ({
-                                            ...prev,
-                                            gstNo: "GST must be 15 characters",
-                                        }));
                                     }
-                                }
-                            }}
-                        />
+                                }}
+                            />
 
-                        {errors?.gstNo && (
-                            <p className="text-red-500 text-xs mt-1">
-                                {errors.gstNo}
-                            </p>
-                        )}
-                    </div>
-                    {/* Pan No */}
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Pan No<span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded px-3 py-2 uppercase"
-                            value={data?.panNo || ""}
-                            maxLength={10}
-                            placeholder="Eg. ABCDE1234F"
-                            required
-                            onChange={(e) => {
-                                const value = e.target.value.toUpperCase();
+                            {errors?.gstNo && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.gstNo}
+                                </p>
+                            )}
+                        </div>
+                        {/* Pan No */}
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">
+                                Pan No<span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                value={data?.panNo || ""}
+                                maxLength={10}
+                                placeholder="Eg. ABCDE1234F"
+                                required
+                                onChange={(e) => {
+                                    const value = e.target.value.toUpperCase();
 
-                                // Allow only valid characters (A-Z, 0-9)
-                                if (/^[A-Z0-9]*$/.test(value)) {
-                                    handleChange("panNo", value);
+                                    // Allow only valid characters (A-Z, 0-9)
+                                    if (/^[A-Z0-9]*$/.test(value)) {
+                                        handleChange("panNo", value);
 
-                                    // Format validation (only when length is 10)
-                                    if (value.length === 10) {
-                                        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+                                        // Format validation (only when length is 10)
+                                        if (value.length === 10) {
+                                            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
-                                        if (!panRegex.test(value)) {
-                                            setErrors((prev) => ({
-                                                ...prev,
-                                                panNo: "Invalid PAN format (e.g. ABCDE1234F)",
-                                            }));
+                                            if (!panRegex.test(value)) {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    panNo: "Invalid PAN format (e.g. ABCDE1234F)",
+                                                }));
+                                            } else {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    panNo: "",
+                                                }));
+                                            }
                                         } else {
                                             setErrors((prev) => ({
                                                 ...prev,
-                                                panNo: "",
+                                                panNo: "PAN must be 10 characters",
                                             }));
                                         }
-                                    } else {
-                                        setErrors((prev) => ({
-                                            ...prev,
-                                            panNo: "PAN must be 10 characters",
-                                        }));
                                     }
-                                }
-                            }}
-                        />
+                                }}
+                            />
 
-                        {errors?.panNo && (
-                            <p className="text-red-500 text-xs mt-1">{errors.panNo}</p>
-                        )}
+                            {errors?.panNo && (
+                                <p className="text-red-500 text-xs mt-1">{errors.panNo}</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* ── Address  Details ───────────────────────────────────── */}
-                <div className="">
+                {/* ── Address  Details ─── */}
+                <div className="bg-white mt-5 rounded-2xl border border-gray-100 shadow-sm p-6">
                     <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
                         Address Details
                     </h2>
-                    <div className="border-t border-gray-200 mt-3 mb-5" />
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7">
                         {/* Address */}
                         <div>
@@ -516,6 +531,7 @@ export default function ResellerBasicDetails() {
                         </div>
                     </div>
                 </div>
+
 
                 {/* ── Settlement Setup ──────────────────────────────────────────── */}
                 <div className="pt-4">
@@ -702,78 +718,78 @@ export default function ResellerBasicDetails() {
                                 setState: setAddressProof,
                             },
                         ].map((document, index) => (
-                                <div
-                                    key={index}
-                                    className="flex h-[125px] flex-col items-center justify-center rounded-lg border border-dashed border-[#d9e2ef] bg-[#f9fbfd] px-3 text-center"
+                            <div
+                                key={index}
+                                className="flex h-[125px] flex-col items-center justify-center rounded-lg border border-dashed border-[#d9e2ef] bg-[#f9fbfd] px-3 text-center"
+                            >
+                                {/* Upload Icon */}
+                                <label
+                                    htmlFor={`document-${index}`}
+                                    className="cursor-pointer"
                                 >
-                                    {/* Upload Icon */}
-                                    <label
-                                        htmlFor={`document-${index}`}
-                                        className="cursor-pointer"
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-7 w-7 text-[#94a3b8]"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-7 w-7 text-[#94a3b8]"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M12 16V4m0 0L8 8m4-4l4 4"
-                                            />
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"
-                                            />
-                                        </svg>
-                                    </label>
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 16V4m0 0L8 8m4-4l4 4"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"
+                                        />
+                                    </svg>
+                                </label>
 
-                                    <input
-                                        id={`document-${index}`}
-                                        type="file"
-                                        accept=".pdf,.jpg,.jpeg,.png"
-                                        className="hidden"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
+                                <input
+                                    id={`document-${index}`}
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
 
-                                            if (file) {
-                                                // 5 MB validation
-                                                if (file.size > 5 * 1024 * 1024) {
-                                                    alert("File size must be less than 5 MB");
-                                                    e.target.value = "";
-                                                    return;
-                                                }
-
-                                                document.setState(file);
+                                        if (file) {
+                                            // 5 MB validation
+                                            if (file.size > 5 * 1024 * 1024) {
+                                                alert("File size must be less than 5 MB");
+                                                e.target.value = "";
+                                                return;
                                             }
-                                        }}
-                                    />
 
-                                    {/* Document Name */}
-                                    <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
-                                        {document.title}
-                                        <span className="text-red-500">*</span>
+                                            document.setState(file);
+                                        }
+                                    }}
+                                />
+
+                                {/* Document Name */}
+                                <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
+                                    {document.title}
+                                    <span className="text-red-500">*</span>
+                                </p>
+
+                                {/* Selected File Name */}
+                                {document.state ? (
+                                    <p
+                                        className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
+                                        title={document.state.name}
+                                    >
+                                        {document.state.name}
                                     </p>
-
-                                    {/* Selected File Name */}
-                                    {document.state ? (
-                                        <p
-                                            className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
-                                            title={document.state.name}
-                                        >
-                                            {document.state.name}
-                                        </p>
-                                    ) : (
-                                        <p className="mt-1 text-[9px] text-[#94a3b8]">
-                                            PDF / JPG / PNG - max 5 MB
-                                        </p>
-                                    )}
-                                </div>
-                            ))}
+                                ) : (
+                                    <p className="mt-1 text-[9px] text-[#94a3b8]">
+                                        PDF / JPG / PNG - max 5 MB
+                                    </p>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </div>
 

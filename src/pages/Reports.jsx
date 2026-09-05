@@ -180,10 +180,10 @@ export default function Reports() {
     <div className="min-h-screen p-4 w-full overflow-x-auto">
       {/* ── Header ── */}
       <div className="mb-5">
-        <h2 className="text-4xl uppercase pb-3 text-blue-900 font-extrabold">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
           Transaction Report
-        </h2>
-        <p className="pb-3 text-lg text-blue-900">
+        </h1>
+        <p className="pb-3 text-sm text-blue-900">
           View and monitor transaction records with detailed reports, status tracking, payment insights, and export options.
         </p>
       </div>
@@ -223,7 +223,7 @@ export default function Reports() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white px-6 py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
+            className="bg-yellow-500 text-black px-6 py-2.5 rounded-lg flex items-center gap-2 text-sm font-normal shadow transition"
           >
             <FaSearch />
             {loading ? "Searching..." : "Search"}

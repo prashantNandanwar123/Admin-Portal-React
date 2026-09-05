@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
+import { toast } from "react-toastify";
 
 import {
-  User, CalendarDays, Clock, Store, UserRound, FileText, MapPin, Building2,
+  User, CalendarDays, UserRound, FileText, MapPin, Building2,
   Receipt
 } from "lucide-react";
 
 export default function VBasicDetails({
   refId,
-  data,
-  setData,
-  errors,
   handleNext }) {
 
   const [apiData, setApiData] = useState({});
@@ -24,8 +22,12 @@ export default function VBasicDetails({
           `/viewMerchantBasicDetails/${refId}`
         );
         if (response.respCode === 0) {
+          toast.success(response.respMsg);
           const res = response.respData;
           setApiData(res || {});
+        }
+        else {
+          toast.error(response?.respMsg);
         }
       } catch (error) {
         toast.error(error);
@@ -39,8 +41,8 @@ export default function VBasicDetails({
     { label: "Form 60", name: "bddDocument", value: "Form60" },
   ];
   const sezOptions = [
-    { label: "SEZ", name: "bddSez", value: "BDD_SEZDetail" },
-    { label: "GST", name: "bddGst", value: "BDD_GSTDetail" },
+    { label: "SEZ",  value: "BDD_SEZDetail" },
+    { label: "GST",  value: "BDD_GSTDetail" },
   ];
 
 
@@ -50,7 +52,7 @@ export default function VBasicDetails({
         <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
           <Building2 className="w-5 h-5 text-yellow-600" />
         </div>
-        <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold">
+        <h2 className="text-xl sm:text-2xl text-blue-900 font-semibold">
           View Merchant Onboarding Details
         </h2>
       </div>
@@ -59,15 +61,7 @@ export default function VBasicDetails({
       </p>
 
       <div className="pt-3">
-        {/* Store Onboarding Status */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
-          {/* <h2 className="text-[18px] sm:text-[18px] uppercase text-gray-700 font-semibold mb-5 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
-              <Store className="w-4 h-4 text-yellow-600" />
-            </span>
-            Store Onboarding Status
-          </h2> */}
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-stretch">
             {/* Highlighted meta strip */}
             <div className="lg:col-span-2 bg-amber-50 rounded-xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
@@ -87,7 +81,7 @@ export default function VBasicDetails({
                 </span>
                 <label className="text-gray-700 text-[13px] sm:text-[15px] leading-tight">
                   <span className="block text-gray-500 text-xs">Created Date</span>
-                  {apiData?.createdDate}
+                  {apiData?.createdAt}
                 </label>
               </div>
             </div>
@@ -251,7 +245,14 @@ export default function VBasicDetails({
                     <input
                       type="radio"
                       className="accent-orange-500"
-                      checked={apiData?.bddSez === item.value}
+                      checked={
+                        (item.value === "BDD_SEZDetail" &&
+                          apiData.bddSez === "BDD_SEZDetail" ||
+                          (item.value === "BDD_GSTDetail" &&
+                            apiData?.bddGst === "BDD_GSTDetail"
+                          )
+                        )
+                      }
                       readOnly
                     />
                     {item.label}
@@ -398,7 +399,7 @@ export default function VBasicDetails({
             {/* Store Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2 text-sm">
-                  Company Name (Business Name)
+                Company Name (Business Name)
               </label>
               <input
                 type="text"
@@ -410,7 +411,7 @@ export default function VBasicDetails({
             {/* Legal Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2 text-sm">
-               Company Legal Name
+                Company Legal Name
               </label>
               <input
                 type="text"
@@ -639,7 +640,7 @@ export default function VBasicDetails({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
           </button>

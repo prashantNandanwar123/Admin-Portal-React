@@ -403,17 +403,17 @@ export default function Role() {
       {/* ── Header ── */}
       <div className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl uppercase pb-3 text-blue-900 font-extrabold">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Role & Access
           </h1>
-          <p className="pb-3 text-lg text-blue-900">
+          <p className="pb-3 text-sm text-blue-900">
             Create and manage user roles with customized permissions, access controls, and authorization settings securely.
           </p>
         </div>
 
         <button
           onClick={openAdd}
-          className="bg-blue-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm shadow transition self-start md:self-auto"
+          className="bg-yellow-500 text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto"
         >
           <FaPlus />
           Add Role

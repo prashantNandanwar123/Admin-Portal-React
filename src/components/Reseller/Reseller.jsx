@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
-import { FaPlus, FaEdit, FaSave, FaTimes, FaEye, FaEyeSlash, FaInfoCircle, FaSearch, FaEllipsisV} from "react-icons/fa";
+import { FaPlus, FaEdit, FaEye, FaSearch} from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -35,8 +35,7 @@ export default function Reseller() {
         ];
         return valuesToCheck.some((val) =>
             String(val).toLowerCase().includes(search)
-        );
-        console.log(valuesToCheck);
+        );       
     });
 
     // ─── Table columns ───────────────────────────────────────────────────────────
@@ -145,18 +144,18 @@ export default function Reseller() {
         {/* ── Header ── */}
         <div className="flex-shrink-0 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 className="text-2xl font-bold text-slate-800">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
                     Reseller Management
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-slate-500 mt-1 font-medium">
                     Securely manage reseller users with role-based access control, custom permissions, and controlled authorization settings.
                 </p>
             </div>
             <button
                 onClick={() => navigate("/app/reseller-basic-details")}
-                className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm shadow transition self-start md:self-auto"
+                className="bg-amber-400 text-slate-900 px-4 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto"
             >
-                <FaPlus />
+                <FaPlus className="w-3 h-3" />
                 Add New Reseller
             </button>
         </div>
@@ -253,21 +252,20 @@ export default function Reseller() {
             <div className="overflow-auto min-h-0">
                 <table className="min-w-[1400px] w-full text-xs whitespace-nowrap border-separate border-spacing-0">
                     <thead>
-                        <tr className="bg-slate-50 text-slate-600">
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">ID</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">User ID</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Company Code</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Company Name</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Full Name</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Email ID</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Mobile No</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Created By</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Status</th>
-                            <th className="px-3 py-3 text-left font-semibold tracking-wide">Action</th>
+                        <tr className="bg-slate-50 text-slate-800">
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">ID</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Reseller ID</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Created Date</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Company Name</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Full Name</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Mobile No</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Created By</th>
+                            <th className="px-3 py-3 text-center font-semibold tracking-wide">Status</th>
+                            <th className="px-15 py-3 text-left font-semibold tracking-wide">Action</th>
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 text-center">
                         {loading ? (
                             <tr>
                                 <td colSpan={10} className="text-center py-10 text-slate-500">
@@ -285,14 +283,14 @@ export default function Reseller() {
                                 <tr key={item.id || index} className="hover:bg-slate-50 transition">
                                     <td className="px-3 py-3">{index + 1}</td>
                                     <td className="px-3 py-3">{item.resellerId || "-"}</td>
-                                    <td className="px-3 py-3">{item.companyCode || "-"}</td>
+                                    <td className="px-3 py-3">{item.createdAt || "-"}</td>
                                     <td className="px-3 py-3">{item.companyName || "-"}</td>
                                     <td className="px-3 py-3">
                                         {(item.firstName || item.lastName)
                                             ? `${item.firstName || ""} ${item.lastName || ""}`.trim()
                                             : "-"}
                                     </td>
-                                    <td className="px-3 py-3">{item.email || "-"}</td>
+                                   
                                     <td className="px-3 py-3">{item.mobile || "-"}</td>
                                     <td className="px-3 py-3">{item.createdBy || "-"}</td>
 
@@ -374,7 +372,7 @@ export default function Reseller() {
                                                 title="More actions"
                                                 className="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-100"
                                             >
-                                                <FaEllipsisV />
+                                               
                                             </button>
                                         </div>
                                     </td>

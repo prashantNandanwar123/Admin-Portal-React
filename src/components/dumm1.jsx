@@ -1,494 +1,455 @@
-import React, { useEffect, useState } from "react";
-import {
-    UserRound,
-    Info,
-    ChevronUp,
-    ChevronDown,
-    Trash2,
-    BriefcaseBusiness,
-    Upload,
-    FileText,
-    CreditCard,
-    RotateCcw,
-    Save,
-    ShieldCheck,
-} from "lucide-react";
-
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
+import { toast } from "react-toastify";
+import { Eye } from "lucide-react";
 
-const EMPTY_DIRECTOR = {
-    name: "",
-    designation: "",
-    photograph: null,
-    addressProof: null,
-    pan: "",
-    aadhaar: "",
+export default function ECompanyDocs({ refId, handleNext, handleBack }) {
 
-};
+    const [documents, setDocuments] = useState({
+        AOA: "",
+        COMPANY_PAN: "",
+        MOA: "",
+        GST: "",
+        COI: "",
+        CANCELLED_CHEQUE: "",
+        SIGNAGE: "",
+        OFFICE_SHOP_PHOTO_1: "",
+        OFFICE_SHOP_PHOTO_2: ""
 
-const DirectorDetail = {
-    director1Name: "",
-    director1Designation: "",
-    director1PanNo: "",
-    director1AadharNo: "",
-    director1Selfie: "",
-    director1Pan: "",
-    director1Aadhar: "",
-
-    director2Name: "",
-    director2Designation: "",
-    director2PanNo: "",
-    director2AadharNo: "",
-    director2Selfie: "",
-    director2Pan: "",
-    director2Aadhar: ""
-};
-
-const DirectorDetails = () => {
-    const [openDirector, setOpenDirector] = useState(1);
-
-    const [directors, setDirectors] = useState({
-        1: { ...EMPTY_DIRECTOR }, // Make Copy In Object
-        2: { ...EMPTY_DIRECTOR },
     });
 
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
+    useEffect(() => {
+        viewCompanyDocs(refId);
+    }, []);
 
-
-    // ACCORDION
-    const toggleDirector = (directorNumber) => {
-        setOpenDirector((prev) =>
-            prev === directorNumber ? null : directorNumber
-        );
-    };
-
-    // INPUT CHANGE
-    const handleChange = (directorNumber, field, value) => {
-        setDirectors((prev) => ({
-            ...prev,
-            [directorNumber]: {
-                ...prev[directorNumber],
-                [field]: value,
-            },
-        }));
-    };
-
-    // FILE CHANGE
-    const handleFileChange = (directorNumber, field, file) => {
-        handleChange(directorNumber, field, file);
-    };
-
-    // RESET DIRECTOR
-    const resetDirector = async (directorNumber) => {
+    const viewCompanyDocs = async (refId) => {
         try {
-            setDirectors((prev) => ({
-                ...prev,
-                [directorNumber]: {
-                    ...EMPTY_DIRECTOR,
-                },
-            }));
-        } catch (err) {
-            console.error("Reset error:", err);
+            const response = await axiosInstance.post(
+                `/merchant/kyc/viewCompanyDocs/${10001}`
+            );
+
+            console.log("company REsponse -->>>", response);
+
+            if (response?.respCode === 0) {
+                toast.success(response?.respMsg);
+                // Documents
+                const apiDocuments = response?.respData?.documents || [];
+
+                const documentMap = {
+                    AOA: null,
+                    COMPANY_PAN: null,
+                    MOA: null,
+                    GST: null,
+                    COI: null,
+                    CANCELLED_CHEQUE: null,
+                    SIGNAGE: null,
+                    OFFICE_SHOP_PHOTO_1: null,
+                    OFFICE_SHOP_PHOTO_2: null,
+                };
+
+                apiDocuments.forEach((doc) => {
+                    documentMap[doc.fileType] = {
+                        fileName: doc.fileName,
+                    };
+                });
+
+                setDocuments(documentMap);
+            } else {
+                toast.error(response?.respMsg);
+                setData({});
+            }
+        } catch (error) {
+            toast.error(error);
+            setData({});
         }
     };
 
-    // SAVE DIRECTORS
-    const handleSave = async () => {
+    const [userData, setUserData] = useState(null);
+
+    // Get logged-in user
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+
+        if (storedUser) {
+            try {
+                setUserData(JSON.parse(storedUser));
+            } catch (error) {
+                console.error("Invalid user data in localStorage", error);
+            }
+        }
+    }, []);
+
+
+    // handleSaveEditCompany  APi
+    const handleSaveEditCompany = async () => {
         try {
-            setSaving(true);
-            setError("");
-            console.log("director1Name : ", director1Name);
             const formData = new FormData();
-            formData.append("refId", "10001")
-            formData.append("uploadedBy", "administrator"),
-            formData.append("director1Name", director1Name);
-            formData.append("director1Designation", director1Designation);
-            formData.append("director1AadharNo", director1AadharNo);
-            formData.append("director1Selfie", director1Selfie);
-            formData.append("director1Pan", director1Pan);
-            formData.append("director1Aadhar", director1Aadhar);
-            formData.append("director2Name", director2Name);
-            formData.append("director2Designation", director2Designation);
-            formData.append("director2AadharNo", director2AadharNo);
-            formData.append("director2Selfie", director2Selfie);
-            formData.append("director2Pan", director2Pan);
-            formData.append("director2Aadhar", director2Aadhar);
 
+            formData.append("refId", refId);
+            formData.append("updatedBy", userData?.userName || "");
 
-            const response = await axiosInstance.post("/merchant/kyc/director", formData, {
+            if (companyPan) {
+                formData.append("companyPan", companyPan);
+            }
+
+            if (aoa) {
+                formData.append("aoa", aoa);
+            }
+
+            if (moa) {
+                formData.append("moa", moa);
+            }
+
+            if (gst) {
+                formData.append("gst", gst);
+            }
+
+            if (coi) {
+                formData.append("coi", coi);
+            }
+
+            if (cancelledCheque) {
+                formData.append("cancelledCheque", cancelledCheque);
+            }
+
+            if (signage) {
+                formData.append("signage", signage);
+            }
+
+            if (officeShopPhoto1) {
+                formData.append("officeShopPhoto1", officeShopPhoto1);
+            }
+
+            if (officeShopPhoto2) {
+                formData.append("officeShopPhoto2", officeShopPhoto2);
+            }
+
+            console.log("Form Data payload : " + formData);
+
+            const response = await axiosInstance.post(
+                `/merchant/kyc/edit/companyDocs`,
+                formData, {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    "content-type": "multipart/form-data",
                 },
-            });
+            }
+            );
+            const resData = response;
 
-            console.log("Director save response:", response);
-
-            alert("Director details saved successfully.");
-        } catch (err) {
-            console.error("Save director error:", err);
-            setError("Unable to save director details.");
-        } finally {
-            setSaving(false);
+            if (resData?.respCode === 0) {
+                toast.success(resData?.respMsg);
+            } else {
+                toast.error(resData?.respMsg);
+            }
+        } catch (error) {
+            toast.error(error);
         }
-    };
-
-    // DIRECTOR UI
-    const renderDirector = (directorNumber) => {
-        const director = directors[directorNumber];
-        const isOpen = openDirector === directorNumber;
-
-        return (
-            <div
-                key={directorNumber}
-                className="border border-gray-200 rounded-xl overflow-hidden bg-white"
-            >
-                {/* Accordion Header */}
-                <div
-                    onClick={() => toggleDirector(directorNumber)}
-                    className="flex items-center justify-between px-3 sm:px-4 py-3 bg-gray-50 cursor-pointer select-none"
-                >
-                    <div className="flex items-center gap-2">
-                        {isOpen ? (
-                            <ChevronUp className="w-4 h-4 text-gray-500" />
-                        ) : (
-                            <ChevronDown className="w-4 h-4 text-gray-500" />
-                        )}
-
-                        <span className="text-sm font-semibold text-gray-800">
-                            Director {directorNumber}
-                        </span>
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            deleteDirector(directorNumber);
-                        }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded-md bg-white hover:bg-red-50 transition"
-                    >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Delete
-                    </button>
-                </div>
-
-                {/* Accordion Body */}
-                {isOpen && (
-                    <div className="border-t border-gray-200">
-                        <div className="p-3 sm:p-4">
-                            {/* First Row */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {/* Director Name */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-600 mb-1.5">
-                                        Director {directorNumber} Name
-                                        <span className="text-red-500 ml-0.5">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            value={DirectorDetail.director1Name}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    "director1Name",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="Enter director name"
-                                            className="w-full h-10 pl-9 pr-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Designation */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-600 mb-1.5">
-                                        Designation
-                                        <span className="text-red-500 ml-0.5">*</span>
-                                    </label>
-
-                                    <div className="relative">
-                                        <BriefcaseBusiness className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1169ad] pointer-events-none" />
-                                        <select
-                                            value={DirectorDetail.director1Designation}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    
-                                                    "director1Designation",
-                                                    e.target.value
-                                                )
-                                            }
-                                            className="appearance-none w-full h-10 pl-9 pr-8 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
-                                        >
-                                            <option value="">Select designation</option>
-                                            <option value="Director">Director</option>
-                                            <option value="Managing Director">
-                                                Managing Director
-                                            </option>
-                                            <option value="CEO">
-                                                CEO
-                                            </option>
-                                            <option value="Proprietor">
-                                                Proprietor
-                                            </option>
-                                            <option value="Partner">
-                                                Partner
-                                            </option>
-                                            <option value="Authorized Signatory">
-                                                Authorized Signatory
-                                            </option>
-                                        </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            {/* Second Row */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                {/* PAN */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                        PAN Number
-                                        <span className="text-red-400 ml-0.5">*</span>
-                                    </label>
-
-                                    <div className="relative">
-                                        <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                        <input
-                                            type="text"
-                                            maxLength={10}
-                                            value={director.pan}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    directorNumber,
-                                                    "pan",
-                                                    e.target.value
-                                                        .toUpperCase()
-                                                        .replace(/[^A-Z0-9]/g, "")
-                                                )
-                                            }
-                                            placeholder="ABCDE1234F"
-                                            className="w-full h-10 pl-9 pr-3 text-xs text-gray-500 border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8] uppercase"
-                                        />
-                                    </div>
-                                    <p className="mt-1.5 text-[9px] text-gray-400">
-                                        Format: AAAAA0000A (10 characters)
-                                    </p>
-                                </div>
-
-                                {/* Aadhaar */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                        Aadhaar Number
-                                        <span className="text-red-400 ml-0.5">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                        <input
-                                            type="text"
-                                            maxLength={12}
-                                            value={director.aadhaar}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    directorNumber,
-                                                    "aadhaar",
-                                                    e.target.value.replace(/\D/g, "")
-                                                )
-                                            }
-                                            placeholder="XXXXXXXXXXXX"
-                                            className="w-full h-10 pl-9 pr-20 text-xs text-gray-500 border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
-                                        />
-                                    </div>
-                                    <p className="mt-1.5 text-[9px] text-gray-400">
-                                        12-digit Aadhaar number
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Third Row */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                {/* Photograph */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                        Director {directorNumber} Photograph
-                                        <span className="text-red-400 ml-0.5">*</span>
-                                    </label>
-                                    <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
-                                        <FileText className="w-4 h-4 ml-3 text-gray-300" />
-                                        <span className="ml-2 text-xs text-gray-400 truncate">
-                                            {director.photograph
-                                                ? director.photograph.name ||
-                                                "Photograph uploaded"
-                                                : "Upload director photograph"}
-                                        </span>
-                                        <div className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-md border border-[#9cc9ee] bg-[#f7fbff]">
-                                            <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(e) =>
-                                                handleFileChange(
-                                                    directorNumber,
-                                                    "photograph",
-                                                    e.target.files?.[0] || null
-                                                )
-                                            }
-                                        />
-                                    </label>
-                                </div>
-
-                                {/* Address Proof */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                        Director {directorNumber} Pan Card
-                                        <span className="text-red-400 ml-0.5">*</span>
-                                    </label>
-                                    <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
-                                        <FileText className="w-4 h-4 ml-3 text-gray-300" />
-                                        <span className="ml-2 text-xs text-gray-400 truncate pr-12">
-                                            {director.addressProof
-                                                ? director.addressProof.name ||
-                                                "Document uploaded"
-                                                : "Upload Director Pan Card"}
-                                        </span>
-                                        <div className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-md border border-[#9cc9ee] bg-[#f7fbff]">
-                                            <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept=".pdf,.jpg,.jpeg,.png"
-                                            className="hidden"
-                                            onChange={(e) =>
-                                                handleFileChange(
-                                                    directorNumber,
-                                                    "addressProof",
-                                                    e.target.files?.[0] || null
-                                                )
-                                            }
-                                        />
-                                    </label>
-                                </div>
-
-                                {/* Aadhar Card */}
-                                <div>
-                                    <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                        Director {directorNumber} Aadhar Card
-                                        <span className="text-red-400 ml-0.5">*</span>
-                                    </label>
-                                    <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
-                                        <FileText className="w-4 h-4 ml-3 text-gray-300" />
-                                        <span className="ml-2 text-xs text-gray-400 truncate pr-12">
-                                            {director.addressProof
-                                                ? director.addressProof.name ||
-                                                "Document uploaded"
-                                                : "Upload Director Aadhar Card"}
-                                        </span>
-                                        <div className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-md border border-[#9cc9ee] bg-[#f7fbff]">
-                                            <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept=".pdf,.jpg,.jpeg,.png"
-                                            className="hidden"
-                                            onChange={(e) =>
-                                                handleFileChange(
-                                                    directorNumber,
-                                                    "addressProof",
-                                                    e.target.files?.[0] || null
-                                                )
-                                            }
-                                        />
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        );
-    };
-
-    // LOADING
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-sm text-gray-500">
-                    Loading director details...
-                </div>
-            </div>
-        );
     }
 
-    // MAIN UI
-    return (
-        <div className="min-h-screen bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5">
-                {/* HEADER */}
-                <div className="flex items-center justify-between pb-5 border-b border-gray-200">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#eef5f9]">
-                            <UserRound className="w-4 h-4 text-[#126aa8]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-semibold text-[#173875]">
-                                Add Director Details
-                            </h2>
+    const documentList = [
+        {
+            title: "Articles of Association (AOA)",
+            documentType: "AOA",
+        },
+        {
+            title: "Company Pan Card",
+            documentType: "COMPANY_PAN",
+        },
+        {
+            title: "Memorandum of Association (MOA)",
+            documentType: "MOA",
+        },
+        {
+            title: "Company GST Certificate",
+            documentType: "GST",
+        },
+        {
+            title: "Certificate of Incorporation (COI)",
+            documentType: "COI",
+        },
+        {
+            title: "Cancel check",
+            documentType: "CANCELLED_CHEQUE",
+        },
+        {
+            title: "Company Signature",
+            documentType: "SIGNAGE",
+        },
+        {
+            title: "Office / Shop Photo 1",
+            documentType: "OFFICE_SHOP_PHOTO_1",
+        },
+        {
+            title: "Office / Shop Photo 2",
+            documentType: "OFFICE_SHOP_PHOTO_2",
+        },
 
-                            <p className="mt-0.5 text-[10px] text-gray-400">
-                                Director information
-                            </p>
-                        </div>
-                    </div>
-                </div>
+    ];
 
-                {/* ERROR */}
-                {error && (
-                    <div className="mt-4 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600">
-                        {error}
-                    </div>
-                )}
+    // View document
+    const viewFile = async (fileName) => {
+        if (!refId || !fileName) {
+            toast.error("RefId or file name is missing");
+            return;
+        }
+        try {
+            const response = await axiosInstance.post(
+                "/merchant/kyc/viewKycDocs",
+                {},
+                {
+                    params: {
+                        refId: refId,
+                        fileName: fileName,
+                    },
+                    responseType: "blob",
+                }
+            );
 
-                {/* INFO */}
-                <div className="mt-6 flex items-center gap-2 px-3 h-9 rounded-lg bg-[#f0f7ff] border border-[#a8d2ff]">
-                    <Info className="w-3.5 h-3.5 text-[#126ab0]" />
+            const blobUrl = URL.createObjectURL(response);
+            window.open(blobUrl, "_blank");
+            // Optional: free memory after some time
+            setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+            }, 5000);
 
-                    <span className="text-[10px] text-[#1858a0]">
-                        Minimum 1 directors required for your entity type.
-                    </span>
-                </div>
+        } catch (error) {
+            toast.error(error);
+        }
+    };
 
-                {/* DIRECTORS */}
-                <div className="mt-3 space-y-3">
-                    {renderDirector(1)}
-                    {renderDirector(2)}
-                </div>
-
-                {/* BUTTONS */}
-                <div className="flex justify-end gap-2 mt-4">
-                    <button
-                        type="button"
-                        // onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
-                    >
-                        Back
-                    </button>
-                    <button
-                        type="button"
-
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded"
-                    >
-                        Save & Next
-                    </button>
-                </div>
+    /* ── Reusable read-only field (matches the reference card design) ── */
+    const ViewField = ({ label, value, required }) => (
+        <div>
+            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
+                {label} {required && <span className="text-red-500">*</span>}
+            </label>
+            <div className="w-full min-h-[42px] border border-gray-200 rounded-lg bg-white px-3 py-2 flex items-center text-[13px] sm:text-sm text-gray-800 shadow-sm">
+                {value || "-"}
             </div>
         </div>
     );
-};
 
-export default DirectorDetails;
+    /* ── Section wrapper card ── */
+    const SectionCard = ({ title, children, className = "" }) => (
+        <div
+            className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`}
+        >
+            <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                {title}
+            </h2>
+            <div className="border-t border-gray-200 mt-3 mb-5" />
+            {children}
+        </div>
+    );
+
+    return (
+        <div className="overflow-y-auto hide-scrollbar  sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
+            {/* ───────────── Header ───────────── */}
+            <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[40px]">
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500">
+                    <div className="flex items-center justify-between w-full px-6 py-4">
+                        {/* Company Documents - LEFT */}
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf3f9]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6 text-blue-700"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M7 3h8l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M15 3v5h5M9 13h6M9 17h6"
+                                        />
+                                    </svg>
+                                </div>
+
+                                <div>
+                                    <h2 className="text-xl sm:text-xl font-semibold text-blue-900">
+                                        Edit Company Documents
+                                    </h2>
+                                    <p className="text-[11px] font-medium text-slate-400">
+                                        Upload and manage your company verification documents
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Document Status - RIGHT */}
+                        <div className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2">
+                            <span className="h-2 w-2 rounded-full bg-blue-600"></span>
+                            <span className="text-xs font-semibold text-blue-700">
+                                DOCUMENT VERIFICATION
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Status */}
+            <SectionCard title="Documents Details">
+                {/* Upload Documents Details */}
+                <div className="w-full">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {documentList.map((document, index) => {
+                            const existingDocument = documents[document.documentType];//AOA
+                            const hasDocument = !!existingDocument;
+
+                            return (
+                                <div
+                                    key={index}
+                                    className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
+                                        ? "border-2 border-green-500 bg-[#f9fbfd]"
+                                        : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
+                                        }`}
+                                >
+
+                                    {/* Green Tick */}
+                                    {hasDocument && (
+                                        <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-3 w-3 text-white"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                strokeWidth="3"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M5 13l4 4L19 7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    )}
+
+                                    {/* Hidden File Input */}
+                                    {/* <input
+                                        id={`document-${index}`}
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png,.jfif"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file =
+                                                e.target.files?.[0];
+
+                                            if (!file) return;
+
+                                            if (
+                                                file.size >
+                                                5 * 1024 * 1024
+                                            ) {
+                                                toast.error(
+                                                    "File size must be less than 5 MB"
+                                                );
+
+                                                e.target.value = "";
+                                                return;
+                                            }
+
+                                            // For now only UI update
+                                            setDocuments((prev) => ({
+                                                ...prev,
+                                                [document.documentType]: {
+                                                    id: null,
+                                                    originalFileName:
+                                                        file.name,
+                                                    downloadUrl: null,
+                                                    file: file,
+                                                },
+                                            }));
+                                        }}
+                                    /> */}
+
+                                    {/* Document Name */}
+                                    <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
+                                        {document.title}
+                                        <span className="text-red-500">
+                                            *
+                                        </span>
+                                    </p>
+
+                                    {/* Existing File Name */}
+                                    {hasDocument ? (
+                                        <p
+                                            className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
+                                            title={
+                                                existingDocument.fileName
+                                            }
+                                        >
+                                            {existingDocument.fileName}
+                                        </p>
+                                    ) : (
+                                        <p className="mt-1 text-[9px] text-[#94a3b8]">
+                                            PDF / JPG / PNG - max 5 MB
+                                        </p>
+                                    )}
+
+                                    {/* Icons */}
+                                    <div className="mt-2 flex items-center gap-3">
+                                        {/* Eye Icon - First */}
+                                        {hasDocument && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    viewFile(
+                                                        existingDocument.fileName
+                                                    )
+                                                }
+                                                title="View document"
+                                                className="cursor-pointer"
+                                            >
+                                                <Eye
+                                                    className="h-5 w-5 text-blue-500"
+                                                    strokeWidth={1.8}
+                                                />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </SectionCard>
+
+
+            {/* BACK & NEXT BUTTONS */}
+            <div className="flex justify-between items-center gap-4 mt-10">
+                <button
+                    type="button"
+                    onClick={handleBack}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+                >
+                    Back
+                </button>
+                <div className="flex justify-center">
+                    <button
+                        type="button"
+                        onClick={handleSaveEditCompany}
+                        className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
+                    >
+                        Update
+                    </button>
+                </div>
+                <button
+                    type="button"
+                    onClick={handleNext}
+                    className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    );
+}

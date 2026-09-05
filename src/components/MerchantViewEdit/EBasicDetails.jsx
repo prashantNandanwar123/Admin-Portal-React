@@ -1,29 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import Select from "react-select";
-import { Store } from "lucide-react";
 import {
   UserRound,
   CalendarDays,
-  Clock3,
   ChevronDown,
   MapPin,
   ReceiptText,
-  CircleUserRound
+  CircleUserRound,
+  FileText
 } from "lucide-react";
 
 export default function EBasicDetails({
   refId,
   data,
   setData,
-  errors,
   handleNext,
 }) {
   const [mccList, setMccList] = useState([]);
   const [legalVehicalNameList, setlegalVehicalNameList] = useState([]);
   const [userData, setUserData] = useState(null);
+  const fileRef = useRef(null);
+
 
   const partnerLogoRef = useRef(null);
 
@@ -102,7 +102,6 @@ export default function EBasicDetails({
       const response = await axiosInstance.post(
         `/viewMerchantBasicDetails/${refId}`
       );
-      console.log("reference Iddddd----->>>>", refId);
       if (response?.respCode === 0) {
         const res = response?.respData || {};
 
@@ -122,8 +121,8 @@ export default function EBasicDetails({
           refId: res?.ref_id || res?.refId || refId,
         }));
       }
-    } catch (err) {
-      toast.error(err);
+    } catch (error) {
+      toast.error(error);
     }
   };
 
@@ -293,18 +292,6 @@ export default function EBasicDetails({
         <p className="ml-12 pb-3 text-md text-blue-900">Edit Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
         {/* STORE STATUS */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-2">
-          {/* Heading */}
-          <div>
-            {/* <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
-                <Store className="w-5 h-5 text-yellow-600" />
-              </div>
-              <h2 className="text-[18px] sm:text-[20px] text-gray-700 font-semibold">
-                Store Onboarding Status
-              </h2>
-            </div> */}
-          </div>
-
           {/* Status Content */}
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-center">
             {/* Created Information Card */}
@@ -330,13 +317,12 @@ export default function EBasicDetails({
                   <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                     <CalendarDays className="w-4 h-4 text-gray-600" />
                   </div>
-
                   <div>
                     <p className="text-[11px] text-gray-500 font-medium">
                       Created Date
                     </p>
                     <p className="text-[13px] text-gray-800 font-semibold">
-                      {data?.createdDate?.split(" ")[0] || "-"}
+                      {data?.createdAt?.split(" ")[0] || "-"}
                     </p>
                   </div>
                 </div>
@@ -456,9 +442,9 @@ export default function EBasicDetails({
 
             {/* Sourcing Channel */}
             <div>
-               <label className="block text-gray-700 font-medium mb-2">
-              Reseller Partner
-              </label>            
+              <label className="block text-gray-700 font-medium mb-2">
+                Reseller Partner
+              </label>
 
               <div className="relative">
                 <select
@@ -485,6 +471,377 @@ export default function EBasicDetails({
             </div>
           </div>
         </div>
+
+        {/* Basic DOcument DETAILS */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-4">
+          {/* Heading */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-yellow-500" />
+            </div>
+            <h2 className="text-base font-semibold text-gray-900 uppercase">
+              Basic Document Details
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Documents radio */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-3">
+                Documents
+              </label>
+
+              <div className="flex items-center gap-5">
+                {documentOptions.map((doc) => (
+                  <label
+                    key={doc.value}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="radio"
+                      checked={
+                        data?.bddDocument === doc.value
+                      }
+                      onChange={() =>
+                        handleChange(
+                          "bddDocument",
+                          doc.value
+                        )
+                      }
+                    />
+
+                    {doc.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Aadhar No */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Aadhar No.
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddAadharNo || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddAadharNo",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* SEZ Detail */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                SEZ Detail
+              </label>
+
+              <div className="border border-gray-300 rounded-full px-5 py-4 flex items-center gap-6 bg-white">
+                {sezOptions.map((item) => (
+                  <label
+                    key={item.value}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="radio"
+                      checked={
+                        data?.bddSez === item.value
+                      }
+                      onChange={() =>
+                        handleChange(
+                          "bddSez",
+                          item.value
+                        )
+                      }
+                    />
+
+                    {item.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* GSTN No */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                GSTN No.
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddGstnNO || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddGstnNO",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* PAN NO */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Pan No
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddPanNo || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddPanNo",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Risk Check */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Risk Check
+              </label>
+
+              <select
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.riskCheck || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "riskCheck",
+                    e.target.value
+                  )
+                }
+              >
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Category
+              </label>
+
+              <select
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddCategory || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddCategory",
+                    e.target.value
+                  )
+                }
+              >
+                <option value="">-- Select --</option>
+                {["Education", "Education Goverment", "Education Private", "Goverment", "Insurance", "Mutual Funds", "Travel", "Utility", "Retail", "ISP", "Cable"].map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* MCC */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                MCC
+              </label>
+
+              <select
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddAgpMcc || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddAgpMcc",
+                    e.target.value
+                  )
+                }
+              >
+                <option value="">-- Select --</option>
+                {Array.isArray(mccList) &&
+                  mccList.map((item, index) => {
+                    const fullText = `${item.code} - ${String(item.name)}`;
+                    return (
+                      <option key={index} value={fullText}>
+                        {fullText}
+                      </option>
+                    );
+                  })}
+              </select>
+            </div>
+
+
+            {/* Vintage Type */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Vintage Type
+              </label>
+
+              <select
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddVintageType || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddVintageType",
+                    e.target.value
+                  )
+                }
+              >
+                <option value="">-- Select --</option>
+                <option value="<1Y - New">&lt;1Y - New</option>
+                <option value=">1<3Y">&gt;1&lt;3Y</option>
+                <option value=">3<5Y">&gt;3&lt;5Y</option>
+                <option value=">5Y">&gt;5Y</option>
+              </select>
+            </div>
+
+            {/* Merchant Business Type */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Merchant Business Type
+              </label>
+
+              <select
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={
+                  data?.bddMerchantBusinessType || ""
+                }
+                onChange={(e) =>
+                  handleChange(
+                    "bddMerchantBusinessType",
+                    e.target.value
+                  )
+                }
+              >
+                <option value="">-- Select --</option>
+                {["Companies Registered Act", "Govt, Govt Undertakings", "Individuals/Proprietor", "Individuals/Professionals", "LLPS", "Pertnership", "Proprietor", "Regd Trusts"].map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+
+              </select>
+            </div>
+
+            {/* Merchant Website URL */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Merchant Website URL
+              </label>
+
+              <input
+                type="text"
+                placeholder="https://www.example.com"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.bddMerchantWebsiteURL || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "bddMerchantWebsiteURL",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Partner Logo Check */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Partner Logo Check
+                <span className="text-red-500">*</span>
+              </label>
+
+              <select
+                className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
+                value={data?.partnerLogoCheck || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleChange("partnerLogoCheck", value);
+                  if (fileRef.current) {
+                    fileRef.current.value = "";
+                  }
+                }}
+              >
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            {/* Partner Logo */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Partner Logo{" "}
+                <span className="text-sm text-gray-500 font-normal">
+                  (jpg or png)
+                </span>
+              </label>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                disabled={data?.partnerLogoCheck !== "Yes"}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  // setPartnerLogo(file);
+                  handleChange("partnerLogoFile", file);
+                }}
+                className="block w-full h-[44px] text-sm text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer file:h-full file:mr-3 file:px-4 file:border-0 file:border-r file:border-gray-200 file:bg-gray-50 file:text-gray-700 file:text-sm file:font-medium hover:file:bg-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+
+              />
+            </div>
+
+            {/* Store Name */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Company Name (Business Name)
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.storeDbaName || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "storeDbaName",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Legal Name */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Company Legal Name
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={data?.storeLegalName || ""}
+                onChange={(e) =>
+                  handleChange(
+                    "storeLegalName",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+
 
         {/* STORE ADDRESS */}
         <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6">
@@ -877,7 +1234,7 @@ export default function EBasicDetails({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
           >
             Next
           </button>

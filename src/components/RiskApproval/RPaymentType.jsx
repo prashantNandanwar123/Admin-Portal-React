@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
+import { CreditCard } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 export default function RPaymentType({
   refId,
-  data,
-  setData,
-  errors,
   handleNext,
   handleBack,
 }) {
@@ -18,18 +18,14 @@ export default function RPaymentType({
       try {
         const response = await axiosInstance.post(
           `rMerchantPaymentType/${refId}`
-        );
+        );       
 
-        console.log("API RESPONSE:", response);
-
-        // Adjust according to your API structure
-        const res = response?.data || response;
-
-        if (res?.respCode === 0) {
-          setApiData(res?.respData || {});
+        if (response?.respCode === 0) {
+          toast.success(response?.respMsg);
+          setApiData(response?.respData || {});
         }
-      } catch (err) {
-        console.error("API ERROR:", err);
+      } catch (error) {
+        toast.error(error);
       }
     };
 
@@ -46,10 +42,17 @@ export default function RPaymentType({
     <>
       <div>
         {/* Header */}
-        <h2 className="text-2xl uppercase pb-3 text-blue-900 font-extrabold">
-          Review Payment Type (UPI)
-        </h2>
-        <p className="pb-4 border-b text-sm text-blue-900 font-noraml">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <CreditCard size={18} />
+          </span>
+
+          <h2 className="text-2xl text-blue-900 font-semibold">
+            Review Payment Type (UPI)
+          </h2>
+        </div>
+
+        <p className="pb-4  text-sm text-blue-900 font-normal ml-13">
           Payment Type Form collects transaction method details for setup.
         </p>
         {/* UPI header */}
@@ -208,7 +211,7 @@ export default function RPaymentType({
         <button
           type="button"
           onClick={handleBack}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
+          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
         >
           Back
         </button>
@@ -216,7 +219,7 @@ export default function RPaymentType({
         <button
           type="button"
           onClick={handleNext}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded"
+          className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
         >
           Next
         </button>

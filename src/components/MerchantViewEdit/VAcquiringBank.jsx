@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { useLocation } from "react-router-dom";
-import { BadgePercent, Landmark, WalletCards, Settings2 } from "lucide-react";
+import { BadgePercent, Landmark, WalletCards, SlidersHorizontal } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 
 export default function VRAcquiringBank({
   refId,
-  data,
-  setData,
-  errors,
   handleNext,
   handleBack
 }) {
@@ -26,10 +25,13 @@ export default function VRAcquiringBank({
           `/viewMerchantAcquiringBank/${refId}`
         );
         if (response?.respCode === 0) {
+          toast.success(response.respMsg);
           const res = response?.respData;
           setApiData(res || {});
+        } else {
+          toast.error(response?.respMsg);
         }
-      } catch (err) {
+      } catch (error) {
         toast.error(error);
       }
     };
@@ -48,7 +50,7 @@ export default function VRAcquiringBank({
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
               <Landmark className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
             </div>
-            <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold">
+            <h2 className="text-xl sm:text-2xl text-blue-900 font-semibold">
               View Acquiring Bank Details
             </h2>
           </div>
@@ -276,153 +278,242 @@ export default function VRAcquiringBank({
         </div>
 
         {/* ── Miscellaneous ─────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-8 mb-8">
-          <h2 className="text-[18px] uppercase sm:text-[20px] text-gray-700 font-semibold mb-6 border-b border-gray-200 pb-3 flex items-center gap-2">
-            <span className="w-8 h-8  rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
-              <Settings2 className="w-4 h-4 text-yellow-600" />
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600">
+              <SlidersHorizontal size={16} />
             </span>
-            Miscellaneous
-          </h2>
+            <h2 className="text-2xl font-semibold text-gray-700">
+              Miscellaneous
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-7">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-7">
-            {/* Text Inputs */}
-            {[
-              {
-                label: "Daily Transaction Limit",
-                value: apiData?.VPA_Mis_DailyTranLimit,
-              },
-              {
-                label: "Per Transaction Limit",
-                value: apiData?.misPerTransactionLimit,
-              },
-              {
-                label: "Fuel Remark",
-                value: apiData?.VPA_Mis_FuelRemark,
-              },
-              {
-                label: "Call Charges",
-                value: apiData?.VPA_Mis_CallCharges,
-              },
-              {
-                label: "Secret Key",
-                value: apiData?.VPA_Mis_SecretKey,
-              },
-              {
-                label: "Merchant Reimbursement",
-                value: apiData?.VPA_Mis_MerchantReimbursement,
-              },
-              {
-                label: "Customer Id",
-                value: apiData?.VPA_Mis_CustomerId,
-              },
-              {
-                label: "VPA",
-                value: apiData?.VPA_Mis_VPA,
-              },
-            ].map(({ label, value }, index) => (
-              <div key={index}>
-                <label className={labelClass}>
-                  {label}
-                </label>
+            {/* Row 1 */}
+            <div>
+              <label className={labelClass}>Daily Transaction Limit</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_DailyTranLimit || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
 
-                <input
-                  type="text"
-                  value={value || ""}
-                  readOnly
-                  className={inputClass}
-                />
+            <div>
+              <label className={labelClass}>Daily Transaction Limit Status</label>
+              <input
+                type="text"
+                value={apiData?.misTransactionLimitStatus || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Application Mode</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_AppMode || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+
+            {/* Row 2 */}
+            <div>
+              <label className={labelClass}>Per Transaction Limit</label>
+              <input
+                type="text"
+                value={apiData?.misPerTransactionLimit || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Per Transaction Limit Status</label>
+              <input
+                type="text"
+                value={apiData?.misPerTransactionLimitStatus || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Transaction Mode</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_TranMode || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+
+            {/* Row 3 */}
+            <div>
+              <label className={labelClass}>
+                FIRC (Foreign Inward Remittance Certificate)
+              </label>
+
+              <div className="border border-gray-200 rounded-full px-4 sm:px-5 flex items-center gap-6 h-10 sm:h-11">
+                {["Yes", "No"].map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 text-sm text-gray-700"
+                  >
+                    <input
+                      type="radio"
+                      className="accent-orange-500"
+                      checked={apiData?.VPA_Mis_FIRC === opt}
+                      readOnly
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
 
-            {/* Select Type Fields */}
-            {[
-              {
-                label: "Daily Transaction Limit Status",
-                value: apiData?.misTransactionLimitStatus,
-              },
-              {
-                label: "Application Mode",
-                value: apiData?.VPA_Mis_AppMode,
-              },
-              {
-                label: "Per Transaction Limit Status",
-                value: apiData?.misPerTransactionLimitStatus,
-              },
-              {
-                label: "Transaction Mode",
-                value: apiData?.VPA_Mis_TranMode,
-              },
-              {
-                label: "FIRC Frequency",
-                value: apiData?.VPA_Mis_FIRCFrequency,
-              },
-              {
-                label: "Fuel Association",
-                value: apiData?.VPA_Mis_FuelAssociation,
-              },
-            ].map(({ label, value }, index) => (
-              <div key={index}>
-                <label className={labelClass}>
-                  {label}
-                </label>
+            <div>
+              <label className={labelClass}>FIRC Frequency</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_FIRCFrequency || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
 
-                <input
-                  type="text"
-                  value={value || ""}
-                  readOnly
-                  className={inputClass}
-                />
+            <div>
+              <label className={labelClass}>Fuel Association</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_FuelAssociation || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+
+            {/* Row 4 */}
+            <div>
+              <label className={labelClass}>Fuel Remark</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_FuelRemark || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Call Charges</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_CallCharges || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Secret Key</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_SecretKey || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+
+            {/* Row 5 */}
+            <div>
+              <label className={labelClass}>Document Required</label>
+
+              <div className="border border-gray-200 rounded-full px-4 sm:px-5 flex items-center gap-6 h-10 sm:h-11">
+                {["Yes", "No"].map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 text-sm text-gray-700"
+                  >
+                    <input
+                      type="radio"
+                      className="accent-orange-500"
+                      checked={apiData?.VPA_Mis_DocumentRequired === opt}
+                      readOnly
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
 
-            {/* Radio Fields */}
-            {[
-              {
-                label: "FIRC",
-                field: "VPA_Mis_FIRC",
-              },
-              {
-                label: "Document Required",
-                field: "VPA_Mis_DocumentRequired",
-              },
-              {
-                label: "Document Pending",
-                field: "VPA_Mis_DocumentPending",
-              },
-            ].map(({ label, field }, index) => (
-              <div key={index}>
-                <label className={labelClass}>
-                  {label}
-                </label>
+            <div>
+              <label className={labelClass}>Document Pending</label>
 
-                <div className="border border-gray-200 rounded-full px-4 sm:px-5 flex items-center gap-6 h-10 sm:h-11">
-                  {["Yes", "No"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-2 text-sm text-gray-700"
-                    >
-                      <input
-                        type="radio"
-                        className="accent-orange-500"
-                        checked={apiData?.[field] === opt}
-                        readOnly
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
+              <div className="border border-gray-200 rounded-full px-4 sm:px-5 flex items-center gap-6 h-10 sm:h-11">
+                {["Yes", "No"].map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 text-sm text-gray-700"
+                  >
+                    <input
+                      type="radio"
+                      className="accent-orange-500"
+                      checked={apiData?.VPA_Mis_DocumentPending === opt}
+                      readOnly
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
 
+            <div>
+              <label className={labelClass}>Merchant Reimbursement</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_MerchantReimbursement || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+
+            {/* Row 6 */}
+            <div>
+              <label className={labelClass}>Customer Id</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_CustomerId || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>VPA</label>
+              <input
+                type="text"
+                value={apiData?.VPA_Mis_VPA || ""}
+                readOnly
+                className={inputClass}
+              />
+            </div>
           </div>
         </div>
+
 
         {/*BACK &  NEXT BUTTON */}
         <div className="flex justify-between items-center gap-4 mt-2 mb-10 sm:mb-15">
           <button
             type="button"
             onClick={handleBack}
-            className="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium hover:bg-gray-50"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
           >
             Back
           </button>
@@ -430,7 +521,7 @@ export default function VRAcquiringBank({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
           </button>

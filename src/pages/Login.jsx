@@ -82,12 +82,12 @@ export default function Login() {
               <img
                 src={logo1}
                 alt="HelloPe"
-                className="h-32 xl:h-20 object-contain
+                className="h-32 xl:h-22.5 object-contain
                 ml-[-80px]
                 sm:ml-[-120px]
                 md:ml-[-150px]
                 lg:ml-[-180px]
-                xl:ml-[-120px]
+                xl:ml-[-150px]
               "
               />
               {/* Heading */}

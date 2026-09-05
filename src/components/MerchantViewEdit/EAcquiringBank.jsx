@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
-import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { CircleDollarSign, Landmark, WalletCards, MoreHorizontal, Settings2 } from "lucide-react";
+import { CircleDollarSign, Landmark, WalletCards, Settings2 } from "lucide-react";
 
 export default function ERAcquiringBank({
   refId,
   data,
-  setData,
-  errors,
+  setData, 
   handleNext,
   handleBack
 }) {
 
-  const location = useLocation();
-
   useEffect(() => {
     if (!refId) return;
 
+    // FetchData APi Call for view
     const fetchData = async () => {
       try {
         const response = await axiosInstance.post(
@@ -40,7 +37,6 @@ export default function ERAcquiringBank({
         toast.error(error);
       }
     };
-
     fetchData();
   }, [refId]);
 
@@ -129,7 +125,7 @@ export default function ERAcquiringBank({
               <Landmark className="w-5 h-5 text-yellow-700" />
             </div>
             <h2 className="text-2xl uppercase text-blue-900 font-bold py-2">
-              Edited Acquiring Bank Setup Details
+              Edit Acquiring Bank Setup Details
             </h2>
           </div>
         </div>
@@ -492,9 +488,9 @@ export default function ERAcquiringBank({
                   </option>
                 ))}
               </select>
-
             </div>
           ))}
+
           {/* Radio Fields */}
           {[
             {
@@ -528,7 +524,6 @@ export default function ERAcquiringBank({
                         handleChange(field, opt)
                       }
                     />
-
                     {opt}
                   </label>
                 ))}
@@ -563,14 +558,12 @@ export default function ERAcquiringBank({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
           >
             Next
           </button>
         </div>
       </div>
-
     </>
-
   );
 }

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import Select from "react-select";
 import { useRef } from "react";
-import { User, Calendar, Clock, ArrowRight, ClipboardCheck, UserRound, FileText, UserPlus } from "lucide-react";
+import { User, Calendar, Clock, ArrowRight, UserRound, FileText, UserPlus } from "lucide-react";
 
 
 export default function BasicDetails({
@@ -19,7 +19,6 @@ export default function BasicDetails({
   const [legalVehicalNameList, setlegalVehicalNameList] = useState([]);
   const [partnerLogo, setPartnerLogo] = useState(null);
   const [refId, setRefId] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
   const [userData, setUserData] = useState(null);
   const fileRef = useRef(null);
 
@@ -132,10 +131,18 @@ export default function BasicDetails({
     { label: "Aadhar No", name: "bddDocument", value: "AadharNo" },
     { label: "Form 60", name: "bddDocument", value: "Form60" },
   ];
+
   const sezOptions = [
-    { label: "SEZ", value: "BDD_SEZDetail" },
-    { label: "GST", value: "BDD_GSTDetail" },
+    {
+      label: "SEZ",
+      value: "BDD_SEZDetail",
+    },
+    {
+      label: "GST",
+      value: "BDD_GSTDetail",
+    },
   ];
+
   //  SAVE API METHOD
   const saveMerchantDetails = async () => {
     const payload = {
@@ -152,7 +159,6 @@ export default function BasicDetails({
       bddPanNo: data?.bddPanNo,
       bddGstnNO: data?.bddGstnNO,
       bddAadharNo: data?.aadharNo,
-      sezDetail: data?.sezDetail,
       riskCheck: data?.riskCheck,
       bddCategory: data?.category,
       bddAgpMcc: data?.mcc,
@@ -236,10 +242,10 @@ export default function BasicDetails({
     >
       <div>
         <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
             <UserPlus size={18} />
           </span>
-          <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold">
+          <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-semibold">
             Merchant Onboarding
           </h2>
         </div>
@@ -248,14 +254,6 @@ export default function BasicDetails({
 
       {/* ── Store Onboarding Status ─────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
-        {/* <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
-            <ClipboardCheck className="w-4 h-4 text-yellow-500" />
-          </div>
-          <h2 className="text-base font-semibold text-gray-900 uppercase">
-            Store Onboarding Status
-          </h2>
-        </div> */}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           {/* Created By / Date / Time strip */}
@@ -412,7 +410,7 @@ export default function BasicDetails({
             />
           </div>
 
-            {/* Sourcing Channel */}
+          {/* Reseller Partner */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
               Reseller Partner<span className="text-red-500">*</span>
@@ -439,7 +437,6 @@ export default function BasicDetails({
           <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
             <FileText className="w-4 h-4 text-yellow-500" />
           </div>
-
           <h2 className="text-base font-semibold text-gray-900 uppercase">
             Basic Document Details
           </h2>
@@ -455,7 +452,8 @@ export default function BasicDetails({
               {documentOptions.map((doc) => (
                 <label
                   key={doc.value}
-                  className="flex items-center gap-2 text-sm text-gray-700"
+                  className="flex items-center gap-2 text-sm text-gray-700
+                  "
                 >
                   <input
                     type="radio"
@@ -499,6 +497,7 @@ export default function BasicDetails({
             <label className="block text-sm text-gray-700 font-medium mb-2">
               SEZ Detail
             </label>
+
             <div className="border border-gray-200 rounded-full px-5 h-[44px] flex items-center gap-6 bg-white">
               {sezOptions.map((item) => (
                 <label
@@ -510,8 +509,27 @@ export default function BasicDetails({
                     name="sezDetail"
                     className="accent-amber-500 w-4 h-4"
                     value={item.value}
-                    checked={data?.sezDetail === item.value}
-                    onChange={(e) => handleChange("sezDetail", e.target.value)}
+                    checked={
+                      (item.value === "BDD_SEZDetail" &&
+                        data?.bddSez === "BDD_SEZDetail") ||
+                      (item.value === "BDD_GSTDetail" &&
+                        data?.bddGst === "BDD_GSTDetail")
+                    }
+                    onChange={() => {
+                      if (item.value === "BDD_SEZDetail") {
+                        setData((prev) => ({
+                          ...prev,
+                          bddSez: "BDD_SEZDetail",
+                          bddGst: "",
+                        }));
+                      } else if (item.value === "BDD_GSTDetail") {
+                        setData((prev) => ({
+                          ...prev,
+                          bddGst: "BDD_GSTDetail",
+                          bddSez: "",
+                        }));
+                      }
+                    }}
                   />
                   {item.label}
                 </label>
@@ -1108,7 +1126,7 @@ export default function BasicDetails({
         <div className="flex justify-end mt-10">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400 text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Save & Next
             <ArrowRight size={16} />

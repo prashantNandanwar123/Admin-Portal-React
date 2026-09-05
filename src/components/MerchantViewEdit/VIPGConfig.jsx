@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -7,17 +7,10 @@ import { Settings2, Link2 } from "lucide-react";
 
 export default function VIPGConfig({
   refId,
-  data,
-  setData,
-  errors,
-  handleNext,
   handleBack
 }) {
 
   const [apiData, setApiData] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [actionType, setActionType] = useState("");
   const [modalData, setModalData] = useState({
     respMsg: "",
     user_id: "",
@@ -31,12 +24,15 @@ export default function VIPGConfig({
     const fetchData = async () => {
       try {
         const response = await axiosInstance.post(
-          `viewMerchantIpg/${refId}`
+          `viewMerchantIpg/${1003}`
         );
 
         if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
+          toast.success(response.respMsg);
+          setApiData(response?.respData || {});
+
+        } else {
+          toast.error(response.respMsg);
         }
       } catch (error) {
         toast.error(error);
@@ -52,14 +48,7 @@ export default function VIPGConfig({
     rstatus: "",
   });
 
-  // ================= HANDLE CHANGE =================
-  const handleChange = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
+  //  submitRiskAprRject Api
   const submitRiskAprRject = async (status) => {
     try {
       const payload = {
@@ -80,7 +69,6 @@ export default function VIPGConfig({
       }
 
     } catch (err) {
-      console.error("SUBMIT ERROR:", err);
       const errorData = err?.response?.data || err;
 
       // REJECT SUCCESS CASE
@@ -104,7 +92,7 @@ export default function VIPGConfig({
         <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
           <Settings2 className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-700" />
         </div>
-        <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-bold py-1">
+        <h2 className="text-xl sm:text-1xl text-blue-900 font-semibold py-1">
           View  IPG Configuration
         </h2>
       </div>
@@ -213,7 +201,7 @@ export default function VIPGConfig({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-7">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
               Merchant SMS Confirmation For Transaction
             </label>
             <input
@@ -268,7 +256,7 @@ export default function VIPGConfig({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {Array.from({ length: 10 }).map((_, index) => (
+          {Array.from({ length: 5 }).map((_, index) => (
             <div key={index}>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Request URL {index + 1}
@@ -296,6 +284,32 @@ export default function VIPGConfig({
         </div>
       </div>
 
+      <div className="bg-white rounded-2xl border flex items-center gap-7 border-gray-100 shadow-sm p-4 sm:p-6 mt-5">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Risk Status
+          </label>
+          <input
+            type="text"
+            value={apiData?.riskStatus || ""}
+            readOnly
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Risk Remark
+          </label>
+          <input
+            type="text"
+            value={apiData?.riskRemark || ""}
+            readOnly
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+          />
+        </div>
+      </div>
+
       {/* ================= ACTION SECTION ================= */}
       <form
         className="mt-8"
@@ -310,7 +324,7 @@ export default function VIPGConfig({
           <button
             type="button"
             onClick={handleBack}
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-5 py-2 rounded-lg shadow-sm transition"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
           >
             Back
           </button>
