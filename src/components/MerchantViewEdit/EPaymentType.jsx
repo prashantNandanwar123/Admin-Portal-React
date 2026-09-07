@@ -275,11 +275,11 @@ export default function EPaymentType({
         <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
           <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
         </div>
-        <h2 className="text-2xl uppercase text-blue-900 font-extrabold">
+<h2 className="text-xl text-blue-900 font-semibold">
           Edit Payment Type Form (UPI)
         </h2>
       </div>
-      <p className="ml-12 text-sm text-blue-900">
+          <p className="ml-12 pb-1 text-sm text-blue-900">
         Payment Type Form collects transaction method details for setup.
       </p>
 
@@ -473,8 +473,7 @@ export default function EPaymentType({
         <div className="flex justify-between mt-10">
           <button
             onClick={handleBack}
-            className="bg-gray-500 text-white px-6 py-2 rounded"
-          >
+ className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"          >
             Back
           </button>
 
@@ -493,7 +492,7 @@ export default function EPaymentType({
             <button
               type="button"
               onClick={handleNext}
-              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
             >
               Next
             </button>

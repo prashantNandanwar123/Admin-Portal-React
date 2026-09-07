@@ -245,16 +245,16 @@ export default function BasicDetails({
           <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
             <UserPlus size={18} />
           </span>
-          <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-semibold">
+          <h2 className="text-xl text-blue-900 font-semibold">
             Merchant Onboarding
           </h2>
         </div>
-        <p className="ml-12 text-lg text-blue-900">Basic Merchant Information</p>
+        <p className="ml-12 pb-1 text-sm text-blue-900">
+          Basic Merchant Information including business details, contact information and required documentation.</p>
       </div>
 
-      {/* ── Store Onboarding Status ─────────────────────────────────── */}
+      {/* ── Store Onboarding Status ─── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           {/* Created By / Date / Time strip */}
           <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-amber-50 rounded-xl px-5 py-4">
@@ -452,9 +452,7 @@ export default function BasicDetails({
               {documentOptions.map((doc) => (
                 <label
                   key={doc.value}
-                  className="flex items-center gap-2 text-sm text-gray-700
-                  "
-                >
+                  className="flex items-center gap-2 text-sm text-gray-700">
                   <input
                     type="radio"
                     className="accent-amber-500 w-4 h-4"
@@ -502,8 +500,7 @@ export default function BasicDetails({
               {sezOptions.map((item) => (
                 <label
                   key={item.value}
-                  className="flex items-center gap-2 text-sm text-gray-700"
-                >
+                  className="flex items-center gap-2 text-sm text-gray-700">
                   <input
                     type="radio"
                     name="sezDetail"

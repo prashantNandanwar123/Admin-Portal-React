@@ -382,11 +382,11 @@ export default function EMSFFee({
           <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
             <Percent className="w-5 h-5 text-yellow-600" />
           </div>
-          <h2 className="text-2xl uppercase text-blue-900 font-bold">
+       <h2 className="text-xl text-blue-900 font-semibold">
             Edit MSF / Convenience Fee
           </h2>
         </div>
-        <p className="mt-1 ml-12 text-sm text-blue-900 pb-5">
+               <p className="ml-12 pb-1 text-sm text-blue-900">
           Configure and update the applicable MSF and convenience fee settings.
         </p>
 
@@ -1071,7 +1071,7 @@ export default function EMSFFee({
         <button
           type="button"
           onClick={handleBack}
-          className="bg-gray-500 text-white px-6 py-2 rounded"
+         className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
         >
           Back
         </button>
@@ -1090,8 +1090,7 @@ export default function EMSFFee({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
-          >
+  className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"          >
             Next
           </button>
         </div>

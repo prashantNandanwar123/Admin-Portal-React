@@ -37,12 +37,11 @@ export default function DirectorDetails({ data, setData, handleNext,
     // Get logged-in user
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-
         if (storedUser) {
             try {
                 setUserData(JSON.parse(storedUser));
             } catch (error) {
-                console.error("Invalid user data in localStorage", error);
+                toast.error(error);
             }
         }
     }, []);
@@ -80,6 +79,7 @@ export default function DirectorDetails({ data, setData, handleNext,
                     ...EMPTY_DIRECTOR,
                 },
             }));
+            
         } catch (error) {
             toast.error(error);
         }
@@ -150,7 +150,6 @@ export default function DirectorDetails({ data, setData, handleNext,
                     });
                 }
             }
-
         } catch (error) {
             setError(error);
         }
@@ -164,20 +163,17 @@ export default function DirectorDetails({ data, setData, handleNext,
         return (
             <div
                 key={directorNumber}
-                className="border border-gray-200 rounded-xl overflow-hidden bg-white"
-            >
+                className="border border-gray-200 rounded-xl overflow-hidden bg-white">
                 {/* Accordion Header */}
                 <div
                     onClick={() => toggleDirector(directorNumber)}
-                    className="flex items-center justify-between px-3 sm:px-4 py-3 bg-gray-50 cursor-pointer select-none"
-                >
+                    className="flex items-center justify-between px-3 sm:px-4 py-3 bg-gray-50 cursor-pointer select-none">
                     <div className="flex items-center gap-2">
                         {isOpen ? (
                             <ChevronUp className="w-4 h-4 text-gray-500" />
                         ) : (
                             <ChevronDown className="w-4 h-4 text-gray-500" />
                         )}
-
                         <span className="text-sm font-semibold text-gray-800">
                             Director {directorNumber}
                         </span>
@@ -189,8 +185,7 @@ export default function DirectorDetails({ data, setData, handleNext,
                             e.stopPropagation();
                             deleteDirector(directorNumber);
                         }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded-md bg-white hover:bg-red-50 transition"
-                    >
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded-md bg-white hover:bg-red-50 transition">
                         <Trash2 className="w-3.5 h-3.5" />
                         Delete
                     </button>
@@ -244,8 +239,7 @@ export default function DirectorDetails({ data, setData, handleNext,
                                                     e.target.value
                                                 )
                                             }
-                                            className="appearance-none w-full h-10 pl-9 pr-8 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
-                                        >
+                                            className="appearance-none w-full h-10 pl-9 pr-8 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]">
                                             <option value="">Select designation</option>
                                             <option value="Director">Director</option>
                                             <option value="Managing Director">
@@ -308,6 +302,7 @@ export default function DirectorDetails({ data, setData, handleNext,
                                         Aadhaar Number
                                         <span className="text-red-400 ml-0.5">*</span>
                                     </label>
+
                                     <div className="relative">
                                         <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                         <input
@@ -448,10 +443,10 @@ export default function DirectorDetails({ data, setData, handleNext,
                             <UserRound className="w-4 h-4 text-[#126aa8]" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-[#173875]">
+                              <h2 className="text-xl text-blue-900 font-semibold">
                                 Add Director Details
                             </h2>
-                            <p className="mt-0.5 text-[10px] text-gray-400">
+                            <p className="ml-12 pb-1 text-sm text-blue-900">
                                 Director information
                             </p>
                         </div>

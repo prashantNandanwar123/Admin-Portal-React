@@ -137,12 +137,12 @@ export default function AcquiringBank({ data, setData, handleNext,
           <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
             <Landmark size={18} />
           </span>
-          <h2 className="text-xl sm:text-1xl uppercase text-blue-900 font-bold">
+      <h2 className="text-xl text-blue-900 font-semibold">
             Acquiring Bank Setup Details
           </h2>
         </div>
 
-        <p className="ml-12 text-sm text-blue-900 leading-relaxed font-noraml">
+          <p className="ml-12 pb-1 text-sm text-blue-900">
           Configure and manage all essential merchant acquiring bank information including
           settlement details, transaction settings for secure and
           seamless banking operations.

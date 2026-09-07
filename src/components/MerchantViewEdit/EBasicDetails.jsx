@@ -285,11 +285,11 @@ export default function EBasicDetails({
           <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
             <CircleUserRound className="w-5 h-5 text-yellow-600" />
           </div>
-          <h2 className="text-2xl uppercase text-blue-900 font-bold">
+      <h2 className="text-xl text-blue-900 font-semibold">
             Edit Basic Details
           </h2>
         </div>
-        <p className="ml-12 pb-3 text-md text-blue-900">Edit Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
+              <p className="ml-12 pb-1 text-sm text-blue-900">Edit Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
         {/* STORE STATUS */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-2">
           {/* Status Content */}
@@ -1016,13 +1016,11 @@ export default function EBasicDetails({
 
         {/* ── Billing Address ──────────────────────────────────────────── */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-3">
-
           {/* Heading */}
           <div className="flex items-center gap-3 mb-5 pb-3">
             <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center shrink-0">
               <ReceiptText className="w-5 h-5 text-yellow-600" />
             </div>
-
             <h2 className="text-[20px] text-gray-700 font-semibold">
               Billing Address
             </h2>
@@ -1036,9 +1034,7 @@ export default function EBasicDetails({
                 checked={data?.billingSameAsShipping || false}
                 onChange={(e) => {
                   const checked = e.target.checked;
-
                   handleChange("billingSameAsShipping", checked);
-
                   if (checked) {
                     setData((prev) => ({
                       ...prev,
@@ -1056,13 +1052,11 @@ export default function EBasicDetails({
                 }}
                 className="w-4 h-4 accent-blue-600 cursor-pointer"
               />
-
               Same as Shipping Address
             </label>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-
             {/* Address Fields */}
             {[
               {
@@ -1134,7 +1128,6 @@ export default function EBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 State<span className="text-red-500">*</span>
               </label>
-
               <Select
                 styles={disabledSelectStyles}
                 isDisabled={data?.billingSameAsShipping}
@@ -1210,14 +1203,13 @@ export default function EBasicDetails({
                 }}
               />
             </div>
-
           </div>
         </div>
       </div>
 
       {/* SAVE BUTTON */}
-      < div className="grid grid-cols-3 items-center mt-10" >
-        <div ></div >
+      <div className="grid grid-cols-3 items-center mt-10" >
+        <div></div >
         {/* Center Button */}
         < div className="flex justify-center" >
           <button
@@ -1234,13 +1226,12 @@ export default function EBasicDetails({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
           </button>
         </div>
       </div>
-
     </>
   );
 }

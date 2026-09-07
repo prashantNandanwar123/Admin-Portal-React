@@ -4,8 +4,6 @@ import { useLocation } from "react-router-dom";
 import { BadgePercent, Landmark, WalletCards, SlidersHorizontal } from "lucide-react";
 import { toast } from "react-toastify";
 
-
-
 export default function VRAcquiringBank({
   refId,
   handleNext,
@@ -294,7 +292,7 @@ export default function VRAcquiringBank({
               <label className={labelClass}>Daily Transaction Limit</label>
               <input
                 type="text"
-                value={apiData?.VPA_Mis_DailyTranLimit || ""}
+                value={apiData?.misTransactionLimit || ""}
                 readOnly
                 className={inputClass}
               />

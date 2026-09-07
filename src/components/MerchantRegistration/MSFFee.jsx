@@ -259,11 +259,11 @@ export default function NSFFee({
         <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
           <BadgeIndianRupee size={18} />
         </span>
-        <h2 className="text-xl sm:text-xl uppercase text-blue-900 font-bold">
+      <h2 className="text-xl text-blue-900 font-semibold">
           MSF / Convenience Fee
         </h2>
       </div>
-      <p className="pl-12 text-sm text-blue-900 mb-4 pb-3">
+             <p className="ml-12 pb-1 text-sm text-blue-900">
         MSFFee form is used to configure UPI/MSF fee structure including domestic and international charges,
         slab-wise configuration, GST, and effective date ranges. You can add multiple fee slabs and save them in a single configuration.
       </p>

@@ -124,12 +124,12 @@ export default function ERAcquiringBank({
             <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
               <Landmark className="w-5 h-5 text-yellow-700" />
             </div>
-            <h2 className="text-2xl uppercase text-blue-900 font-bold py-2">
+        <h2 className="text-xl text-blue-900 font-semibold">
               Edit Acquiring Bank Setup Details
             </h2>
           </div>
         </div>
-        <p className="text-sm ml-12 text-blue-900 leading-relaxed font-noraml pb-3">
+          <p className="ml-12 pb-1 text-sm text-blue-900">
           Configure and manage all essential merchant acquiring bank information including
           settlement details, transaction settings for secure and
           seamless banking operations.
@@ -366,7 +366,6 @@ export default function ERAcquiringBank({
           <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
             <Settings2 className="w-5 h-5 text-yellow-600" />
           </div>
-
           <h2 className="text-xl font-medium text-gray-700">
             Miscellaneous
           </h2>
@@ -515,8 +514,7 @@ export default function ERAcquiringBank({
                 {["Yes", "No"].map((opt) => (
                   <label
                     key={opt}
-                    className="flex items-center gap-2 text-sm text-gray-700"
-                  >
+                    className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="radio"
                       checked={data?.[field] === opt}
@@ -538,8 +536,7 @@ export default function ERAcquiringBank({
         <button
           type="button"
           onClick={handleBack}
-          className="bg-gray-500 text-white px-6 py-2 rounded"
-        >
+          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"        >
           Back
         </button>
 
@@ -547,8 +544,7 @@ export default function ERAcquiringBank({
           <button
             type="button"
             onClick={handleSaveAndNext}
-            className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
-          >
+            className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded">
             Update
           </button>
         </div>
@@ -558,8 +554,7 @@ export default function ERAcquiringBank({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded shadow-sm transition"
-          >
+            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"          >
             Next
           </button>
         </div>

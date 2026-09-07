@@ -185,11 +185,11 @@ export default function PaymentType({
         <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
           <QrCode size={18} />
         </span>
-        <h2 className="text-xl sm:text-1xl uppercase text-blue-900 font-bold">
+ <h2 className="text-xl text-blue-900 font-semibold">
           Payment Type Form (UPI)
         </h2>
       </div>
-      <p className="ml-12 pb-4 text-sm text-blue-900">
+     <p className="ml-12 pb-1 text-sm text-blue-900">
         Payment Type Form collects transaction method details for setup.
       </p>
 

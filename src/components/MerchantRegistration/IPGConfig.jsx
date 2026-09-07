@@ -134,11 +134,11 @@ export default function IPGConfigurationForm({
         <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-100 text-blue-600 shrink-0">
           <ShieldCheck size={16} />
         </span>
-        <h2 className="text-xl sm:text-2xl uppercase text-blue-900 font-extrabold">
+        <h2 className="text-xl text-blue-900 font-semibold">
           IPG Configuration
         </h2>
       </div>
-      <p className="text-blue-900 mb-6 pb-5 ml-12">
+            <p className="ml-12 pb-1 text-sm text-blue-900">
         IPG (Internet Payment Gateway) Configuration enables secure online payment processing by connecting merchants with banks and payment systems. It supports digital payments like cards, UPI, and net banking while ensuring safe, fast, and reliable transactions with proper security compliance.
       </p>
       <form
