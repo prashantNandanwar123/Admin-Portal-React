@@ -148,7 +148,6 @@ export default function EBasicDetails({
     }));
   };
 
-
   const fetchDetailsCollection = async () => {
     try {
       const response = await axiosInstance.post("/getDetailsCollection");
@@ -566,13 +565,13 @@ export default function EBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 SEZ Detail
               </label>
-              <div className="border border-gray-300 rounded-full px-5 py-4 flex items-center gap-6 bg-white">
+              <div className="border border-gray-300 rounded-full px-5 py-2.5 flex items-center gap-6 bg-white">
                 {sezOptions.map((item) => (
                   <label
                     key={item.value}
                     className="flex items-center gap-2">                  
                     <input
-                      type="radio"
+                      type="radio"  
                       checked={
                         data?.bddSez === item.value
                       }
@@ -995,15 +994,8 @@ export default function EBasicDetails({
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-gray-100 mb-6" />
-
-          {/* Divider */}
-          <div className="border-t border-gray-100 mb-6" />
-
           {/* ───────────────── Company Type ───────────────── */}
           <div>
-
             <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
               Company Type
               <span className="text-red-500 ml-1">*</span>

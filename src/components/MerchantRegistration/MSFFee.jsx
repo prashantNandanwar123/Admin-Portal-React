@@ -322,11 +322,11 @@ export default function MSFFee({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 mb-4">
             <div>
               <label className={labelClass}>
-                Effective To {req}
+                Effective To{req}
               </label>
               <input
                 type="date"
-                max={today}
+                min={today}
                 className={inputClass}
                 value={form.effectiveTo}
                 onChange={(e) =>

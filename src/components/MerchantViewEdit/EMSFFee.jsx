@@ -115,7 +115,7 @@ export default function EMSFFee({
   const fetchMIDList = async (AcqBankName) => {
     try {
       const response = await axiosInstance.post(`/getMSFUpiMID/${AcqBankName}`);
-      const apiData = response?.data?.respData;
+      const apiData = response?.respData;
       // const apiData = response?.respData || response?.data?.respData;
 
       // convert object → "key-value" string array
@@ -380,7 +380,7 @@ export default function EMSFFee({
                 <label className={labelClass}>Effective To{req}</label>
                 <input
                   type="date"
-                  max={today}
+                  min={today}
                   className={inputClass}
                   value={form.effectiveTo}
                   onChange={(e) =>

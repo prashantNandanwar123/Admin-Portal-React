@@ -4,13 +4,14 @@ import axiosInstance from "../api/axios";
 const CryptoDashboard = () => {
     const [activeTab, setActiveTab] = useState("ONRAMP");
 
-     const todayDate = new Date().toISOString().split("T")[0];
-
     const today = new Date();
+
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
-    const currentDate = `${year}- ${month}-${day}`;
+
+    const currentDate = `${year}-${month}-${day}`;
+    const todayDate = currentDate;
 
     const [fromDate, setFromDate] = useState(currentDate);
     const [toDate, setToDate] = useState(currentDate);
@@ -84,7 +85,6 @@ const CryptoDashboard = () => {
             setLoading(false);
         }
     };
-
 
     // AMOUNT FORMAT
     const formatAmount = (amount) => {

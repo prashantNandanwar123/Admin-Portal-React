@@ -28,6 +28,8 @@ export default function EPaymentType({
   const [acquirerList, setAcquirerList] = useState([]);
   const [merchantList, setMerchantList] = useState([]);
 
+  const today = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (!refId) return;
 
@@ -279,9 +281,10 @@ export default function EPaymentType({
             </div>
 
             <div>
-              <label className={labelClass}>Effective Date {req}</label>
+              <label className={labelClass}>Effective Date{req}</label>
               <input
                 type="date"
+                min={today}
                 className={inputClass}
                 value={form.effectiveDate}
                 onChange={(e) => updateField("effectiveDate", e.target.value)}
