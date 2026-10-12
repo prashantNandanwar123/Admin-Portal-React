@@ -1,1404 +1,441 @@
-import React, { useState, useEffect, useRef } from "react";
-import axiosInstance from "../../api/axios";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../api/axios";
+import { FaSearch, FaFileExcel } from "react-icons/fa";
 
-export default function EBasicDetails({
-  refId,
-  data,
-  setData,
-  errors,
-  handleNext,
-}) {
+// ─── Excel / CSV Export ───────────────────────────────────────────────────────
+const exportToExcel = (data) => {
+  if (!data.length) return alert("No data to export");
 
-
-  const [stateList, setStateList] = useState([]);
-  const [cityList, setCityList] = useState([]);
-  const [mccList, setMccList] = useState([]);
-  // const [partnerLogo, setPartnerLogo] = useState(null);
-  const userData = JSON.parse(localStorage.getItem("user"));
-
-  useEffect(() => {
-    if (!refId) return;
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.post(
-          `/viewMerchantBasicDetails/${refId}`
-        );
-        console.log("API RESPONSE:", response);
-        if (response?.respCode === 0) {
-          const res = response?.respData || {};
-          setData((prev) => ({
-            ...prev,
-            ...res,
-
-            refId:
-              res?.ref_id ||
-              res?.refId ||
-              refId,
-          }));
-
-          console.log(
-            "FINAL REF ID =====>",
-            res?.ref_id || res?.refId || refId
-          );
-
-        }
-      } catch (err) {
-        console.error("API ERROR:", err);
-      }
-    };
-
-    fetchData();
-  }, [refId]);
-
-
-  const documentOptions = [
-    { label: "Aadhar No", value: "AadharNo" },
-    { label: "Form 60", value: "Form60" },
+  const headers = [
+    "MID", "DBA Name", "Merchant Type", "Payment Type",
+    "Order No", "Txn Ref No", "Proc Ref ID",
+    "Pay Amount", "MSF Fee", "MSF GST Fee",
+    "Convenience Fee", "GST Fee", "Total Amount",
+    "Txn Date", "Txn Resp Date",
+    "Full Name", "Mobile No", "Email ID",
+    "Response Message", "RRN", "Charge Type",
   ];
 
-  const sezOptions = [
-    { label: "SEZ", value: "BDD_SEZDetail" },
-    { label: "GST", value: "BDD_GSTDetail" },
-  ];
+  const rows = data.map((r) => [
+    r.mid, r.dbaName, r.merchantType, r.paymentType,
+    r.meOrderNo, r.meTrnRefNo, r.procTrnRefId,
+    r.payAmount, r.msfFee, r.msfGstFee,
+    r.convenienceFee ?? "", r.gstFee ?? "", r.totalAmount,
+    r.txnDate, r.txnRespDate,
+    r.fullName, r.mobileNo, r.emailId,
+    r.respMessage, r.rrn ?? "", r.chargeType,
+  ]);
 
-  // COMMON HANDLE CHANGE
-  const handleChange = (field, value) => {
-    setData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map((v) => `"${v}"`).join(","))
+    .join("\n");
 
-
-  //---- stateList-cityList-mccList API Call
-  useEffect(() => {
-    fetchDetailsCollection();
-  }, []);
-
-  const fetchDetailsCollection = async () => {
-    try {
-      const response = await axiosInstance.post("/getDetailsCollection");
-
-      const apiData =
-        response?.respData || response?.respData || {};
-
-      setStateList(apiData?.stateList || []);
-      setCityList(apiData?.cityList || []);
-
-      const formattedMcc = Object.entries(apiData?.mccList || {}).map(
-        ([code, name]) => ({
-          code,
-          name,
-        })
-      );
-
-      setMccList(formattedMcc);
-      setRefId(apiData?.ref_id);
-
-      // store refId in parent state
-      if (apiData?.ref_id) {
-        handleChange("refId", apiData?.ref_id);
-      }
-
-    } catch (error) {
-      console.error(
-        "[BasicDetails] fetchDetailsCollection → API Error:",
-        error
-      );
-    }
-  };
-  // Save Edit BasicDetails  API Call
-  const handleSaveAndNext = async () => {
-    try {
-
-      const payload = {
-        ref_id: data?.refId || refId,
-
-        partnerLogoCheck: data?.partnerLogoCheck,
-        basicSrcChannel: data?.storeChannel,
-        storeType: data?.storeType,
-        storeTurnoverCategory: data?.storeTurnoverCategory,
-        storeDbaName: data?.storeDbaName,
-        storeLegalName: data?.storeLegalName,
-
-        bddDocument: data?.bddDocument,
-        bddGst: data?.bddGst,
-        bddSez: data?.bddSez,
-        bddPanNo: data?.bddPanNo,
-        bddGstnNO: data?.bddGstnNO,
-        bddAadharNo: data?.bddAadharNo,
-
-        riskCheck: data?.riskCheck,
-        bddCategory: data?.bddCategory,
-        bddAgpMcc: data?.bddAgpMcc,
-        bddPremisesType: data?.bddPremisesType,
-        bddVintageType: data?.bddVintageType,
-        bddMerchantBusinessType:
-          data?.bddMerchantBusinessType,
-
-        bddMerchantWebsiteURL:
-          data?.bddMerchantWebsiteURL,
-
-        bddRegistrationDate:
-          data?.bddRegistrationDate,
-
-        bddApplicationNo: data?.bddApplicationNo,
-        bddCorporateNo: data?.bddCorporateNo,
-        bddYearsInBusiness: data?.bddYearsInBusiness,
-
-        bddClosestCompetitor:
-          data?.bddClosestCompetitor,
-
-        bddShopsInCountry:
-          data?.bddShopsInCountry,
-
-        bddAverageTicketSize:
-          data?.bddAverageTicketSize,
-
-        bddDefineBusiness:
-          data?.bddDefineBusiness,
-
-        // ADDRESS
-        addStoreAddress1: data?.addStoreAddress1,
-        addStoreAddress2: data?.addStoreAddress2,
-        addStoreAddress3: data?.addStoreAddress3,
-
-        addCity: data?.addCity,
-        addState: data?.addState,
-        addCountry: data?.addCountry,
-        addZipcode: data?.addZipcode,
-
-        // CONTACT
-        cpdNameTitle: data?.cpdNameTitle,
-        cpdName: data?.cpdName,
-        cpdDateOfBirth: data?.cpdDateOfBirth,
-        cpdPhoneNo: data?.cpdPhoneNo,
-        cpdMobile: data?.cpdMobile,
-        cpdFax: data?.cpdFax,
-
-        cpdPrimaryEmailId:
-          data?.cpdPrimaryEmailId,
-
-        cpdSecondaryEmailId:
-          data?.cpdSecondaryEmailId,
-
-        // BILLING
-        baAddress1: data?.baAddress1,
-        baAddress2: data?.baAddress2,
-        baAddress3: data?.baAddress3,
-
-        baCity: data?.baCity,
-        baState: data?.baState,
-        baCountry: data?.baCountry,
-        baZipcode: data?.baZipcode,
-      };
-
-      console.log("REF ID PROP =====>", refId);
-      console.log("DATA REF ID =====>", data?.refId);
-      console.log("FINAL PAYLOAD =====>", payload);
-
-      const multipartData = new FormData();
-
-      multipartData.append(
-        "data",
-        new Blob([JSON.stringify(payload)], {
-          type: "application/json",
-        })
-      );
-
-      if (data?.partnerLogoFile) {
-        multipartData.append(
-          "partnerLogo",
-          data.partnerLogoFile
-        );
-      }
-
-      const response = await axiosInstance.post(
-        "/saveEditMeBasicDetails",
-        multipartData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("SAVE RESPONSE =====>", response);
-
-      if (response?.respCode === 0) {
-
-        toast.success(response?.respMsg);
-        setData((prev) => ({
-          ...prev,
-          refId: response?.respData?.ref_id,
-        }));
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `TxnReport_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 
-      } else {
-        toast.error(
-          response?.respMsg
-        );
-      }
-    } catch (error) {
-      console.error("SAVE ERROR =====>", error);
-      toast.error(error);
-    }
-  };
+// ─── Status Badge ─────────────────────────────────────────────────────────────
+const StatusBadge = ({ msg }) => {
+  const lower = (msg || "").toLowerCase();
+  const isSuccess = lower.includes("success") || lower.includes("approved");
+  const isPending = lower.includes("pending");
 
+  const cls = isSuccess
+    ? "bg-green-100 text-green-700 border border-green-300"
+    : isPending
+      ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+      : "bg-red-100 text-red-700 border border-red-300";
 
   return (
-    <>
-      <div>
-        <h2 className="text-2xl uppercase text-blue-900 font-extrabold py-2">
-          Edited Basic Details
-        </h2>
-        <p className="pb-3 text-lg text-blue-900">Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
+    <span className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${cls}`}>
+      {msg || "-"}
+    </span>
+  );
+};
 
-        <div className="pt-4 border-t border-gray-300">
-          {/* STORE STATUS */}
-          <h2 className="text-[20px] text-gray-700 mb-6">
-            Store Onboarding Status
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <label className="text-gray-900 text-[15px] rounded-full border bg-yellow-300 px-4 py-2 font-medium">
-                Created By : {data?.createdBy}
-              </label>
-            </div>
+// ─── Main Component ───────────────────────────────────────────────────────────
+export default function Reports() {
+  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd for input[type=date]
 
-            <div>
-              <label className="text-gray-700 text-[15px]">
-                Created Date :
-                <span className="ml-3">
-                  {data?.createdDate?.split(" ")[0]}{" "}
-                  <span className="mx-2">|</span>{" "}
-                  {data?.createdDate?.split(" ")[1]}
-                </span>
-              </label>
-            </div>
-          </div>
-          {/* STORE INFO */}
-          <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
-            Store Information
-          </h2>
+  const [fromDate, setFromDate] = useState(today);
+  const [toDate, setToDate] = useState(today);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* STORE TYPE */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                Store Type
-              </label>
-              <div className="flex items-center gap-5">
-                {["Physical", "Web Store"].map((type) => (
-                  <label
-                    key={type}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="radio"
-                      checked={data?.storeType === type}
-                      onChange={() =>
-                        handleChange("storeType", type)
-                      }
-                    />
-                    {type}
-                  </label>
-                ))}
-              </div>
-            </div>
 
-            {/* CHANNEL */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                Channel
-              </label>
+  // Search Data
+  const filteredData = data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .includes(searchTerm.trim().toLowerCase())
+    )
+  );
 
-              <div className="flex items-center gap-5">
-                {["IPG", "POS"].map((ch) => (
-                  <label
-                    key={ch}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="radio"
-                      checked={data?.storeChannel === ch}
-                      onChange={() =>
-                        handleChange(
-                          "storeChannel",
-                          ch
-                        )
-                      }
-                    />
+  // Pagination
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
 
-                    {ch}
-                  </label>
-                ))}
-              </div>
-            </div>
+  // ─── Format date: yyyy-mm-dd → dd/mm/yyyy ──────────────────────────────────
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [y, m, d] = dateStr.split("-");
+    return `${d}/${m}/${y}`;
+  };
 
-            {/* Turnover Category */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Turnover Category
-              </label>
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.storeTurnoverCategory || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "storeTurnoverCategory",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                <option value="Small Merchant(<=20Lacs)">
-                  Small Merchant(&lt;=20Lacs)
-                </option>
-                <option value="Other Merchant(>20Lacs)">
-                  Other Merchant(&gt;20Lacs)
-                </option>
-              </select>
-            </div>
+  useEffect(() => {
+    fetchData();
+  }, [page, size]);
 
-            {/* Partner Logo Check */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Partner Logo Check
-                <span className="text-red-500">*</span>
-              </label>
 
-              <select
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
-                value={data?.partnerLogoCheck || ""}
-                onChange={(e) =>
-                  handleChange("partnerLogoCheck", e.target.value)
-                }
-              >
-                <option value="">-- Select --</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
+  // ─── Search API ─────────────────────────────────────────────────────────────
+  const fetchData = async (currentPage = 0, currentSize = size) => {
+    if (!fromDate || !toDate) {
+      alert("Please select From Date and To Date");
+      return;
+    }
+    try {
+      setLoading(true);
+      const resData = await axiosInstance.post(
+        `/TxnReport?page=${currentPage}&size=${currentSize}`,
+        {
+          fromDate: formatDate(fromDate),
+          toDate: formatDate(toDate),
+        }
+      );
+      if (resData?.respCode === 0) {
+        setData(resData.data || []);
+        setTotalPages(resData.totalPages || 0);
+        setTotalRecords(resData.totalRecords || 0);
+        setPage(currentPage);
+      } else {
+        setData([]);
+        setTotalPages(0);
+        setTotalRecords(0);
+      }
+      setSearched(true);
+    } catch (error) {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-              {errors?.partnerLogoCheck && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.partnerLogoCheck}
-                </p>
-              )}
-            </div>
+  const handleSearch = () => fetchData(0, size);
+  const handlePageChange = (newPage) => fetchData(newPage, size);
+  const handleSizeChange = (newSize) => {
+    setSize(newSize);
+    fetchData(0, newSize);
+  };
 
-           
-            {/* Store Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Store Name (Business Name)
-              </label>
+  // ─── Pagination helpers ─────────────────────────────────────────────────────
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(0, page - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages - 1, start + maxVisible - 1);
+    if (end - start < maxVisible - 1) start = Math.max(0, end - maxVisible + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
 
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.storeDbaName || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "storeDbaName",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+  // ─── Table columns config ───────────────────────────────────────────────────
+  const columns = [
+    { label: "#", key: "srNo" },
+    { label: "MID", key: "mid" },
+    { label: "Fee Type", key: "FeeType" },
+    { label: "DBA Name", key: "dbaName" },
+    { label: "Merchant Type", key: "merchantType" },
+    { label: "Payment Type", key: "paymentType" },
+    { label: "Order No", key: "meOrderNo" },
+    { label: "Txn Ref No", key: "meTrnRefNo" },
+    { label: "Proc Ref ID", key: "procTrnRefId" },
+    { label: "Pay Amt", key: "payAmount" },
+    { label: "MSF Fee", key: "msfFee" },
+    { label: "MSF GST", key: "msfGstFee" },
+    { label: "Conv. Fee", key: "convenienceFee" },
+    { label: "GST Fee", key: "gstFee" },
+    { label: "Total Amt", key: "totalAmount" },
+    { label: "Txn Date", key: "txnDate" },
+    { label: "Resp Date", key: "txnRespDate" },
+    { label: "Customer Name", key: "fullName" },
+    { label: "Mobile", key: "mobileNo" },
+    { label: "Email", key: "emailId" },
+    { label: "Status", key: "respMessage" },
+    { label: "RRN", key: "rrn" },
+  ];
 
-            {/* Legal Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Legal Name
-              </label>
+  return (
+    <div className="min-h-screen p-4 w-full overflow-x-auto">
+      {/* ── Header ── */}
+      <div className="mb-5">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
+          Transaction Report
+        </h1>
+        <p className="pb-3 text-sm text-blue-900">
+          View and monitor transaction records with detailed reports, status tracking, payment insights, and export options.
+        </p>
+      </div>
 
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.storeLegalName || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "storeLegalName",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+      {/* ── Filter Bar ── */}
+      <div className="mb-5">
+        <div className="flex flex-col md:flex-row gap-4 items-end flex-wrap">
+          {/* From Date */}
+          <div className="w-full md:w-52">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              From Date
+            </label>
+            <input
+              type="date"
+              value={fromDate}
+              max={today}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
           </div>
 
-          {/* ── Basic Document Details ───────────────────────────────────── */}
-          <h2 className="text-[20px] text-gray-700 mt-10 mb-6 border-b border-gray-300 pb-5">
-            Basic Document Details
-          </h2>
+          {/* To Date */}
+          <div className="w-full md:w-52">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              To Date
+            </label>
+            <input
+              type="date"
+              value={toDate}
+              max={today}
+              onChange={(e) => setToDate(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Documents radio */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                Documents
-              </label>
+          {/* Search */}
+          <button
+            onClick={handleSearch}
+            disabled={loading}
+            className="bg-yellow-500 text-black px-6 py-2.5 rounded-lg flex items-center gap-2 text-sm font-normal shadow transition"
+          >
+            <FaSearch />
+            {loading ? "Searching..." : "Search"}
+          </button>
 
-              <div className="flex items-center gap-5">
-                {documentOptions.map((doc) => (
-                  <label
-                    key={doc.value}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="radio"
-                      checked={
-                        data?.bddDocument === doc.value
-                      }
-                      onChange={() =>
-                        handleChange(
-                          "bddDocument",
-                          doc.value
-                        )
-                      }
-                    />
+          {/* Excel Download */}
+          <button
+            onClick={() => exportToExcel(data)}
+            disabled={!data.length}
+            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
+          >
+            <FaFileExcel />
+            Excel
+          </button>
+        </div>
+      </div>
 
-                    {doc.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Aadhar No */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Aadhar No.
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddAadharNo || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddAadharNo",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* SEZ Detail */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                SEZ Detail
-              </label>
-
-              <div className="border border-gray-300 rounded-full px-5 py-4 flex items-center gap-6 bg-white">
-                {sezOptions.map((item) => (
-                  <label
-                    key={item.value}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="radio"
-                      checked={
-                        data?.bddSez === item.value
-                      }
-                      onChange={() =>
-                        handleChange(
-                          "bddSez",
-                          item.value
-                        )
-                      }
-                    />
-
-                    {item.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* GSTN No */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                GSTN No.
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddGstnNO || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddGstnNO",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* PAN NO */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Pan No
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddPanNo || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddPanNo",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Risk Check */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Risk Check
-              </label>
-
+      {/* ── Table ── */}
+      <div className="w-full">
+        {/* Search */}
+        <div className="flex justify-end mb-4">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-slate-600 font-medium">Show</span>
               <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.riskCheck || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "riskCheck",
-                    e.target.value
-                  )
-                }
+                value={size}
+                onChange={(e) => handleSizeChange(Number(e.target.value))}
+                className="border border-gray-300 rounded px-2 py-1.5 text-sm"
               >
-                <option value="">-- Select --</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
+                <option value={10}>10</option>
+                <option value={25}>25 </option>
+                <option value={50}>50 </option>
               </select>
+              <span className="text-slate-600 font-medium">entries</span>
             </div>
 
-            {/* Category */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Category
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddCategory || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddCategory",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                {["Education", "Education Goverment", "Education Private", "Goverment", "Insurance", "Mutual Funds", "Travel", "Utility", "Retail", "ISP", "Cable"].map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* MCC */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                MCC
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddAgpMcc || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddAgpMcc",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                {Array.isArray(mccList) &&
-                  mccList.map((item, index) => {
-                    const fullText = `${item.code} - ${String(item.name)}`;
-                    return (
-                      <option key={index} value={fullText}>
-                        {fullText}
-                      </option>
-                    );
-                  })}
-              </select>
-
-            </div>
-
-            {/* Premises Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Premises Type
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddPremisesType || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddPremisesType",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                {["Leased(Regd)", "Leased(Un-Regd)", "Owned", "Rent Letter"].map((p) => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-
-              </select>
-            </div>
-
-            {/* Vintage Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Vintage Type
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddVintageType || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddVintageType",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                <option value="<1Y - New">&lt;1Y - New</option>
-                <option value=">1<3Y">&gt;1&lt;3Y</option>
-                <option value=">3<5Y">&gt;3&lt;5Y</option>
-                <option value=">5Y">&gt;5Y</option>
-              </select>
-            </div>
-
-            {/* Merchant Business Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Merchant Business Type
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={
-                  data?.bddMerchantBusinessType || ""
-                }
-                onChange={(e) =>
-                  handleChange(
-                    "bddMerchantBusinessType",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                {["Companies Registered Act", "Govt, Govt Undertakings", "Individuals/Proprietor", "Individuals/Professionals", "LLPS", "Pertnership", "Proprietor", "Regd Trusts"].map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-
-              </select>
-            </div>
-
-            {/* Merchant Website URL */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Merchant Website URL
-              </label>
-
+            <div className="relative w-full max-w-xs">
+              <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
               <input
                 type="text"
-                placeholder="https://www.example.com"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddMerchantWebsiteURL || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddMerchantWebsiteURL",
-                    e.target.value
-                  )
-                }
+                placeholder="Search merchant..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-
-            {/* Registration Date */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Registration Date
-              </label>
-
-              <input
-                type="date"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddRegistrationDate || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddRegistrationDate",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Application No */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Application No
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddApplicationNo || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddApplicationNo",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Corporate Identification Number(CIN) */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Corporate Identification Number(CIN)
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddCorporateNo || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddCorporateNo",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Years in Business */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Years in Business
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddYearsInBusiness || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddYearsInBusiness",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Closest Competitor */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Who is your closest competitor?
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddClosestCompetitor || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddClosestCompetitor",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Shops Count */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                How many shops do you have in the country?
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddShopsInCountry || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddShopsInCountry",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Average Ticket Size */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Average Ticket Size
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.bddAverageTicketSize || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "bddAverageTicketSize",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                <option value="<2000">&lt;2000</option>
-                <option value="<5000>2000">&lt;5000&gt;2000</option>
-                <option value="<5001>10000">&lt;5001&gt;10000</option>
-                <option value=">10001">&gt;10001</option>
-              </select>
-            </div>
-
-            {/* Business Define */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">
-                How do you define your Business
-              </label>
-
-              <div className="flex items-center gap-5">
-                {["Fast Growing", "Mature"].map((b) => (
-                  <label
-                    key={b}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="radio"
-                      checked={
-                        data?.bddDefineBusiness === b
-                      }
-                      onChange={() =>
-                        handleChange(
-                          "bddDefineBusiness",
-                          b
-                        )
-                      }
-                    />
-
-                    {b}
-                  </label>
-                ))}
-              </div>
             </div>
           </div>
         </div>
 
-        {/* STORE ADDRESS */}
-        <div>
-          <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3 pt-5">
-            Store Address
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-            {/* Address 1 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 1
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addStoreAddress1 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addStoreAddress1",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Address 2 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 2
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addStoreAddress2 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addStoreAddress2",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Address 3 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 3
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addStoreAddress3 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addStoreAddress3",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Country */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Country
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addCountry || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addCountry",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                <option value="India">India</option>
-              </select>
-            </div>
-
-            {/* State */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                State
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addState || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addState",
-                    e.target.value
-                  )
-                }
-              >
-
-                <option value="">-- Select --</option>
-                {stateList.map((item, index) => (
-                  <option key={index} value={item}>{item}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* City */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                City
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addCity || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addCity",
-                    e.target.value
-                  )
-                }
-              >
-
-                <option value="">-- Select --</option>
-                {cityList.map((item, index) => (
-                  <option key={index} value={item}>{item}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Zip Code */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Zip Code
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.addZipcode || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "addZipcode",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-          </div>
-        </div>
-        {/* ── Contact Person Details ───────────────────────────────────── */}
-        <div className="rounded-md mt-8">
-          <h2 className="text-[20px] text-gray-700 mb-6 border-b border-gray-300 pb-3">
-            Contact Person Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-            {/* Full Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Full Name
-              </label>
-
-              <div className="flex w-full">
-                <select
-                  className="border border-gray-300 rounded-l px-3 py-2 bg-white w-24"
-                  value={data?.cpdNameTitle || ""}
-                  onChange={(e) =>
-                    handleChange("cpdNameTitle", e.target.value)
-                  }
-                >
-                  <option value="">Title</option>
-
-                  {["Mr", "Ms", "Mrs", "Miss", "Dr"].map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
+        {/* Table Scroll */}
+        <div
+          style={{
+            width: "calc(100vw - 320px)",
+            overflowX: "scroll",
+            overflowY: "hidden",
+          }}
+        >
+          <div
+            className="border border-gray-300"
+            style={{
+              minWidth: "1800px",
+            }}
+          >
+            <table
+              style={{
+                minWidth: "1800px",
+              }}
+              className="w-full text-xs whitespace-nowrap"
+            >
+              <thead>
+                <tr className="bg-yellow-500 text-white">
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      className="px-3 py-3 text-left font-semibold tracking-wide"
+                    >
+                      {col.label}
+                    </th>
                   ))}
-                </select>
+                </tr>
+              </thead>
 
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  className="flex-1 border border-l-0 border-gray-300 rounded-r px-3 py-2"
-                  value={data?.cpdName || ""}
-                  onChange={(e) =>
-                    handleChange("cpdName", e.target.value)
-                  }
-                />
-              </div>
-            </div>
-            {/* Date of Birth */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Date of Birth
-              </label>
-              <input
-                type="date"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.cpdDateOfBirth || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "cpdDateOfBirth",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={columns.length} className="text-center py-14">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="h-9 w-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-gray-500 text-sm">
+                          Loading transactions...
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredData.length > 0 ? (
+                  filteredData.map((item, index) => (
+                    <tr
+                      key={index}
+                      className={`border-b hover:bg-blue-50 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        }`}
+                    >
+                      <td className="px-3 py-2.5 text-gray-600 font-medium">
+                        {page * size + index + 1}
+                      </td>
+                      <td className="px-3 py-2.5 font-semibold text-blue-700">
+                        {item.mid || "-"}
+                      </td>
+                      <td className="px-3 py-2.5">{item.chargeType || "-"}</td>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Phone No. with STD Code
-              </label>
+                      <td className="px-3 py-2.5">{item.dbaName || "-"}</td>
+                      <td className="px-3 py-2.5">{item.merchantType || "-"}</td>
 
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.cpdPhoneNo || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "cpdPhoneNo",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+                      <td className="px-3 py-2.5">
+                        <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold">
+                          {item.paymentType || "-"}
+                        </span>
+                      </td>
 
-            {/* Mobile */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Mobile
-              </label>
+                      <td className="px-3 py-2.5">{item.meOrderNo || "-"}</td>
+                      <td className="px-3 py-2.5">{item.meTrnRefNo || "-"}</td>
+                      <td className="px-3 py-2.5">{item.procTrnRefId || "-"}</td>
 
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.cpdMobile || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "cpdMobile",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+                      <td className="px-3 py-2.5 font-semibold text-gray-800">
+                        ₹{item.payAmount / 100 || "0"}
+                      </td>
 
-            {/* Fax */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Fax
-              </label>
+                      <td className="px-3 py-2.5">{item.msfFee ?? "-"}</td>
+                      <td className="px-3 py-2.5">{item.msfGstFee ?? "-"}</td>
+                      <td className="px-3 py-2.5">{item.convenienceFee ?? "-"}</td>
+                      <td className="px-3 py-2.5">{item.gstFee ?? "-"}</td>
 
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.cpdFax || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "cpdFax",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+                      <td className="px-3 py-2.5 font-bold text-gray-800">
+                        ₹{item.totalAmount / 100 || "0"}
+                      </td>
 
-            {/* Primary Email */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Primary Email Id
-              </label>
+                      <td className="px-3 py-2.5">{item.txnDate || "-"}</td>
+                      <td className="px-3 py-2.5">{item.txnRespDate || "-"}</td>
+                      <td className="px-3 py-2.5">{item.fullName || "-"}</td>
+                      <td className="px-3 py-2.5">{item.mobileNo || "-"}</td>
+                      <td className="px-3 py-2.5">{item.emailId || "-"}</td>
 
-              <input
-                type="email"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.cpdPrimaryEmailId || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "cpdPrimaryEmailId",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+                      <td className="px-3 py-2.5">
+                        <StatusBadge msg={item.respMessage} />
+                      </td>
 
-            {/* Secondary Email */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Secondary Email Id
-              </label>
-
-              <input
-                type="email"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.cpdSecondaryEmailId || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "cpdSecondaryEmailId",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
+                      <td className="px-3 py-2.5">{item.rrn || "-"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={columns.length}>
+                      <div
+                        style={{
+                          width: "1800px",
+                        }}
+                        className="text-center py-14 text-gray-400 text-sm"
+                      >
+                        {searched
+                          ? "No transactions found for the selected date range."
+                          : "Select a date range and click Search to view transactions."}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* ── Billing Address ──────────────────────────────────────────── */}
-        <div className="rounded-md mt-3 pb-4">
-          <h2 className="text-[20px] text-gray-700 mb-2 border-b border-gray-300 pb-3">
-            Billing Address
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-            {/* Address 1 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 1
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baAddress1 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baAddress1",
-                    e.target.value
-                  )
-                }
-              />
+        {/* Pagination */}
+        {totalPages > 0 && (
+          <div className="mt-4 flex flex-col md:flex-row justify-between items-center gap-4 px-5 py-3">
+            <div className="text-sm text-gray-600">
+              Showing page{" "}
+              <span className="font-bold text-blue-700">{page + 1}</span> of{" "}
+              <span className="font-bold text-blue-700">{totalPages}</span> |
+              Total Records:{" "}
+              <span className="font-bold text-blue-700">{totalRecords}</span>
             </div>
 
-            {/* Address 2 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 2
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baAddress2 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baAddress2",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Address 3 */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Address 3
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baAddress3 || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baAddress3",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            {/* Country */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Country
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baCountry || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baCountry",
-                    e.target.value
-                  )
-                }
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 0}
+                className="px-3 py-1.5 rounded border text-sm font-medium disabled:opacity-40"
               >
-                <option value="">-- Select --</option>
-                <option value="India">India</option>
-              </select>
-            </div>
+                ← Prev
+              </button>
 
-            {/* State */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                State
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baState || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baState",
-                    e.target.value
-                  )
-                }
+              {getPageNumbers().map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handlePageChange(p)}
+                  className={`w-9 h-9 rounded text-sm font-semibold ${p === page
+                    ? "bg-orange-600 text-white"
+                    : "border hover:bg-gray-100"
+                    }`}
+                >
+                  {p + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1.5 rounded border text-sm font-medium disabled:opacity-40"
               >
-                <option value="">-- Select --</option>
-                {stateList.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* City */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                City
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baCity || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baCity",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-
-                {cityList.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-
-              </select>
-            </div>
-
-            {/* Zip Code */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Zip Code
-              </label>
-
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={data?.baZipcode || ""}
-                onChange={(e) =>
-                  handleChange(
-                    "baZipcode",
-                    e.target.value
-                  )
-                }
-              />
+                Next →
+              </button>
             </div>
           </div>
-        </div>
-      </div >
-      {/* SAVE BUTTON */}
-      < div className="grid grid-cols-3 items-center mt-10" >
-        {/* Empty Left Side */}
-        < div ></div >
-        {/* Center Button */}
-        < div className="flex justify-center" >
-          <button
-            type="button"
-            onClick={handleSaveAndNext}
-            className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
-          >
-            Update
-          </button>
-        </div >
-
-        {/* Right Button */}
-        < div className="flex justify-end" >
-          <button
-            type="button"
-            onClick={handleNext}
-            className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2 rounded"
-          >
-            Next
-          </button>
-        </div >
-      </div >
-
-    </>
+        )}
+      </div>
+    </div>
   );
 }

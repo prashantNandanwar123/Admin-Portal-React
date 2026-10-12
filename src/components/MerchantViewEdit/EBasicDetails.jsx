@@ -9,8 +9,15 @@ import {
   ChevronDown,
   MapPin,
   ReceiptText,
-  CircleUserRound,
-  FileText
+  UserPlus,
+  FileText,
+  Eye,
+  Building2,
+  Handshake,
+  BriefcaseBusiness,
+  Upload,
+  ArrowRight,
+  User
 } from "lucide-react";
 
 export default function EBasicDetails({
@@ -21,12 +28,8 @@ export default function EBasicDetails({
 }) {
   const [mccList, setMccList] = useState([]);
   const [legalVehicalNameList, setlegalVehicalNameList] = useState([]);
-  const [userData, setUserData] = useState(null);
   const fileRef = useRef(null);
-
-
   const partnerLogoRef = useRef(null);
-
   const countryList = statecity.map((item) => item.country);
 
   // Selected Country
@@ -149,8 +152,7 @@ export default function EBasicDetails({
   const fetchDetailsCollection = async () => {
     try {
       const response = await axiosInstance.post("/getDetailsCollection");
-      const apiData =
-        response?.respData || response?.respData || {};
+      const apiData = response?.respData || response?.respData || {};
       setlegalVehicalNameList(apiData?.legalVehicalNameList || []);
       const formattedMcc = Object.entries(apiData?.mccList || {}).map(
         ([code, name]) => ({
@@ -160,16 +162,43 @@ export default function EBasicDetails({
       );
       setMccList(formattedMcc);
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     }
   };
+  const handleViewFile = async (fileName) => {
+    if (!refId || !fileName) {
+      toast.error("RefId or file name is missing");
+      return;
+    }
+    try {
+      const response = await axiosInstance.post(
+        "/merchant/kyc/viewKycDocs",
+        {},
+        {
+          params: {
+            refId: refId,
+            fileName: fileName,
+          },
+          responseType: "blob",
+        }
+      );
+      const fileUrl = URL.createObjectURL(response);
+      window.open(fileUrl, "_blank");
 
+      setTimeout(() => {
+        URL.revokeObjectURL(fileUrl);
+      }, 10000);
+
+    } catch (error) {
+      toast.error(error);
+    }
+  };
   // Save Edit BasicDetails  API Call
   const handleSaveAndNext = async () => {
     try {
       const payload = {
-        ref_id: data?.refId || refId,
 
+        ref_id: data?.refId || refId,
         partnerLogoCheck: data?.partnerLogoCheck,
         basicSrcChannel: data?.basicSrcChannel,
         storeDbaName: data?.storeDbaName,
@@ -186,11 +215,9 @@ export default function EBasicDetails({
         bddCategory: data?.bddCategory,
         bddAgpMcc: data?.bddAgpMcc,
         bddVintageType: data?.bddVintageType,
-        bddMerchantBusinessType:
-          data?.bddMerchantBusinessType,
-
-        bddMerchantWebsiteURL:
-          data?.bddMerchantWebsiteURL,
+        bddMerchantBusinessType: data?.bddMerchantBusinessType,
+        bddMerchantWebsiteURL: data?.bddMerchantWebsiteURL,
+        companyType: data?.companyType,
 
         // ADDRESS
         addStoreAddress1: data?.addStoreAddress1,
@@ -208,12 +235,8 @@ export default function EBasicDetails({
         cpdDateOfBirth: data?.cpdDateOfBirth,
         cpdPhoneNo: data?.cpdPhoneNo,
         cpdMobile: data?.cpdMobile,
-
-        cpdPrimaryEmailId:
-          data?.cpdPrimaryEmailId,
-
-        cpdSecondaryEmailId:
-          data?.cpdSecondaryEmailId,
+        cpdPrimaryEmailId: data?.cpdPrimaryEmailId,
+        cpdSecondaryEmailId: data?.cpdSecondaryEmailId,
 
         // BILLING
         baAddress1: data?.billingAddress1,
@@ -235,10 +258,7 @@ export default function EBasicDetails({
       );
 
       if (data?.partnerLogoFile) {
-        multipartData.append(
-          "partnerLogo",
-          data.partnerLogoFile
-        );
+        multipartData.append("partnerLogo", data.partnerLogoFile);
       }
 
       const response = await axiosInstance.post(
@@ -278,55 +298,57 @@ export default function EBasicDetails({
   };
 
   return (
-    <>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSaveAndNext();
+      }}
+      className="space-y-4">
 
       <div>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
-            <CircleUserRound className="w-5 h-5 text-yellow-600" />
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+              <UserPlus className="w-5 h-5 text-yellow-600" />
+            </div>
+            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+              Edit Basic Details
+            </h2>
           </div>
-      <h2 className="text-xl text-blue-900 font-semibold">
-            Edit Basic Details
-          </h2>
+          <p className="ml-13 text-sm text-slate-700 -mt-3">
+            Edit Basic Details Form collects essential information such as personal
+            and contact details to create a user profile.
+          </p>
         </div>
-              <p className="ml-12 pb-1 text-sm text-blue-900">Edit Basic Details Form collects essential information such as personal and contact details to create a user profile.</p>
-        {/* STORE STATUS */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-2">
-          {/* Status Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-center">
-            {/* Created Information Card */}
-            <div className="bg-yellow-50 border border-yellow-100 rounded-lg px-4 py-3">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Created By */}
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
-                    <UserRound className="w-4 h-4 text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-gray-500 font-medium">
-                      Created By
-                    </p>
-                    <p className="text-[13px] text-gray-800 font-semibold">
-                      {data?.createdBy || "-"}
-                    </p>
-                  </div>
-                </div>
 
-                {/* Created Date */}
-                <div className="flex items-center gap-3 sm:border-l sm:border-gray-200 sm:pl-5">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                    <CalendarDays className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-gray-500 font-medium">
-                      Created Date
-                    </p>
-                    <p className="text-[13px] text-gray-800 font-semibold">
-                      {data?.createdAt?.split(" ")[0] || "-"}
-                    </p>
-                  </div>
-                </div>
-              </div>
+        {/* STORE STATUS */}
+        <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#fec931] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+              <User className="w-4 h-4 text-black" />
+            </span>
+            <div>
+              <p className="text-lg sm:text-xs text-slate-900 font-medium">
+                Created By
+              </p>
+              <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                {data?.createdBy || "-"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+              <CalendarDays className="w-4 h-4 text-black" />
+            </span>
+            <div>
+              <p className="text-[11px] sm:text-xs text-slate-900 font-medium">
+                Created At
+              </p>
+              <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                {data?.createdAt?.split(" ")[0] || "-"}
+              </p>
             </div>
           </div>
         </div>
@@ -335,10 +357,10 @@ export default function EBasicDetails({
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-4">
           {/* Heading */}
           <div className="flex items-center gap-3 mb-6 pb-3">
-            <div className="w-9 h-9 rounded-full bg-yellow-100 border border-yellow-100 flex items-center justify-center shrink-0">
-              <UserRound className="w-5 h-5 text-yellow-600" />
+            <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 border border-yellow-100 flex items-center justify-center shrink-0">
+              <UserRound className="w-5 h-5" />
             </div>
-            <h2 className="text-[20px] text-gray-700 font-semibold">
+            <h2 className="text-base font-semibold text-gray-900 uppercase flex items-center gap-2">
               Contact Person Details
             </h2>
           </div>
@@ -347,12 +369,12 @@ export default function EBasicDetails({
             {/* Full Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Full Name
+                Full Name<span className="text-red-500 ml-1">*</span>
               </label>
-
               <div className="flex w-full">
                 <select
                   className="border border-gray-300 rounded-l px-3 py-2 bg-white w-24 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  required
                   value={data?.cpdNameTitle || ""}
                   onChange={(e) =>
                     handleChange("cpdNameTitle", e.target.value)
@@ -369,6 +391,7 @@ export default function EBasicDetails({
                 <input
                   type="text"
                   placeholder="Full Name"
+                  required
                   className="flex-1 border border-l-0 border-gray-300 rounded-r px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   value={data?.cpdName || ""}
                   onChange={(e) =>
@@ -396,25 +419,28 @@ export default function EBasicDetails({
             {/* Mobile */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Mobile No
+                Mobile No<span className="text-red-500 ml-1">*</span>
               </label>
-
               <input
                 type="text"
+                maxLength={10}
+                required
+                inputMode="numeric"
+                pattern="[0-9]*"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 value={data?.cpdMobile || ""}
-                onChange={(e) =>
-                  handleChange("cpdMobile", e.target.value)
-                }
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  handleChange("cpdMobile", value)
+                }}
               />
             </div>
 
             {/* Primary Email */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Primary Email Id
+                Primary Email Id<span className="text-red-500 ml-1">*</span>
               </label>
-
               <input
                 type="email"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -443,13 +469,13 @@ export default function EBasicDetails({
             {/* Sourcing Channel */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Reseller Partner
+                Reseller Partner<span className="text-red-500 ml-1">*</span>
               </label>
 
               <div className="relative">
                 <select
                   className="w-full appearance-none border border-gray-300 rounded 
-                     px-3 py-2.5 pr-10 bg-white text-[13px] text-gray-700
+                     px-3 py-2 pr-10 bg-white text-md text-gray-700
                      outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                   value={data?.basicSrcChannel || ""}
                   onChange={(e) =>
@@ -472,14 +498,13 @@ export default function EBasicDetails({
           </div>
         </div>
 
-        {/* Basic DOcument DETAILS */}
+        {/* Basic Document DETAILS */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-4">
-          {/* Heading */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 border border-yellow-100 flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4 text-yellow-500" />
             </div>
-            <h2 className="text-base font-semibold text-gray-900 uppercase">
+            <h2 className="text-base font-semibold text-gray-900 uppercase flex items-center gap-2">
               Basic Document Details
             </h2>
           </div>
@@ -490,7 +515,6 @@ export default function EBasicDetails({
               <label className="block text-gray-700 font-medium mb-3">
                 Documents
               </label>
-
               <div className="flex items-center gap-5">
                 {documentOptions.map((doc) => (
                   <label
@@ -519,17 +543,19 @@ export default function EBasicDetails({
             {/* Aadhar No */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Aadhar No.
+                Aadhar No.<span className="text-red-500 ml-1">*</span>
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
+                maxLength={12}
+                inputMode="numeric"
+                pattern = "0-9"
                 value={data?.bddAadharNo || ""}
                 onChange={(e) =>
                   handleChange(
                     "bddAadharNo",
-                    e.target.value
+                    e.target.value.replace(/\D/g,"").slice(0,12)
                   )
                 }
               />
@@ -540,13 +566,11 @@ export default function EBasicDetails({
               <label className="block text-gray-700 font-medium mb-2">
                 SEZ Detail
               </label>
-
               <div className="border border-gray-300 rounded-full px-5 py-4 flex items-center gap-6 bg-white">
                 {sezOptions.map((item) => (
                   <label
                     key={item.value}
-                    className="flex items-center gap-2"
-                  >
+                    className="flex items-center gap-2">                  
                     <input
                       type="radio"
                       checked={
@@ -559,7 +583,6 @@ export default function EBasicDetails({
                         )
                       }
                     />
-
                     {item.label}
                   </label>
                 ))}
@@ -569,7 +592,7 @@ export default function EBasicDetails({
             {/* GSTN No */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                GSTN No.
+                GSTN No.<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -588,7 +611,7 @@ export default function EBasicDetails({
             {/* PAN NO */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Pan No
+                Pan No<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -607,7 +630,7 @@ export default function EBasicDetails({
             {/* Risk Check */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Risk Check
+                Risk Check<span className="text-red-500 ml-1">*</span>
               </label>
 
               <select
@@ -654,7 +677,7 @@ export default function EBasicDetails({
             {/* MCC */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                MCC
+                MCC<span className="text-red-500 ml-1">*</span>
               </label>
 
               <select
@@ -707,33 +730,6 @@ export default function EBasicDetails({
               </select>
             </div>
 
-            {/* Merchant Business Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Merchant Business Type
-              </label>
-
-              <select
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={
-                  data?.bddMerchantBusinessType || ""
-                }
-                onChange={(e) =>
-                  handleChange(
-                    "bddMerchantBusinessType",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">-- Select --</option>
-                {["Companies Registered Act", "Govt, Govt Undertakings", "Individuals/Proprietor", "Individuals/Professionals", "LLPS", "Pertnership", "Proprietor", "Regd Trusts"].map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-
-              </select>
-            </div>
-
             {/* Merchant Website URL */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
@@ -758,7 +754,7 @@ export default function EBasicDetails({
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 Partner Logo Check
-                <span className="text-red-500">*</span>
+                <span className="text-red-500 ml-1">*</span>
               </label>
 
               <select
@@ -779,32 +775,66 @@ export default function EBasicDetails({
             </div>
 
             {/* Partner Logo */}
+
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                Partner Logo{" "}
+                Partner Logo
                 <span className="text-sm text-gray-500 font-normal">
                   (jpg or png)
                 </span>
-              </label>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".jpg,.jpeg,.png"
-                disabled={data?.partnerLogoCheck !== "Yes"}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  // setPartnerLogo(file);
-                  handleChange("partnerLogoFile", file);
-                }}
-                className="block w-full h-[44px] text-sm text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer file:h-full file:mr-3 file:px-4 file:border-0 file:border-r file:border-gray-200 file:bg-gray-50 file:text-gray-700 file:text-sm file:font-medium hover:file:bg-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                <span className="text-red-400 ml-0.5">*</span>
 
-              />
+              </label>
+              <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
+                <div className="w-full flex items-center justify-between">
+                  {/* Left: File icon + File name */}
+                  <div className="flex items-center min-w-0">
+                    <FileText className="w-4 h-4 ml-3 text-gray-300 shrink-0" />
+                    <span className="ml-2 text-xs text-gray-400 truncate">
+                      {data?.partnerLogoName || "No file selected"}
+                    </span>
+                  </div>
+                  {/* Right: View icon */}
+                  <div className="mr-2 flex items-center gap-1">
+                    {/* View Aadhar */}
+                    <button
+                      type="button"
+                      onClick={() => handleViewFile(data?.partnerLogoName)}
+                      className="p-1.5 rounded-md bg-green-50 hover:bg-green-100 transition"
+                      title="View Partner Logo"
+                    >
+                      <Eye className="w-4 h-4 text-green-500" />
+                    </button>
+
+                    {/* Upload Partner Logo */}
+                    <label
+                      className="p-1.5 rounded-md bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
+                      title="Upload Partner Logo"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
+
+                      <input
+                        ref={fileRef}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        disabled={data?.partnerLogoCheck !== "Yes"}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          // setPartnerLogo(file);
+                          handleChange("partnerLogoFile", file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </label>
             </div>
 
-            {/* Store Name */}
+            {/* Company Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Company Name (Business Name)
+                Company Name (Business Name)<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -823,7 +853,7 @@ export default function EBasicDetails({
             {/* Legal Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Company Legal Name
+                Company Legal Name<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -838,21 +868,257 @@ export default function EBasicDetails({
                 }
               />
             </div>
+
           </div>
         </div>
 
+        {/* ── Selected Business Type ─────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 border border-yellow-100 flex items-center justify-center shrink-0">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 uppercase">
+                Select Business Type
+              </h2>
+            </div>
+          </div>
+          {/* ───────────────── Business Entity Type ───────────────── */}
+          <div className="mb-6">
+            <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
+              Business Entity Type
+              <span className="text-red-500 ml-1">*</span>
+            </label>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+
+              {[
+                {
+                  value: "Company",
+                  subtitle: "Pvt Ltd / OPC / LLC",
+                  icon: Building2,
+                },
+                {
+                  value: "LLP",
+                  subtitle: "Limited Liability",
+                  icon: Handshake,
+                },
+                {
+                  value: "Firm",
+                  subtitle: "Partnership",
+                  icon: BriefcaseBusiness,
+                },
+                {
+                  value: "Proprietor",
+                  subtitle: "Individual",
+                  icon: UserRound,
+                },
+              ].map((item) => {
+
+                const Icon = item.icon;
+
+                const selected =
+                  data?.bddMerchantBusinessType === item.value;
+
+                return (
+                  <div
+                    key={item.value}
+                    onClick={() =>
+                      handleChange("bddMerchantBusinessType", item.value)
+                    }
+                    className={`
+            relative h-[84px] rounded-xl border
+            flex flex-col items-center justify-center
+            cursor-pointer
+            transition-all duration-200
+            ${selected
+                        ? "border-blue-600 bg-blue-50 shadow-sm"
+                        : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50/30"
+                      }
+          `}
+                  >
+
+                    {/* Selected Indicator */}
+                    <div
+                      className={`
+              absolute top-2 right-2
+              w-4 h-4 rounded-full border
+              flex items-center justify-center
+              ${selected
+                          ? "border-blue-600"
+                          : "border-gray-300"
+                        }
+            `}
+                    >
+                      {selected && (
+                        <div className="w-2 h-2 rounded-full bg-blue-600" />
+                      )}
+                    </div>
+
+                    {/* Icon */}
+                    <div
+                      className={`
+              w-8 h-8 rounded-lg
+              flex items-center justify-center mb-1
+              ${selected
+                          ? "bg-blue-600 text-white"
+                          : "bg-blue-50 text-blue-400"
+                        }
+            `}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+
+                    {/* Title */}
+                    <span
+                      className={`
+              text-xs font-semibold
+              ${selected
+                          ? "text-blue-700"
+                          : "text-gray-600"
+                        }
+            `}
+                    >
+                      {item.value}
+                    </span>
+
+                    {/* Subtitle */}
+                    <span className="text-[9px] text-gray-400 mt-0.5">
+                      {item.subtitle}
+                    </span>
+
+                  </div>
+                );
+              })}
+
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 mb-6" />
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 mb-6" />
+
+          {/* ───────────────── Company Type ───────────────── */}
+          <div>
+
+            <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
+              Company Type
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+
+              {[
+                {
+                  value: "Private Limited",
+                  icon: Building2,
+                },
+                {
+                  value: "One Person Company",
+                  icon: UserRound,
+                },
+                {
+                  value: "Public Limited",
+                  icon: Building2,
+                },
+                {
+                  value: "LLC",
+                  icon: Building2,
+                },
+              ].map((item) => {
+
+                const Icon = item.icon;
+
+                const selected =
+                  data?.companyType === item.value;
+
+                return (
+                  <div
+                    key={item.value}
+                    onClick={() =>
+                      handleChange("companyType", item.value)
+                    }
+                    className={`
+            relative h-[72px] rounded-xl border
+            flex items-center gap-3 px-3
+            cursor-pointer
+            transition-all duration-200
+            ${selected
+                        ? "border-blue-600 bg-blue-50 shadow-sm"
+                        : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50/30"
+                      }
+          `}
+                  >
+
+                    {/* Radio */}
+                    <div
+                      className={`
+              w-4 h-4 rounded-full border shrink-0
+              flex items-center justify-center
+              ${selected
+                          ? "border-blue-600"
+                          : "border-gray-300"
+                        }
+            `}
+                    >
+                      {selected && (
+                        <div className="w-2 h-2 rounded-full bg-blue-600" />
+                      )}
+                    </div>
+
+                    {/* Icon */}
+                    <Icon
+                      className={`
+              w-4 h-4
+              ${selected
+                          ? "text-blue-600"
+                          : "text-gray-400"
+                        }
+            `}
+                    />
+
+                    {/* Text */}
+                    <div>
+
+                      <p
+                        className={`
+                text-xs font-semibold
+                ${selected
+                            ? "text-blue-700"
+                            : "text-gray-600"
+                          }
+              `}
+                      >
+                        {item.value}
+                      </p>
+
+                      {selected && (
+                        <p className="text-[9px] text-blue-500 mt-0.5">
+                          Selected
+                        </p>
+                      )}
+
+                    </div>
+
+                  </div>
+                );
+              })}
+
+            </div>
+          </div>
+        </div>
 
         {/* STORE ADDRESS */}
-        <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6">
-
-          {/* Heading */}
+        <div className="mt-5 bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-6 pb-3 pt-1">
-            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 border border-yellow-100 flex items-center justify-center shrink-0">
               <MapPin className="w-5 h-5 text-yellow-600" />
             </div>
-            <h2 className="text-[20px] text-gray-700 font-semibold">
-              Store Address
+            <h2 className="text-base font-semibold text-gray-900 uppercase">
+              Company Address
             </h2>
           </div>
 
@@ -860,7 +1126,7 @@ export default function EBasicDetails({
             {/* Address 1 */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Address 1
+                Address 1<span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="text"
@@ -905,7 +1171,7 @@ export default function EBasicDetails({
             {/* Country */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Country<span className="text-red-500">*</span>
+                Country<span className="text-red-500 ml-1">*</span>
               </label>
 
               <Select
@@ -937,7 +1203,7 @@ export default function EBasicDetails({
             {/* State */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                State<span className="text-red-500">*</span>
+                State<span className="text-red-500 ml-1">*</span>
               </label>
 
               <Select
@@ -968,7 +1234,7 @@ export default function EBasicDetails({
             {/* City */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                City<span className="text-red-500">*</span>
+                City<span className="text-red-500 ml-1">*</span>
               </label>
 
               <Select
@@ -1015,13 +1281,12 @@ export default function EBasicDetails({
         </div>
 
         {/* ── Billing Address ──────────────────────────────────────────── */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-3">
-          {/* Heading */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-5">
           <div className="flex items-center gap-3 mb-5 pb-3">
-            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 border border-yellow-100 flex items-center justify-center shrink-0">
               <ReceiptText className="w-5 h-5 text-yellow-600" />
             </div>
-            <h2 className="text-[20px] text-gray-700 font-semibold">
+            <h2 className="text-base font-semibold text-gray-900 uppercase">
               Billing Address
             </h2>
           </div>
@@ -1076,7 +1341,7 @@ export default function EBasicDetails({
               <div key={field}>
                 <label className="block text-gray-700 font-medium mb-2">
                   {label}
-                  {required && <span className="text-red-500">*</span>}
+                  {required && <span className="text-red-500 ml-1">*</span>}
                 </label>
 
                 <input
@@ -1094,7 +1359,7 @@ export default function EBasicDetails({
             {/* Country */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Country<span className="text-red-500">*</span>
+                Country<span className="text-red-500 ml-1">*</span>
               </label>
 
               <Select
@@ -1126,7 +1391,7 @@ export default function EBasicDetails({
             {/* State */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                State<span className="text-red-500">*</span>
+                State<span className="text-red-500 ml-1">*</span>
               </label>
               <Select
                 styles={disabledSelectStyles}
@@ -1156,7 +1421,7 @@ export default function EBasicDetails({
             {/* City */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                City<span className="text-red-500">*</span>
+                City<span className="text-red-500 ml-1">*</span>
               </label>
 
               <Select
@@ -1186,7 +1451,7 @@ export default function EBasicDetails({
             {/* Zip Code */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Zip Code<span className="text-red-500">*</span>
+                Zip Code<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -1213,8 +1478,7 @@ export default function EBasicDetails({
         {/* Center Button */}
         < div className="flex justify-center" >
           <button
-            type="button"
-            onClick={handleSaveAndNext}
+            type="submit"
             className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
           >
             Update
@@ -1226,12 +1490,13 @@ export default function EBasicDetails({
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>
-    </>
+    </form>
   );
 }

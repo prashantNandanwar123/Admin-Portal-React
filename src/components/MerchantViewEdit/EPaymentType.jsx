@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Pencil } from "lucide-react";
+import { QrCode, ArrowRight, ArrowLeft } from "lucide-react";
 
 const initForm = {
   processor: "",
@@ -109,10 +109,7 @@ export default function EPaymentType({
       setAcquirerList(apiData?.upiName || []);
     }
     catch (error) {
-      console.error(
-        "[BasicDetails] fetchDetailsCollection → API Error:",
-        error
-      );
+      toast.error(error);
     }
   };
 
@@ -121,11 +118,10 @@ export default function EPaymentType({
       const response = await axiosInstance.post(
         `/getMSFUpiMerchantName/${AcqBankName}`
       );
-      const apiData =
-        response?.respData || response?.respData || {};
+      const apiData = response?.respData || response?.respData || {};
       setMerchantList(apiData?.merchantList || []);
     } catch (error) {
-      console.error(error);
+      toast.error(error);
       setMerchantList([]);
     }
   };
@@ -205,94 +201,37 @@ export default function EPaymentType({
     }
   };
 
-  //   const saveEditPaymentType = async () => {
-  //   try {
-  //     if (tableData.length === 0) {
-  //       setShowSaveError(true);
-  //       return;
-  //     }
 
-  //     setShowSaveError(false);
-
-  //     // ✅ Multiple rows payload
-  //     const payload = tableData.map((row) => ({
-  //       ref_id: data?.refId,
-
-  //       upiProcessor: row.processor,
-  //       upiAcquirer: row.acquirer,
-  //       upiType: activeTab,
-  //       upiMerchant: row.merchantName,
-  //       upiEffectiveDate: row.effectiveDate,
-  //       upiStatus: row.status,
-  //       upiSortOrder: row.sortOrder,
-  //       upiPerTxnLimit: row.perTransactionLimit,
-  //     }));
-
-  //     console.log("FINAL PAYLOAD", payload);
-
-  //     const response = await axiosInstance.post(
-  //       "/saveEditPaymentType",
-  //       payload,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     const resData = response?.data || response;
-
-  //     if (resData?.respCode === 0) {
-  //       toast.success(resData?.respMsg || "Saved Successfully");
-
-  //       setData((prev) => ({
-  //         ...prev,
-  //         refId: resData?.respData?.ref_id || prev.refId,
-  //         selectedAcquirer: tableData[0]?.acquirer,
-  //       }));
-
-  //       handleNext();
-  //     } else {
-  //       toast.error(resData?.respMsg || "Save Failed");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error("Something went wrong");
-  //   }
-  // };
-
-  const inputClass =
-    "w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white";
-
+  const inputClass = "w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-[#fec931] bg-white";
   const labelClass = "block text-sm text-gray-700 mb-1";
-
-  const req = <span className="text-red-500">*</span>;
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
-          <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
+      <div className="mb-3 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+            <QrCode size={18} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-1">
+            Edit Payment Type Form (UPI)
+          </h2>
         </div>
-<h2 className="text-xl text-blue-900 font-semibold">
-          Edit Payment Type Form (UPI)
-        </h2>
+        <p className="ml-12 text-sm text-slate-700 -mt-1">
+          Payment Type Form collects transaction method details for setup.
+        </p>
       </div>
-          <p className="ml-12 pb-1 text-sm text-blue-900">
-        Payment Type Form collects transaction method details for setup.
-      </p>
 
       <div className="pt-2">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
-          {/* UPI header */}
-          <div className="bg-blue-500 text-white px-4 py-3 rounded-md mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6">
+          <div className="bg-[#fec931] text-black px-4 py-3 rounded-md mb-6 flex items-center gap-3">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black">
+              <QrCode size={16} />
+            </span>
             <h2 className="text-lg font-semibold">UPI</h2>
           </div>
-
-          {/* Form */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
             <div>
               <label className={labelClass}>Processor {req}</label>
               <select
@@ -313,10 +252,7 @@ export default function EPaymentType({
                 onChange={(e) => {
                   const value = e.target.value;
                   updateField("acquirer", value);
-
-                  //  AUTO CALL API
                   fetchMerchantName(value);
-
                   // optional reset
                   updateField("merchantName", "");
                 }}
@@ -472,8 +408,11 @@ export default function EPaymentType({
         {/* Buttons */}
         <div className="flex justify-between mt-10">
           <button
+            type="button"
             onClick={handleBack}
- className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"          >
+            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
+          >
+            <ArrowLeft size={16} />
             Back
           </button>
 
@@ -492,9 +431,10 @@ export default function EPaymentType({
             <button
               type="button"
               onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+              className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
             >
               Next
+              <ArrowRight size={16} />
             </button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Settings } from "lucide-react";
+import { ShieldCheck, ArrowLeft, Link } from "lucide-react";
 
 export default function RIPGConfig({
   refId,
@@ -113,206 +113,250 @@ export default function RIPGConfig({
 
   return (
     <div className="relative">
-      <div className="mb-5">
-        {/* Main Heading */}
-        <div className="flex items-center gap-3 mb-2">
-          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
-            <Settings size={18} />
+      <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <ShieldCheck size={16} />
           </span>
-          <h2 className="text-2xl text-blue-900 font-semibold">
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-2">
             Review IPG Configuration
           </h2>
         </div>
-        {/* Subheading */}
-        <p className="ml-12 text-sm text-blue-900 font-normal pb-5">
+        <p className="ml-12 text-sm text-slate-500 font-normal -mt-2">
           Review and verify the Internet Payment Gateway configuration and setup details.
         </p>
       </div>
+
       {/* ================= TOP SECTION VIEW ONLY ================= */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value (Visa)
-          </label>
-          <input
-            type="text"
-            value={apiData?.ipg_ECIValueVisa || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value (Master)
-          </label>
-          <input
-            type="text"
-            value={apiData?.ipg_ECIValueMaster || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value Maestro
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_ECIValueMaestro || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Integration Approach
-          </label>
-          <input
-            type="text"
-            value={apiData?.ipg_IntegrationApproach || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PCI DSS Certificate Number
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_PCIDSSCertificateNumber || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PCI DSS Expiry Date
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_PCIDSSExpiryDate || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Merchant Email Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_MerchantEmail || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Customer Email Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_CustomerEmail || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Merchant SMS Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_MerchantSMS || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Customer SMS Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_CustomerSMS || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Server to Server Call
-          </label>
-
-          <input
-            type="text"
-            value={
-              apiData?.ipg_ServertoServerCall === true
-                ? "Yes"
-                : apiData?.ipg_ServertoServerCall === false
-                  ? "No"
-                  : ""
-            }
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-      </div>
-
-      {/* ================= REQUEST URLS ================= */}
-      <div className="border-t border-gray-300 my-10"></div>
-      <h2 className="text-3xl font-light text-gray-700 mb-8">
-        Request URL's
-      </h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <div key={index}>
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 pb-4 mt-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
+          <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Request URL {index + 1}
+              ECI Value (Visa)<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
-              value={apiData?.[`requestURL${index + 1}`] || ""}
+              value={apiData?.ipg_ECIValueVisa || ""}
               readOnly
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
             />
           </div>
-        ))}
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            POS TID Count
-          </label>
-          <input
-            type="text"
-            value={apiData?.posTidCount || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              ECI Value (Master)<span className="text-red-500 ml-1">*</span>
+            </label>
+            <input
+              type="text"
+              value={apiData?.ipg_ECIValueMaster || ""}
+              readOnly
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              ECI Value Maestro<span className="text-red-500 ml-1">*</span>
+            </label>
+
+            <input
+              type="text"
+              value={apiData?.ipg_ECIValueMaestro || ""}
+              readOnly
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Integration Approach<span className="text-red-500 ml-1">*</span>
+            </label>
+            <input
+              type="text"
+              value={apiData?.ipg_IntegrationApproach || ""}
+              readOnly
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              PCI DSS Certificate Number
+            </label>
+
+            <input
+              type="text"
+              value={apiData?.ipg_PCIDSSCertificateNumber || ""}
+              readOnly
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              PCI DSS Expiry Date
+            </label>
+
+            <input
+              type="text"
+              value={apiData?.ipg_PCIDSSExpiryDate || ""}
+              readOnly
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Merchant Email Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantEmail === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantEmail === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Customer Email Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerEmail === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerEmail === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Merchant SMS Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantSMS === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantSMS === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Customer SMS Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerSMS === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerSMS === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={apiData?.ipg_ServertoServerCall}
+                readOnly
+              />
+              Server to Server Call
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= REQUEST URLS ================= */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 pb-4 mt-5">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 my-4">
+            <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+              <Link size={20} />
+            </span>
+            <h2 className="text-base font-semibold text-gray-900 uppercase">
+              Request URL's
+            </h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Request URL {index + 1}
+              </label>
+              <input
+                type="text"
+                value={apiData?.[`requestURL${index + 1}`] || ""}
+                readOnly
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+              />
+            </div>
+          ))}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              POS TID Count
+            </label>
+            <input
+              type="text"
+              value={apiData?.posTidCount || ""}
+              readOnly
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+            />
+          </div>
         </div>
       </div>
 
       {/* ================= ACTION SECTION ================= */}
       <form
-        className="mt-10 border-t border-gray-200 pt-6"
+        className="pt-6"
         onSubmit={(e) => {
           e.preventDefault();
           submitRiskAprRject(actionType);
@@ -322,7 +366,7 @@ export default function RIPGConfig({
           {/* Remark */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Remark <span className="text-red-500">*</span>
+              Remark <span className="text-red-500 ml-1">*</span>
             </label>
 
             <input
@@ -362,8 +406,9 @@ export default function RIPGConfig({
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
           >
+            <ArrowLeft size={16} />
             Back
           </button>
         </div>
@@ -408,7 +453,7 @@ export default function RIPGConfig({
             <div className="mt-8 flex justify-center">
               <button
                 onClick={handleCloseModal}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-medium transition"
+                className="inline-flex items-center gap-2 bg-[#fec931] font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
               >
                 Close
               </button>

@@ -2,16 +2,11 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-import { Eye, User, CalendarDays, UserPlus } from "lucide-react";
+import { Eye, User, CalendarDays, UserPlus, UserRound, MapPin, Landmark, Upload, CreditCard } from "lucide-react";
 
 
 export default function ResellerViewDetails() {
-
     const [apiData, setData] = useState({});
-    const [passportPhoto, setPassportPhoto] = useState(null);
-    const [aadharCard, setAadharCard] = useState(null);
-    const [panCard, setPanCard] = useState(null);
-    const [addressProof, setAddressProof] = useState(null);
     const location = useLocation();
     const resellerId = location.state?.resellerId;
     const [documents, setDocuments] = useState({
@@ -35,14 +30,12 @@ export default function ResellerViewDetails() {
                 setData(response?.respData || {});
                 // Documents
                 const apiDocuments = response?.respData?.documents || [];
-
                 const documentMap = {
                     PASSPORT_PHOTO: null,
                     AADHAAR_CARD: null,
                     PAN_CARD: null,
                     ADDRESS_PROOF: null,
                 };
-
                 apiDocuments.forEach((doc) => {
                     documentMap[doc.documentType] = {
                         id: doc.id,
@@ -50,7 +43,6 @@ export default function ResellerViewDetails() {
                         downloadUrl: doc.downloadUrl,
                     };
                 });
-
                 setDocuments(documentMap);
             } else {
                 toast.error(response?.respMsg);
@@ -89,24 +81,17 @@ export default function ResellerViewDetails() {
                 return;
             }
 
-            console.log("Downloading document ID:", documentId);
-
             const response = await axiosInstance.get(
                 `/reseller/reDownloadDocs/${documentId}`,
                 {
                     responseType: "blob",
                 }
             );
-
-            console.log("BLOB RESPONSE --->>>", response);
-
             const blobUrl = URL.createObjectURL(response);
             window.open(blobUrl, "_blank");
-            // Optional: free memory after some time
             setTimeout(() => {
                 window.URL.revokeObjectURL(blobUrl);
             }, 5000);
-
         } catch (error) {
             toast.error(error);
         }
@@ -116,7 +101,7 @@ export default function ResellerViewDetails() {
     const ViewField = ({ label, value, required }) => (
         <div>
             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                {label} {required && <span className="text-red-500">*</span>}
+                {label} {required && <span className="text-red-500 ml-1">*</span>}
             </label>
             <div className="w-full min-h-[42px] border border-gray-200 rounded-lg bg-white px-3 py-2 flex items-center text-[13px] sm:text-sm text-gray-800 shadow-sm">
                 {value || "-"}
@@ -125,34 +110,34 @@ export default function ResellerViewDetails() {
     );
 
     /* ── Section wrapper card ── */
-    const SectionCard = ({ title, children, className = "" }) => (
-        <div
-            className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`}
-        >
-            <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                {title}
-            </h2>
-            <div className="mb-5" />
+    const SectionCard = ({ title, icon: Icon, children, className = "" }) => (
+        <div className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`}>
+            <div className="flex items-center gap-3 mb-5">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                    {Icon && <Icon size={15} />}
+                </span>
+                <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                    {title}
+                </h2>
+            </div>
             {children}
         </div>
     );
 
     return (
         <div className="overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
-
-
             <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-5 py-2 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-500 via-yellow-500 to-yellow-500"></div>
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#fec931] via-yellow-[#fec931] to-yellow-500"></div>
                 <div>
                     <div className="flex items-center gap-3 mt-2">
                         <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
                             <UserPlus size={18} />
                         </span>
-                        <h2 className="text-xl text-blue-900 font-semibold">
-                             Reseller Details
+                        <h2 className="text-xl text-slate-800 font-semibold">
+                            View Reseller Details
                         </h2>
                     </div>
-                    <p className="ml-12 pb-1 text-sm text-blue-900">
+                    <p className="ml-12 pb-1 text-sm text-slate-700">
                         View and manage reseller onboarding details including profile
                         information, verification status, and account configuration in a
                         centralized dashboard.
@@ -160,40 +145,39 @@ export default function ResellerViewDetails() {
                 </div>
             </div>
 
-            {/* ── Onboarding Status ─────────────────────────────────────── */}
-            <SectionCard>
-                <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#F3E3B0] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
-                    <div className="flex items-center gap-3">
-                        <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
-                            <User className="w-4 h-4 text-[#8a6d1a]" />
-                        </span>
-                        <div>
-                            <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
-                                Created By
-                            </p>
-                            <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
-                                {apiData?.approvedBy || "-"}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
-                            <CalendarDays className="w-4 h-4 text-[#8a6d1a]" />
-                        </span>
-                        <div>
-                            <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
-                                Created At
-                            </p>
-                            <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
-                                {apiData?.createdAt || "-"}
-                            </p>
-                        </div>
+            {/* ── Onboarding Status ───── */}
+            <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#fec931] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
+                <div className="flex items-center gap-3">
+                    <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                        <User className="w-4 h-4 text-black" />
+                    </span>
+                    <div>
+                        <p className="text-lg sm:text-xs text-slate-900 font-medium">
+                            Created By
+                        </p>
+                        <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                            {apiData?.approvedBy || "-"}
+                        </p>
                     </div>
                 </div>
-            </SectionCard>
 
-            {/* ── Basic Reseller Details ───────────────────────────────── */}
-            <SectionCard title="Basic Reseller Details">
+                <div className="flex items-center gap-3">
+                    <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                        <CalendarDays className="w-4 h-4 text-black" />
+                    </span>
+                    <div>
+                        <p className="text-[11px] sm:text-xs text-slate-900 font-medium">
+                            Created At
+                        </p>
+                        <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                            {apiData?.createdAt || "-"}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Basic Reseller Details ──────── */}
+            <SectionCard title="Basic Reseller Details" icon={UserRound}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                     <ViewField label="First Name" required value={apiData?.firstName} />
                     <ViewField label="Last Name" required value={apiData?.lastName} />
@@ -213,24 +197,20 @@ export default function ResellerViewDetails() {
             </SectionCard>
 
             {/* ── Address ───────────────────────────────────────────────── */}
-            <SectionCard title="Address">
+            <SectionCard title="Address" icon={MapPin}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                     <ViewField label="Address" required value={apiData?.address} />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
                     <ViewField label="Country" required value={apiData?.country} />
                     <ViewField label="State" required value={apiData?.state} />
-                    <ViewField label="City" required value={apiData?.city} />
                 </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 mt-5">
+                    <ViewField label="City" required value={apiData?.city} />
                     <ViewField label="Zip Code" required value={apiData?.pincode} />
                 </div>
             </SectionCard>
 
             {/* ── Settlement Setup ──────────────────────────────────────── */}
-            <SectionCard title="Settlement Setup">
+            <SectionCard title="Settlement Setup" icon={Landmark}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-6 xl:gap-x-7 gap-y-5">
                     <div>
                         <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-2">
@@ -264,7 +244,7 @@ export default function ResellerViewDetails() {
             </SectionCard>
 
             {/* ── Beneficiary Account Details ──────────────────────────── */}
-            <SectionCard title="Beneficiary Account Details">
+            <SectionCard title="Beneficiary Account Details" icon={CreditCard}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                     <ViewField
                         label="Beneficiary Account Name"
@@ -294,10 +274,9 @@ export default function ResellerViewDetails() {
             </SectionCard>
 
             {/* Status */}
-            <SectionCard title="Documents Details">
+            <SectionCard title="Documents Details" icon={Upload}>
                 {/* Upload Documents Details */}
                 <div className="w-full">
-                    <p className="border-t border-gray-300 py-3"></p>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         {documentList.map((document, index) => {
                             const existingDocument =
@@ -420,7 +399,6 @@ export default function ResellerViewDetails() {
                         })}
                     </div>
                 </div>
-
             </SectionCard>
         </div>
     );

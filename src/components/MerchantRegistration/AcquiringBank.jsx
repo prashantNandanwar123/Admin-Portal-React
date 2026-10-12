@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import axiosInstance from "../../api/axios";
-import { Receipt, Landmark, UserRound, SlidersHorizontal } from "lucide-react";
-
+import { WalletCards, CircleDollarSign, Landmark, Settings2, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function AcquiringBank({ data, setData, handleNext,
@@ -11,7 +10,6 @@ export default function AcquiringBank({ data, setData, handleNext,
   const handleChange = (field, value) => {
     setData({ ...data, [field]: value });
   };
-
 
   const saveAcquiringBank = async () => {
 
@@ -45,20 +43,11 @@ export default function AcquiringBank({ data, setData, handleNext,
         // Miscellaneous
         misTransactionLimit: data?.misTransactionLimit,
         misTransactionLimitStatus: data?.misTransactionLimitStatus,
-        VPA_Mis_AppMode: data?.VPA_Mis_AppMode,
+        msCurrency: data?.msCurrency,
         misPerTransactionLimit: data?.misPerTransactionLimit,
         misPerTransactionLimitStatus: data?.misPerTransactionLimitStatus,
-
-        VPA_Mis_TranMode: data?.VPA_Mis_TranMode,
-        VPA_Mis_FIRC: data?.VPA_Mis_FIRC,
-        VPA_Mis_FIRCFrequency: data?.VPA_Mis_FIRCFrequency,
-        VPA_Mis_FuelAssociation: data?.VPA_Mis_FuelAssociation,
-        VPA_Mis_FuelRemark: data?.VPA_Mis_FuelRemark,
-        VPA_Mis_CallCharges: data?.VPA_Mis_CallCharges,
-        VPA_Mis_SecretKey: data?.VPA_Mis_SecretKey,
         VPA_Mis_DocumentRequired: data?.VPA_Mis_DocumentRequired,
         VPA_Mis_DocumentPending: data?.VPA_Mis_DocumentPending,
-        VPA_Mis_MerchantReimbursement: data?.VPA_Mis_MerchantReimbursement,
         VPA_Mis_CustomerId: data?.VPA_Mis_CustomerId,
         VPA_Mis_VPA: data?.VPA_Mis_VPA,
 
@@ -120,42 +109,42 @@ export default function AcquiringBank({ data, setData, handleNext,
     });
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
   return (
     <>
-
       <form
         onSubmit={(e) => {
           e.preventDefault();
           saveAcquiringBank();
         }}
       >
-        <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
-            <Landmark size={18} />
-          </span>
-      <h2 className="text-xl text-blue-900 font-semibold">
-            Acquiring Bank Setup Details
-          </h2>
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+              <Landmark className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
+            </div>
+            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+              Acquiring Bank Setup Details
+            </h2>
+          </div>
+          <p className="ml-14 text-sm text-slate-700 -mt-3">
+            Configure and manage all essential merchant acquiring bank information
+            including settlement details, transaction settings for secure and
+            seamless banking operations.
+          </p>
         </div>
 
-          <p className="ml-12 pb-1 text-sm text-blue-900">
-          Configure and manage all essential merchant acquiring bank information including
-          settlement details, transaction settings for secure and
-          seamless banking operations.
-        </p>
-
-        {/* ── Fee Setup ─────────────────────────────────────────────────── */}
+        {/* ── Fee Setup ────────── */}
         <div className="py-5">
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-5">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600">
-                <Receipt size={16} />
+              <span className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                <CircleDollarSign className="w-4 h-4 text-yellow-600" />
               </span>
-              <h2 className="text-[18px] text-[#5c5c5c] font-semibold">
+              <h2 className="text-base font-semibold text-gray-900 uppercase">
                 Fee Setup
               </h2>
             </div>
@@ -175,7 +164,7 @@ export default function AcquiringBank({ data, setData, handleNext,
                 <div key={field}>
                   <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
                     {label}
-                    {required && <span className="text-red-500"> *</span>}
+                    {required && <span className="text-red-500 ml-1">*</span>}
                   </label>
 
                   <input
@@ -198,7 +187,7 @@ export default function AcquiringBank({ data, setData, handleNext,
               {/* AMC Type */}
               <div>
                 <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                  AMC Type <span className="text-red-500">*</span>
+                  AMC Type <span className="text-red-500 ml-1">*</span>
                 </label>
 
                 <select
@@ -223,21 +212,21 @@ export default function AcquiringBank({ data, setData, handleNext,
           </div>
         </div>
 
-        {/* ── Settlement Setup ──────────────────────────────────────────── */}
+        {/* ── Settlement Setup ─────────── */}
         <div className="pb-5">
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-5">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">
-                <Landmark size={16} />
+              <span className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                <Landmark className="w-4 h-4 text-yellow-600" />
               </span>
-              <h2 className="text-[18px] text-[#5c5c5c] font-semibold">Settlement Setup</h2>
+              <h2 className="text-base font-semibold text-gray-900 uppercase">Settlement Setup</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
 
-              {/* ✅ Fixed: value+onChange now on the <input>, not <label> */}
+              {/* fixed: value+onChange now on the <input>, not <label> */}
               <div>
                 <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                  Settlement Type <span className="text-red-500">*</span>
+                  Settlement Type <span className="text-red-500 ml-1">*</span>
                 </label>
                 <div className="flex items-center gap-5 mt-2">
                   {["Manual", "Automatic"].map((type) => (
@@ -263,7 +252,7 @@ export default function AcquiringBank({ data, setData, handleNext,
               ].map(({ label, field, options }) => (
                 <div key={field}>
                   <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                    {label} <span className="text-red-500">*</span>
+                    {label} <span className="text-red-500 ml-1">*</span>
                   </label>
                   <select
                     value={data?.[field] || ""}
@@ -284,11 +273,10 @@ export default function AcquiringBank({ data, setData, handleNext,
         <div className="pb-5">
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600">
-                <UserRound size={16} />
+              <span className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                <WalletCards className="w-4 h-4 text-yellow-600" />
               </span>
-              <h2 className="text-2xl font-semibold text-gray-700">
-                Beneficiary Account Details
+              <h2 className="text-base font-semibold text-gray-900 uppercase">Beneficiary Account Details
               </h2>
             </div>
 
@@ -420,19 +408,17 @@ export default function AcquiringBank({ data, setData, handleNext,
         <section className="pb-5">
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600">
-                <SlidersHorizontal size={16} />
+              <span className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                <Settings2 className="w-5 h-5 text-yellow-600" />
               </span>
-              <h2 className="text-2xl font-semibold text-gray-700">
-                Miscellaneous
+              <h2 className="text-base font-semibold text-gray-900 uppercase">                Miscellaneous
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Daily Transaction Limit */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Daily Transaction Limit
-                  <span className="text-red-500"> *</span>
+                  Daily Transaction Limit<span className="text-red-500"> *</span>
                 </label>
 
                 <input
@@ -485,29 +471,24 @@ export default function AcquiringBank({ data, setData, handleNext,
                 </select>
               </div>
 
-              {/* Application Mode */}
+              {/* Transaction Currency */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Application Mode
+                  Transaction Currency Type  <span className="text-red-500"> *</span>
                 </label>
 
                 <select
-                  value={data?.VPA_Mis_AppMode || ""}
+                  value={data?.msCurrency || ""}
                   onChange={(e) =>
-                    handleChange("VPA_Mis_AppMode", e.target.value)
+                    handleChange("msCurrency", e.target.value)
                   }
                   required
                   className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">-- Select --</option>
-                  <option value="BUS MODE">BUS MODE</option>
-                  <option value="FULL MODE">FULL MODE</option>
-                  <option value="KOTAK ADMIN MENU">KOTAK ADMIN MENU</option>
-                  <option value="LODHA ADMIN MENU">LODHA ADMIN MENU</option>
-                  <option value="LODHA-PALAVA ADMIN MENU">
-                    LODHA-PALAVA ADMIN MENU
-                  </option>
-                  <option value="MERCHANT MENU">MERCHANT MENU</option>
+                  <option value="INR">INR - INDIA</option>
+                  <option value="IDR">IDR - INDONESIA</option>
+                  <option value="VND">VND - VIETNAM</option>
                 </select>
               </div>
               {/* Per Transaction Limit */}
@@ -560,189 +541,6 @@ export default function AcquiringBank({ data, setData, handleNext,
                 </select>
               </div>
 
-              {/* Transaction Mode */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Transaction Mode
-                </label>
-
-                <select
-                  value={data?.VPA_Mis_TranMode || ""}
-                  onChange={(e) =>
-                    handleChange("VPA_Mis_TranMode", e.target.value)
-                  }
-                  required
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">-- Select --</option>
-                  <option value="Last 5 Transactions (Offline)">
-                    Last 5 Transactions (Offline)
-                  </option>
-                  <option value="Purchase Bus Ticket">
-                    Purchase Bus Ticket
-                  </option>
-                  <option value="Balance Enquiry">
-                    Balance Enquiry
-                  </option>
-                  <option value="Bus pass validation">
-                    Bus pass validation
-                  </option>
-                </select>
-              </div>
-
-              {/* FIRC */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  FIRC (Foreign Inward Remittance Certificate)
-                  <span className="text-red-500"> *</span>
-                </label>
-
-                <div className="flex items-center gap-6 h-11">
-                  <label className="flex items-center gap-2 text-sm text-gray-700">
-                    <input
-                      type="radio"
-                      name="VPA_Mis_FIRC"
-                      value="Yes"
-                      required
-                      checked={data?.VPA_Mis_FIRC === "Yes"}
-                      onChange={(e) =>
-                        handleChange("VPA_Mis_FIRC", e.target.value)
-                      }
-                    />
-                    Yes
-                  </label>
-
-                  <label className="flex items-center gap-2 text-sm text-gray-700">
-                    <input
-                      type="radio"
-                      name="VPA_Mis_FIRC"
-                      value="No"
-                      checked={data?.VPA_Mis_FIRC === "No"}
-                      onChange={(e) =>
-                        handleChange("VPA_Mis_FIRC", e.target.value)
-                      }
-                    />
-                    No
-                  </label>
-                </div>
-              </div>
-
-              {/* FIRC Frequency */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  FIRC Frequency
-                </label>
-
-                <select
-                  value={data?.VPA_Mis_FIRCFrequency || ""}
-                  onChange={(e) =>
-                    handleChange("VPA_Mis_FIRCFrequency", e.target.value)
-                  }
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">-- Select --</option>
-                  <option value="Daily">Daily</option>
-                  <option value="Monthly">Monthly</option>
-                </select>
-              </div>
-
-              {/* Fuel Association */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Fuel Association
-                </label>
-
-                <select
-                  value={data?.VPA_Mis_FuelAssociation || ""}
-                  onChange={(e) =>
-                    handleChange("VPA_Mis_FuelAssociation", e.target.value)
-                  }
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">-- Select --</option>
-                  <option value="BPCL">BPCL</option>
-                  <option value="CNG">CNG</option>
-                  <option value="Essar Fuel">Essar Fuel</option>
-                  <option value="Fuel ME">Fuel ME</option>
-                  <option value="HP GAS">HP GAS</option>
-                  <option value="HPCL">HPCL</option>
-                  <option value="IBP">IBP</option>
-                  <option value="IOCL">IOCL</option>
-                  <option value="LPG">LPG</option>
-                  <option value="MGL">MGL</option>
-                  <option value="MNGL">MNGL</option>
-                  <option value="Reliance">Reliance</option>
-                  <option value="No Name">No Name</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              {/* Fuel Remark */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Fuel Remark
-                </label>
-
-                <input
-                  type="text"
-                  value={data?.VPA_Mis_FuelRemark || ""}
-                  onChange={(e) =>
-                    handleChange("VPA_Mis_FuelRemark", e.target.value)
-                  }
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Call Charges */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Call Charges
-                </label>
-
-                <input
-                  type="text"
-                  value={data?.VPA_Mis_CallCharges || ""}
-                  onChange={(e) => {
-                    const value = e.target.value;
-
-                    if (value && !/^[0-9]+$/.test(value)) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        VPA_Mis_CallCharges: "Only numbers are allowed",
-                      }));
-                    } else {
-                      setErrors((prev) => ({
-                        ...prev,
-                        VPA_Mis_CallCharges: "",
-                      }));
-                    }
-
-                    handleChange("VPA_Mis_CallCharges", value);
-                  }}
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                {errors?.VPA_Mis_CallCharges && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.VPA_Mis_CallCharges}
-                  </p>
-                )}
-              </div>
-
-              {/* Secret Key */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Secret Key
-                </label>
-
-                <input
-                  type="text"
-                  value={data?.VPA_Mis_SecretKey || ""}
-                  onChange={(e) =>
-                    handleChange("VPA_Mis_SecretKey", e.target.value)
-                  }
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
 
               {/* Document Required */}
               <div>
@@ -824,21 +622,6 @@ export default function AcquiringBank({ data, setData, handleNext,
                   </label>
                 </div>
               </div>
-              {/* Merchant Reimbursement */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Merchant Reimbursement
-                </label>
-
-                <input
-                  type="text"
-                  value={data?.VPA_Mis_MerchantReimbursement || ""}
-                  onChange={(e) =>
-                    handleChange("VPA_Mis_MerchantReimbursement", e.target.value)
-                  }
-                  className="w-full h-11 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
 
               {/* Customer Id */}
               <div>
@@ -879,18 +662,20 @@ export default function AcquiringBank({ data, setData, handleNext,
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 text-white px-5 py-1 rounded-full hover:bg-gray-600"
+            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
           >
+            <ArrowLeft size={16} />
             Back
           </button>
           <button
             type="submit"
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+            className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Save & Next
+            <ArrowRight size={16} />
           </button>
         </div>
-      </form>
+      </form >
     </>
   );
 }

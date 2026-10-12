@@ -1,22 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import RiskApprovalFrom from "../RiskApproval/RiskApprovalFrom";
 import axiosInstance from "../../api/axios";
 import { LiaEyeSolid } from "react-icons/lia";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
-
 import {
   FaChevronLeft,
-  FaChevronRight,
-  FaPlus,
+  FaChevronRight,  
   FaSearch,
 } from "react-icons/fa";
 
 export default function RiskApproval() {
 
   const location = useLocation();
-
   const [data, setData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,7 +22,6 @@ export default function RiskApproval() {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-
 
   const [view, setView] = useState("list");
   const [currentStep, setCurrentStep] = useState(0);
@@ -49,7 +45,6 @@ export default function RiskApproval() {
         "/riskApproval",
         {}
       );
-      console.log("response Data::--", res);
       const response = res?.data ?? res;
       if (response?.respCode === 0) {
         setData(response?.respData || []);
@@ -100,7 +95,7 @@ export default function RiskApproval() {
 
   return (
     <>
-      <div className="px-10 pb-10 pt-8">
+      <div className="lg:px-5 pb-10 pt-8 px-3">
         {/* Header */}
         <div className="flex items-center justify-between pb-5 ml-5">
           <div>
@@ -125,7 +120,7 @@ export default function RiskApproval() {
                   setEntriesPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#fec931]"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -135,51 +130,34 @@ export default function RiskApproval() {
             </div>
 
             {/* Search */}
-            <div className="relative w-full lg:w-80">
+            <div className="relative w-full lg:w-60">
               <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
               <input
                 type="text"
-                placeholder="Search merchant..."
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-slate-200  pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#fec931] focus:bg-white transition-all"
               />
             </div>
           </div>
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left border-collapse">
-              {/* Table Head */}
-              <thead className="bg-slate-50 text-slate-800 text-xs uppercase tracking-wider">
+            <table className="w-full text-sm text-left border-collapse">             
+              <thead className="bg-[#fec931] text-black text-xs uppercase [&_th]:border-t-0">
                 <tr>
-                  <th className="px-4 py-3">
-                    ID
-                  </th>
-                  <th className="px-4 py-3 text-center">
-                    Created Date
-                  </th>
-                  <th className="px-4 py-3 text-center">
-                    Legal Name
-                  </th>
-                  <th className="px-4 py-3 text-center">
-                    Contact Person Name
-                  </th>
-                  <th className="px-4 py-3 text-center">
-                    Email Address
-                  </th>
-                  <th className="px-4 py-3 text-center">
-                    Mobile Number
-                  </th>
-                  <th className="px-4 py-3 text-center">
-                    Created By
-                  </th>
-                  <th className="px-4 py-3 text-center text-center">
-                    Action
-                  </th>
+                  <th className="px-4 py-3">ID</th>
+                  <th className="px-4 py-3 text-center font-semibold">Created At</th>
+                  <th className="px-4 py-3 text-center font-semibold">Legal Name</th>
+                  <th className="px-4 py-3 text-center font-semibold">Reseller Name</th>
+                  <th className="px-4 py-3 text-center font-semibold">Email Address</th>
+                  <th className="px-4 py-3 text-center font-semibold">Mobile Number</th>
+                  <th className="px-4 py-3 text-center font-semibold">Created By</th>
+                  <th className="px-4 py-3 text-center font-semibold">Action</th>
                 </tr>
               </thead>
 
@@ -189,42 +167,21 @@ export default function RiskApproval() {
                   currentData.map((item, index) => (
                     <tr
                       key={index}
-                      className="hover:bg-gray-50 transition"
-                    >
+                      className="hover:bg-gray-50 transition">                    
                       {/* ID */}
-                      <td className="px-4 py-3 text-center">
-                        {item[0]}
-                      </td>
-
+                      <td className="px-4 py-3 text-center">{item[0]}</td>
                       {/* Created Date */}
-                      <td className="px-4 py-3 font-semibold text-blue-600 text-center">
-                        {item[6]}
-                      </td>
-
+                      <td className="px-4 py-3 text-black-600 text-center">{item[6]}</td>
                       {/* Legal Name */}
-                      <td className="px-4 py-3 text-center">
-                        {item[1]}
-                      </td>
+                      <td className="px-4 py-3 text-center">{item[1]}</td>
                       {/* Contact Person */}
-                      <td className="px-4 py-3 text-center">
-                        {item[2]}
-                      </td>
-
+                      <td className="px-4 py-3 text-center">{item[2]}</td>
                       {/* Email */}
-                      <td className="px-4 py-3 text-center">
-                        {item[3]}
-                      </td>
-
+                      <td className="px-4 py-3 text-center">{item[3]}</td>
                       {/* Mobile */}
-                      <td className="px-4 py-3 text-center">
-                        {item[4]}
-                      </td>
-
+                      <td className="px-4 py-3 text-center">{item[4]}</td>
                       {/* Created By */}
-                      <td className="px-4 py-3 font-semibold text-blue-600 text-center">
-                        {item[7]}
-                      </td>
-
+                      <td className="px-4 py-3 font-semibold text-slate-900 text-center">{item[7]}</td>
                       {/* Action */}
                       <td className="px-4 py-3 text-center">
                         <button
@@ -247,7 +204,6 @@ export default function RiskApproval() {
                     </td>
                   </tr>
                 )}
-
               </tbody>
             </table>
 
@@ -291,7 +247,7 @@ export default function RiskApproval() {
                     key={index}
                     onClick={() => setCurrentPage(index + 1)}
                     className={`w-10 h-10 rounded-xl font-medium transition-all ${currentPage === index + 1
-                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                      ? "bg-[#fec931] text-black shadow-lg"
                       : "bg-white border hover:bg-slate-100"
                       }`}
                   >

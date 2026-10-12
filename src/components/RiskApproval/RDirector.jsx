@@ -9,7 +9,7 @@ import {
     FileText,
     CreditCard,
     ShieldCheck,
-    Eye
+    Eye, ArrowRight, ArrowLeft
 } from "lucide-react";
 
 export default function RDirector({ refId,
@@ -18,7 +18,7 @@ export default function RDirector({ refId,
 
     const [openDirector, setOpenDirector] = useState(1);
     const [directorCount, setDirectorCount] = useState(1);
-        const [directorData, setDirectorData] = useState({});
+    const [directorData, setDirectorData] = useState({});
 
     useEffect(() => {
         VDirectorDetails(refId);
@@ -174,7 +174,7 @@ export default function RDirector({ refId,
                                             <BriefcaseBusiness className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1169ad] pointer-events-none" />
                                             <input
                                                 readOnly
-                                                 value={currentDirector?.directorDesignation || ""}
+                                                value={currentDirector?.directorDesignation || ""}
                                                 className="appearance-none w-full h-10 pl-9 pr-8 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
 
                                             >
@@ -196,7 +196,7 @@ export default function RDirector({ refId,
                                             <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                             <input
 
-                                                   value={currentDirector?.directorPanNo || ""}
+                                                value={currentDirector?.directorPanNo || ""}
                                                 className="w-full h-10 pl-9 pr-3 text-xs text-gray-500 border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8] uppercase"
                                             />
                                         </div>
@@ -211,7 +211,7 @@ export default function RDirector({ refId,
                                         <div className="relative">
                                             <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                             <input
-                                                   value={currentDirector?.directorAadharNo || ""}
+                                                value={currentDirector?.directorAadharNo || ""}
 
                                                 className="w-full h-10 pl-9 pr-20 text-xs text-gray-500 border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
                                             />
@@ -234,7 +234,7 @@ export default function RDirector({ refId,
                                                 <div className="flex items-center min-w-0">
                                                     <FileText className="w-4 h-4 ml-3 text-gray-300 shrink-0" />
                                                     <span className="ml-2 text-xs text-gray-400 truncate">
-                                                           {selfie?.fileName || "No photograph uploaded"}
+                                                        {selfie?.fileName || "No photograph uploaded"}
                                                     </span>
                                                 </div>
 
@@ -296,7 +296,7 @@ export default function RDirector({ refId,
                                                 <div className="flex items-center min-w-0">
                                                     <FileText className="w-4 h-4 ml-3 text-gray-300 shrink-0" />
                                                     <span className="ml-2 text-xs text-gray-400 truncate">
-                                                           {aadhar?.fileName || "No Aadhaar document uploaded"}
+                                                        {aadhar?.fileName || "No Aadhaar document uploaded"}
                                                     </span>
                                                 </div>
                                                 {/* Right: View icon */}
@@ -323,24 +323,22 @@ export default function RDirector({ refId,
     // MAIN UI
     return (
         <div className="bg-white">
-            <div className="max-w-screen mx-auto px-4 sm:px-6 py-5">
-                {/* HEADER */}
-                <div className="flex items-center justify-between pb-5">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#eef5f9]">
-                            <UserRound className="w-4 h-4 text-[#126aa8]" />
-                        </div>
-                        <div>
-                            <h2 className="xl:text-2xl sm:text-lg font-semibold text-[#173875]">
-                                Review Director Details
-                            </h2>
-                            <p className="mt-0.5 text-sm text-gray-500">
-                                Director information
-                            </p>
+            <div>               
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[15px]">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-yellow-100">
+                                <UserRound className="w-4 h-4 text-yellow-600" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl sm:text-xl text-slate-800 font-semibold"> Review Director Details</h2>
+                                <p className="text-sm text-slate-500 font-normal">Director information </p>
+                            </div>
                         </div>
                     </div>
-                </div>               
-                              
+                </div>
+
                 {/* DIRECTORS */}
                 <div className="mt-3 space-y-3">
                     {renderDirector(1)}
@@ -350,22 +348,23 @@ export default function RDirector({ refId,
                     )}
                 </div>
 
-
                 {/* BACK & NEXT BUTTONS */}
                 <div className="flex justify-between items-center gap-4 mt-10">
                     <button
                         type="button"
                         onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+                        className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
                     >
+                        <ArrowLeft size={16} />
                         Back
                     </button>
                     <button
                         type="button"
                         onClick={handleNext}
-                        className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                        className="inline-flex items-center gap-2 bg-[#fec931] font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
                     >
                         Next
+                        <ArrowRight size={16} />
                     </button>
                 </div>
             </div>

@@ -1,31 +1,24 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import {
   User,
   Landmark,
-  CreditCard,
+  QrCode,
   IndianRupee,  
   Upload,
   Settings,
   Check
 } from "lucide-react";
 
-
 import EBasicDetails from "./EBasicDetails";
 import EDirector from "./EDirector";
 import EAcquiringBank from "./EAcquiringBank";
 import EPaymentType from "./EPaymentType";
 import EMSFFee from "./EMSFFee";
-// import EChecklist from "./EChecklist";
-// import EUploadDocuments from "./EUploadDocuments";
 import ECompanyDocs from "./ECompanyDocs";
 import EIPGConfig from "./EIPGConfig";
 
-
-export default function MerchantsEditForm({
-  merchantData,
-  
-}) {
+export default function MerchantsEditForm({merchantData}) {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({});
@@ -33,51 +26,13 @@ export default function MerchantsEditForm({
 
   //  STEP CONFIG
   const steps = [
-    {
-      title: "Basic Details",
-      component: EBasicDetails,
-      icon: User,
-    },
-    {
-      title: "Director Details",
-      component: EDirector,
-      icon: User,
-    },
-    {
-      title: "Acquiring Bank",
-      component: EAcquiringBank,
-      icon: Landmark,
-    },
-    {
-      title: "Payment Type",
-      component: EPaymentType,
-      icon: CreditCard,
-    },
-    {
-      title: "MSF Fee",
-      component: EMSFFee,
-      icon: IndianRupee,
-    },
-    // {
-    //   title: "Checklist",
-    //   component: EChecklist,
-    //   icon: ClipboardCheck,
-    // },
-    // {
-    //   title: "Upload Documents",
-    //   component: EUploadDocuments,
-    //   icon: Upload,
-    // },
-    {
-      title: "Company Documents",
-      component: ECompanyDocs,
-      icon: Upload,
-    },
-    {
-      title: "IPG Config",
-      component: EIPGConfig,
-      icon: Settings,
-    },
+    { title: "Basic Details", component: EBasicDetails, icon: User },
+    { title: "Director Details", component: EDirector, icon: User },
+    { title: "Acquiring Bank", component: EAcquiringBank, icon: Landmark },
+    { title: "Payment Type", component: EPaymentType, icon: QrCode },
+    { title: "MSF Fee", component: EMSFFee, icon: IndianRupee },
+    { title: "Company Documents", component: ECompanyDocs, icon: Upload },
+    { title: "IPG Config", component: EIPGConfig, icon: Settings },
   ];
 
   const CurrentComponent = steps[currentStep].component;

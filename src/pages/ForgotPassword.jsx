@@ -36,7 +36,6 @@ export default function ForgotPassword() {
       );
 
       if (response?.respCode === 0) {
-        console.log(response);
         toast.success(response.respMsg);
         setOtpSent(true);   // OTP field show hoga
       } else {
@@ -124,7 +123,6 @@ export default function ForgotPassword() {
       });
 
       if (response?.respCode === 0) {
-        console.log("rest password Message--->>>", response?.respMsg);
         toast.success(response?.respMsg);
         setTimeout(() => {
           navigate("/");
@@ -140,7 +138,7 @@ export default function ForgotPassword() {
     }
   };
 
-  const req = <span className="text-red-500">*</span>;
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
     <div className="bg-[#f4f4f4] min-h-screen w-full p-4 md:p-6 lg:p-8 xl:p-3 flex items-center justify-center">
@@ -313,7 +311,7 @@ export default function ForgotPassword() {
                     type="button"
                     onClick={sendOtp}
                     disabled={loading}
-                    className="w-full bg-[#FEC62F] hover:bg-[#FEC91F] text-white py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
+                    className="w-full bg-[#fec931] hover:bg-[#FEC91F] text-black py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
                   >
                     {loading ? "Sending..." : "Send OTP"}
                   </button>
@@ -343,7 +341,7 @@ export default function ForgotPassword() {
                     type="button"
                     onClick={verifyOtp}
                     disabled={loading}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
+                    className="w-full bg-[#fec931] hover:bg-[#FEC91F] text-black py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
                   >
                     {loading ? "Verifying..." : "Verify OTP"}
                   </button>
@@ -414,7 +412,7 @@ export default function ForgotPassword() {
                       type="button"
                       onClick={handleResetPassword}
                       disabled={loading}
-                      className="w-full bg-[#FDBB01] hover:bg-[#FDC630] text-white py-3 xl:py-2 xl:text-sm rounded-xl font-semibold"
+                      className="w-full bg-[#fec931] text-black py-3 xl:py-2 xl:text-sm rounded-xl font-medium"
                     >
                       {loading ? "Processing..." : "Reset Password"}
                     </button>
@@ -579,7 +577,7 @@ export default function ForgotPassword() {
                       type="button"
                       onClick={sendOtp}
                       disabled={loading}
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold"
+                      className="w-full bg-[#fec931] text-black py-3 rounded-xl font-semibold"
                     >
                       {loading ? "Sending..." : "Send OTP"}
                     </button>
@@ -608,7 +606,7 @@ export default function ForgotPassword() {
                       type="button"
                       onClick={verifyOtp}
                       disabled={loading}
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold"
+                      className="w-full bg-[#fec931] text-black py-3 rounded-xl font-semibold"
                     >
                       {loading ? "Verifying..." : "Verify OTP"}
                     </button>

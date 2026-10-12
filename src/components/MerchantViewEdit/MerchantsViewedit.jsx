@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import MerchantsViewEditForm from "./MerchantsViewEditForm";
 import MerchantsEditForm from "./MerchantsEditForm";
@@ -179,149 +179,155 @@ export default function MerchantsViewedit() {
 
           {/* Search */}
           <div className="flex items-center gap-3 w-full lg:w-auto">
-            <div className="relative w-full lg:w-80">
+            <div className="relative w-full">
               <FaSearch className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 text-sm" />
               <input
                 type="text"
-                placeholder="Search merchant by name, MID, TID..."
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setPage(0);
                 }}
-                className="w-full border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 focus:bg-white transition-all"
+                className="w-full border border-slate-200  pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#fec931] focus:bg-white transition-all"
               />
             </div>
           </div>
         </div>
 
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="bg-slate-50 text-slate-900 text-left uppercase text-xs tracking-wide">
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">ID</th>
-              <th className="border-b border-slate-200 px-4 py-3 font-bold text-center">
-                Merchant Legal Name
-              </th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">MID</th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">TID</th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">
-                Contact Number
-              </th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">
-                Email Address
-              </th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">MCC</th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">Status</th>
-              <th className="border-b border-slate-200 px-4 py-3 font-semibold text-center">
-                Action
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading ? (
-              <tr>
-                <td
-                  colSpan="9"
-                  className="text-center py-6 text-slate-400"
-                >
-                  Loading...
-                </td>
-              </tr>
-            ) : filteredData.length > 0 ? (
-              filteredData.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-slate-50 border-b border-slate-100 last:border-b-0"
-                >
-                  {/* Serial Number */}
-                  <td className="px-4 py-4 text-slate-500 text-center">
-                    {page * size + index + 1}
-                  </td>
-
-                  {/* Merchant Name */}
-                  <td className="px-4 py-4 text-center">
-                    <div className="font-semibold text-slate-800">
-                      {item.store_dba_name || "-"}
-                    </div>
-                    {/* <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  Verified
-                </span> */}
-                  </td>
-
-                  {/* MID */}
-                  <td className="px-4 py-4 text-slate-600 text-center">
-                    {item.midnumber || "-"}
-                  </td>
-
-                  {/* TID */}
-                  <td className="px-4 py-4 text-slate-600 text-center">
-                    {item.tidnumber || "-"}
-                  </td>
-
-                  {/* Contact */}
-                  <td className="px-4 py-4 text-slate-600 text-center">
-                    {item.cpd_mobile || "-"}
-                  </td>
-
-                  {/* Email */}
-                  <td className="px-4 py-4 text-slate-600 text-center">
-                    {item.cpd_primary_email_id || "-"}
-                  </td>
-
-                  {/* MCC */}
-                  <td className="px-4 py-4 text-slate-600 text-center">
-                    {item.bdd_agp_mcc || "-"}
-                  </td>
-
-                  {/* Status */}
-                  <td className="px-4 py-4 text-center">
-                    <button onClick={() => handleStatusChange(
-                      item.midnumber,
-                      item.status
-                    )
-                    }
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Active"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                        }`}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full ${item.status === "Active" ? "bg-green-500" : "bg-red-500"}`} />
-                      {item.status}
-                    </button>
-                  </td>
-
-                  {/* Action */}
-                  <td className="px-4 py-4 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => handleViewClick(item.ref_id)}
-                        className="border  bg-yellow-500 border-none text-white border-slate-300 text-slate-600 hover:bg-yellow-600 px-3 py-1.5 rounded-lg text-xs font-medium"
-                      >
-                        VIEW
-                      </button>
-                      <button
-                        onClick={() => handleEditClick(item.ref_id)}
-                        className="bg-slate-800 hover:bg-slate-900 border-none text-white px-3 py-1.5 rounded-lg text-xs font-medium">
-                        EDIT
-                      </button>
-                    </div>
-                  </td>
+        <div className="w-full overflow-x-auto">
+          <div className="max-h-[500px] overflow-y-auto">
+            <table
+              className="min-w-[1400px] w-full text-sm">
+              <thead className="sticky top-0 z-20 [&_th]:border-t-0">
+                <tr className="bg-yellow-400 text-black text-left uppercase text-xs tracking-wide">
+                  <th className="border border-slate-200 px-4 py-3 font-semibold text-center">
+                    ID
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-medium text-center whitespace-nowrap">
+                    Merchant Name
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-medium text-center whitespace-nowrap">
+                    Merchant Legal Name
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-medium text-center whitespace-nowrap">
+                    MID
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-semibold text-center whitespace-nowrap">
+                    TID
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-medium text-center whitespace-nowrap">
+                    Contact Number
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-medium text-center whitespace-nowrap">
+                    Email Address
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-semibold text-center whitespace-nowrap">
+                    MCC
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-semibold text-center whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="border border-slate-200 px-4 py-3 font-semibold text-center whitespace-nowrap">
+                    Action
+                  </th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="9"
-                  className="text-center py-6 text-gray-500"
-                >
-                  No Data Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              </thead>
+
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="10" className="text-center py-6 text-slate-400 border border-slate-200">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : filteredData.length > 0 ? (
+                  filteredData.map((item, index) => (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-slate-50 border border-slate-200"
+                    >
+                      <td className="border border-slate-200 px-4 py-4 text-slate-500 text-center">
+                        {page * size + index + 1}
+                      </td>
+                      <td className="px-4 py-4 text-center border border-slate-200">
+                        <div className="font-semibold text-slate-800">
+                          {item.cpd_name || "-"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-center border border-slate-200">
+                        <div className="font-semibold text-slate-800">
+                          {item.store_dba_name || "-"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-slate-600 text-center border border-slate-200">
+                        {item.midnumber || "-"}
+                      </td>
+                      <td className="px-4 py-4 text-slate-600 text-center border border-slate-200">
+                        {item.tidnumber || "-"}
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-600 text-center border border-slate-200">
+                        {item.cpd_mobile || "-"}
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-600 text-center border border-slate-200">
+                        {item.cpd_primary_email_id || "-"}
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-600 text-center border border-slate-200">
+                        {item.bdd_agp_mcc || "-"}
+                      </td>
+
+                      <td className="px-4 py-4 text-center border border-slate-200">
+                        <button
+                          onClick={() =>
+                            handleStatusChange(item.midnumber, item.status)
+                          }
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Active"
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-600"
+                            }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${item.status === "Active"
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
+                          />
+                          {item.status}
+                        </button>
+                      </td>
+
+                      <td className="px-4 py-4 text-center border border-slate-200 border border-slate-200">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => handleViewClick(item.ref_id)}
+                            className="bg-[#fec931] text-black px-3 py-1.5 rounded-lg text-xs font-medium"
+                          >
+                            VIEW
+                          </button>
+                          <button
+                            onClick={() => handleEditClick(item.ref_id)}
+                            className="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium"
+                          >
+                            EDIT
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="10" className="text-center py-6 text-gray-500">
+                      No Data Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Bottom Pagination */}
         <div className="flex flex-col md:flex-row justify-between items-center p-5 gap-4 border-t border-slate-200">

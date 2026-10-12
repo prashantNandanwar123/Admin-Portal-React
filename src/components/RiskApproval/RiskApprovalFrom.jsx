@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
 import {
   User,
   Landmark,
-  CreditCard,
+  QrCode,
   IndianRupee,
   Upload,
   Settings,
@@ -11,14 +11,12 @@ import {
 } from "lucide-react";
 
 import RBasicDetails from "./RBasicDetails";
+import RDirector from "./RDirector";
 import RAcquiringBank from "./RAcquiringBank";
 import RPaymentType from "./RPaymentType";
 import RMSFFee from "./RMSFFee";
-// import RChecklist from "./RChecklist";
-// import RUploadDocuments from "./RUploadDocuments";
 import RCompanyDocs from "./RCompanyDocs";
 import RIPGConfig from "./RIPGConfig";
-import RDirector from "./RDirector";
 
 export default function RiskApprovalFrom({
   merchantData, // RefId
@@ -27,56 +25,15 @@ export default function RiskApprovalFrom({
 
   const [currentStep, setCurrentStep] = useState(0);
 
-
   //  STEP CONFIG
   const steps = [
-    // {
-    //   title: "Basic Details",
-    //   component: RBasicDetails,
-    //   icon: User,
-    // },
-    // {
-    //   title: "Director Details",
-    //   component: RDirector,
-    //   icon: User
-    // },
-
-    {
-      title: "Acquiring Bank",
-      component: RAcquiringBank,
-      icon: Landmark,
-    },
-    {
-      title: "Payment Type",
-      component: RPaymentType,
-      icon: CreditCard,
-    },
-    {
-      title: "MSF Fee",
-      component: RMSFFee,
-      icon: IndianRupee,
-    },
-    // {
-    //   title: "Checklist",
-    //   component: RChecklist,
-    //   icon: ClipboardCheck,
-    // },
-    // {
-    //   title: "Upload Documents",
-    //   component: RUploadDocuments,
-    //   icon: Upload,
-    // },
-    {
-      title: "Company Documents",
-      component: RCompanyDocs,
-      icon: Upload,
-    },
-
-    {
-      title: "IPG Config",
-      component: RIPGConfig,
-      icon: Settings,
-    },
+    { title: "Basic Details", component: RBasicDetails, icon: User },
+    { title: "Director Details", component: RDirector, icon: User },
+    { title: "Acquiring Bank", component: RAcquiringBank, icon: Landmark },
+    { title: "Payment Type", component: RPaymentType, icon: QrCode },
+    { title: "MSF Fee", component: RMSFFee, icon: IndianRupee },
+    { title: "Company Documents", component: RCompanyDocs, icon: Upload },
+    { title: "IPG Config", component: RIPGConfig, icon: Settings },
   ];
 
   const CurrentComponent = steps[currentStep].component;

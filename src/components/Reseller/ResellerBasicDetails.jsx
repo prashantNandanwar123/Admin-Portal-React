@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
-import { UserPlus, UserRound } from "lucide-react";
+import { UserPlus, UserRound, User, CalendarDays, MapPin, Landmark, Upload } from "lucide-react";
 
 export default function ResellerBasicDetails() {
     const [userData, setUserData] = useState(null);
@@ -74,8 +74,7 @@ export default function ResellerBasicDetails() {
             formData.append("aadharCard", aadharCard);
             formData.append("panCard", panCard);
             formData.append("addressProof", addressProof);
-            formData.append(
-                "reseller",
+            formData.append("reseller",
                 new Blob(
                     [
                         JSON.stringify({
@@ -110,8 +109,7 @@ export default function ResellerBasicDetails() {
                     }
                 )
             );
-            const response = await axiosInstance.post(
-                `/reseller/admin/signup`,
+            const response = await axiosInstance.post(`/reseller/admin/signup`,
                 formData, {
                 headers: {
                     "content-type": "multipart/form-data",
@@ -151,19 +149,57 @@ export default function ResellerBasicDetails() {
                             <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
                                 <UserPlus size={18} />
                             </span>
-                            <h2 className="text-xl text-blue-900 font-semibold">
+                            <h2 className="text-xl text-slate-800 font-semibold">
                                 Reseller Onboarding
                             </h2>
                         </div>
-                        <p className="ml-12 pb-1 text-sm text-blue-900">
+                        <p className="ml-12 pb-1 text-sm text-slate-700">
                             Streamlined reseller onboarding with secure registration, verification,
                             and role-based access setup for faster activation.
                         </p>
                     </div>
                 </div>
 
+                {/* ── Status ─────────────────────────────────────────────────── */}
+                <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#fec931] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
+                    <div className="flex items-center gap-3">
+                        <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                            <User className="w-4 h-4 text-black" />
+                        </span>
+                        <div>
+                            <p className="text-lg sm:text-xs text-slate-900 font-medium">
+                                Created By
+                            </p>
+                            <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                                {userData?.userName}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                            <CalendarDays className="w-4 h-4" />
+                        </span>
+                        <div>
+                            <p className="text-lg sm:text-xs text-slate-900 font-medium">
+                                Created Date
+                            </p>
+
+                            <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                                {new Date().toLocaleDateString("en-IN")}
+                                {" "}
+                                {new Date().toLocaleTimeString("en-IN", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true
+                                })}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 {/* ── Basic Document Details ─── */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
                     <div className="mb-3">
                         <div className="flex items-center gap-3">
                             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
@@ -180,7 +216,7 @@ export default function ResellerBasicDetails() {
                         {/* First Name */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                First Name <span className="text-red-500">*</span>
+                                First Name <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -200,7 +236,7 @@ export default function ResellerBasicDetails() {
                         {/* Last Name */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                Last Name <span className="text-red-500">*</span>
+                                Last Name <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -221,7 +257,7 @@ export default function ResellerBasicDetails() {
                         {/* Email */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                Email Id<span className="text-red-500">*</span>
+                                Email Id<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="email"
@@ -242,7 +278,7 @@ export default function ResellerBasicDetails() {
                         {/* Mobile */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                Mobile No<span className="text-red-500">*</span>
+                                Mobile No<span className="text-red-500 ml-1">*</span>
                             </label>
 
                             <input
@@ -262,7 +298,7 @@ export default function ResellerBasicDetails() {
                         {/* Last Name */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                Comapny Name <span className="text-red-500">*</span>
+                                Comapny Name <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -287,7 +323,7 @@ export default function ResellerBasicDetails() {
                         {/* Aadhar No */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                Aadhar No.<span className="text-red-500">*</span>
+                                Aadhar No.<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -310,7 +346,7 @@ export default function ResellerBasicDetails() {
                         {/* GSTN No */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                GSTN No.<span className="text-red-500">*</span>
+                                GSTN No.<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -361,7 +397,7 @@ export default function ResellerBasicDetails() {
                         {/* Pan No */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-2">
-                                Pan No<span className="text-red-500">*</span>
+                                Pan No<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -411,14 +447,20 @@ export default function ResellerBasicDetails() {
 
                 {/* ── Address  Details ─── */}
                 <div className="bg-white mt-5 rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                        Address Details
-                    </h2>
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <MapPin size={15} />
+                        </span>
+                        <h2 className="text-base font-semibold text-gray-900 uppercase">
+                            Address Details
+                        </h2>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7">
                         {/* Address */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Address <span className="text-red-500">*</span>
+                                Address <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -434,7 +476,7 @@ export default function ResellerBasicDetails() {
                         {/* Country */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Country <span className="text-red-500">*</span>
+                                Country <span className="text-red-500 ml-1">*</span>
                             </label>
                             <Select
                                 options={countryList.map((country) => ({
@@ -456,12 +498,58 @@ export default function ResellerBasicDetails() {
                                 }
                                 placeholder="Select Country"
                                 isSearchable
+                                className="w-full"
+                                classNamePrefix="custom-select"
+                                styles={{
+                                    control: (base, state) => ({
+                                        ...base,
+                                        minHeight: "42px",
+                                        height: "42px",
+                                        border: state.isFocused
+                                            ? "1px solid #fbbf24"
+                                            : "1px solid #e5e7eb",
+                                        borderRadius: "8px",
+                                        backgroundColor: "#ffffff",
+                                        boxShadow: state.isFocused
+                                            ? "0 0 0 2px rgba(251, 191, 36, 0.2)"
+                                            : "none",
+                                        transition: "all 0.2s",
+                                        "&:hover": {
+                                            borderColor: "#fbbf24",
+                                        },
+                                    }),
+                                    valueContainer: (base) => ({
+                                        ...base,
+                                        padding: "0 12px",
+                                    }),
+                                    input: (base) => ({
+                                        ...base,
+                                        margin: 0,
+                                        padding: 0,
+                                        fontSize: "14px",
+                                    }),
+                                    singleValue: (base) => ({
+                                        ...base,
+                                        fontSize: "14px",
+                                        color: "#1f2937",
+                                    }),
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        fontSize: "14px",
+                                        color: "#9ca3af",
+                                    }),
+                                    indicatorsContainer: (base) => ({
+                                        ...base,
+                                        height: "40px",
+                                    }),
+                                }}
                             />
                         </div>
+
                         {/* State */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                State <span className="text-red-500">*</span>
+                                State <span className="text-red-500 ml-1">*</span>
                             </label>
                             <Select
                                 options={stateList.map((item) => ({
@@ -482,6 +570,51 @@ export default function ResellerBasicDetails() {
                                 }
                                 placeholder="Select State"
                                 isSearchable
+                                className="w-full"
+                                classNamePrefix="custom-select"
+                                styles={{
+                                    control: (base, state) => ({
+                                        ...base,
+                                        minHeight: "42px",
+                                        height: "42px",
+                                        border: state.isFocused
+                                            ? "1px solid #fbbf24"
+                                            : "1px solid #e5e7eb",
+                                        borderRadius: "8px",
+                                        backgroundColor: "#ffffff",
+                                        boxShadow: state.isFocused
+                                            ? "0 0 0 2px rgba(251, 191, 36, 0.2)"
+                                            : "none",
+                                        transition: "all 0.2s",
+                                        "&:hover": {
+                                            borderColor: "#fbbf24",
+                                        },
+                                    }),
+                                    valueContainer: (base) => ({
+                                        ...base,
+                                        padding: "0 12px",
+                                    }),
+                                    input: (base) => ({
+                                        ...base,
+                                        margin: 0,
+                                        padding: 0,
+                                        fontSize: "14px",
+                                    }),
+                                    singleValue: (base) => ({
+                                        ...base,
+                                        fontSize: "14px",
+                                        color: "#1f2937",
+                                    }),
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        fontSize: "14px",
+                                        color: "#9ca3af",
+                                    }),
+                                    indicatorsContainer: (base) => ({
+                                        ...base,
+                                        height: "40px",
+                                    }),
+                                }}
                             />
                         </div>
 
@@ -489,7 +622,7 @@ export default function ResellerBasicDetails() {
                         {/* City */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                City <span className="text-red-500">*</span>
+                                City <span className="text-red-500 ml-1">*</span>
                             </label>
                             <Select
                                 options={cityList.map((city) => ({
@@ -509,19 +642,65 @@ export default function ResellerBasicDetails() {
                                 }
                                 placeholder="Select City"
                                 isSearchable
+                                className="w-full"
+                                classNamePrefix="custom-select"
+                                styles={{
+                                    control: (base, state) => ({
+                                        ...base,
+                                        minHeight: "42px",
+                                        height: "42px",
+                                        border: state.isFocused
+                                            ? "1px solid #fbbf24"
+                                            : "1px solid #e5e7eb",
+                                        borderRadius: "8px",
+                                        backgroundColor: "#ffffff",
+                                        boxShadow: state.isFocused
+                                            ? "0 0 0 2px rgba(251, 191, 36, 0.2)"
+                                            : "none",
+                                        transition: "all 0.2s",
+                                        "&:hover": {
+                                            borderColor: "#fbbf24",
+                                        },
+                                    }),
+                                    valueContainer: (base) => ({
+                                        ...base,
+                                        padding: "0 12px",
+                                    }),
+                                    input: (base) => ({
+                                        ...base,
+                                        margin: 0,
+                                        padding: 0,
+                                        fontSize: "14px",
+                                    }),
+                                    singleValue: (base) => ({
+                                        ...base,
+                                        fontSize: "14px",
+                                        color: "#1f2937",
+                                    }),
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        fontSize: "14px",
+                                        color: "#9ca3af",
+                                    }),
+                                    indicatorsContainer: (base) => ({
+                                        ...base,
+                                        height: "40px",
+                                    }),
+                                }}
                             />
                         </div>
+
                         {/* Zip Code */}
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">
-                                Zip Code<span className="text-red-500">*</span>
+                            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
+                                Zip Code<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
                                 maxLength={6}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                className="w-full border border-gray-200 rounded-lg bg-white px-3 py-2.5 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition"
                                 value={data?.pincode || ""}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
@@ -532,64 +711,75 @@ export default function ResellerBasicDetails() {
                     </div>
                 </div>
 
-
                 {/* ── Settlement Setup ──────────────────────────────────────────── */}
-                <div className="pt-4">
-                    <h2 className="text-[18px] text-[#5c5c5c] mb-2">Settlement Setup</h2>
-                    <p className="border-t border-gray-300 py-3"></p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
-                        {/*  Fixed: value+onChange now on the <input>, not <label> */}
-                        <div>
-                            <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                                Settlement Type <span className="text-red-500">*</span>
-                            </label>
-                            <div className="flex items-center gap-5 mt-2">
-                                {["Manual", "Automatic"].map((type) => (
-                                    <label key={type} className="flex items-center gap-1 text-[14px] text-[#5c5c5c]">
-                                        <input
-                                            type="radio"
-                                            name="RSS_SettlementType"
-                                            required
-                                            value={type}
-                                            checked={data?.RSS_SettlementType === type}
-                                            onChange={(e) => handleChange("RSS_SettlementType", e.target.value)}
-                                        />
-                                        {type}
-                                    </label>
-                                ))}
-                            </div>
+                <div className="bg-white mt-5 rounded-2xl border border-gray-100 shadow-sm px-6 py-2">
+                    <div className="pt-4">
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                                <Landmark size={15} />
+                            </span>
+                            <h2 className="text-base font-semibold text-gray-900 uppercase">
+                                Settlement Setup
+                            </h2>
                         </div>
 
-                        {[
-                            { label: "Settlement Cycle (If Automated)", field: "RSS_SettlementCycle", options: ["Daily", "Daily Twice", "Two Days Once", "Weekly"] },
-                            { label: "Payment By", field: "RSS_PaymentBy", options: ["A/C Credit", "IMPS", "NEFT", "RTGS"] },
-                            { label: "Payment Advice", field: "RSS_PaymentAdvice", options: ["Daily", "Monthly", "Weekly"] },
-                        ].map(({ label, field, options }) => (
-                            <div key={field}>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-7 gap-y-5">
+                            {/*  Fixed: value+onChange now on the <input>, not <label> */}
+                            <div>
                                 <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
-                                    {label} <span className="text-red-500">*</span>
+                                    Settlement Type <span className="text-red-500 ml-1">*</span>
                                 </label>
-                                <select
-                                    value={data?.[field] || ""}
-                                    required
-                                    onChange={(e) => handleChange(field, e.target.value)}
-                                    className="w-full h-8 border border-gray-400 rounded-sm bg-white px-3 text-sm text-gray-600 outline-none"
-                                >
-                                    <option value="">-- Select --</option>
-                                    {options.map((o) => <option key={o} value={o}>{o}</option>)}
-                                </select>
+                                <div className="flex items-center gap-5 mt-2">
+                                    {["Manual", "Automatic"].map((type) => (
+                                        <label key={type} className="flex items-center gap-1 text-[14px] text-[#5c5c5c]">
+                                            <input
+                                                type="radio"
+                                                name="RSS_SettlementType"
+                                                required
+                                                value={type}
+                                                checked={data?.RSS_SettlementType === type}
+                                                onChange={(e) => handleChange("RSS_SettlementType", e.target.value)}
+                                            />
+                                            {type}
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
-                        ))}
+
+                            {[
+                                { label: "Settlement Cycle (If Automated)", field: "RSS_SettlementCycle", options: ["Daily", "Daily Twice", "Two Days Once", "Weekly"] },
+                                { label: "Payment By", field: "RSS_PaymentBy", options: ["A/C Credit", "IMPS", "NEFT", "RTGS"] },
+                                { label: "Payment Advice", field: "RSS_PaymentAdvice", options: ["Daily", "Monthly", "Weekly"] },
+                            ].map(({ label, field, options }) => (
+                                <div key={field}>
+                                    <label className="block text-[14px] font-semibold text-[#6b5f4d] mb-2">
+                                        {label} <span className="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <select
+                                        value={data?.[field] || ""}
+                                        required
+                                        onChange={(e) => handleChange(field, e.target.value)}
+                                        className="w-full h-8 border border-gray-400 rounded-sm bg-white px-3 text-sm text-gray-600 outline-none"
+                                    >
+                                        <option value="">-- Select --</option>
+                                        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+                                    </select>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
                 {/* ── Beneficiary Account Details ───────────────────────────────── */}
-                <div className="pt-4">
-                    <h2 className="text-[20px] text-gray-700 my-3">
-                        Beneficiary Account Details
-                    </h2>
-                    <p className="border-t border-gray-300 py-3"></p>
+                <div className="bg-white mt-5 rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <UserRound size={15} />
+                        </span>
+                        <h2 className="text-base font-semibold text-gray-900 uppercase">
+                            Beneficiary Account Details
+                        </h2>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
                             {
@@ -690,11 +880,15 @@ export default function ResellerBasicDetails() {
                 </div>
 
                 {/* ── Upload Documents Details ───────────────────────────────── */}
-                <div className="w-full mt-5">
-                    <h2 className="text-[20px] text-gray-700 my-3">
-                        Upload Documents Details
-                    </h2>
-                    <p className="border-t border-gray-300 py-3"></p>
+                <div className="bg-white mt-5 rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <Upload size={15} />
+                        </span>
+                        <h2 className="text-base font-semibold text-gray-900 uppercase">
+                            Upload Documents Details
+                        </h2>
+                    </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         {[
                             {
@@ -717,16 +911,14 @@ export default function ResellerBasicDetails() {
                                 state: addressProof,
                                 setState: setAddressProof,
                             },
+
                         ].map((document, index) => (
                             <div
                                 key={index}
-                                className="flex h-[125px] flex-col items-center justify-center rounded-lg border border-dashed border-[#d9e2ef] bg-[#f9fbfd] px-3 text-center"
-                            >
-                                {/* Upload Icon */}
+                                className="flex h-[125px] flex-col items-center justify-center rounded-lg border border-dashed border-[#d9e2ef] bg-[#f9fbfd] px-3 text-center"                            >
                                 <label
                                     htmlFor={`document-${index}`}
-                                    className="cursor-pointer"
-                                >
+                                    className="cursor-pointer">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className="h-7 w-7 text-[#94a3b8]"
@@ -755,7 +947,6 @@ export default function ResellerBasicDetails() {
                                     className="hidden"
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
-
                                         if (file) {
                                             // 5 MB validation
                                             if (file.size > 5 * 1024 * 1024) {
@@ -763,7 +954,6 @@ export default function ResellerBasicDetails() {
                                                 e.target.value = "";
                                                 return;
                                             }
-
                                             document.setState(file);
                                         }
                                     }}
@@ -772,7 +962,7 @@ export default function ResellerBasicDetails() {
                                 {/* Document Name */}
                                 <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
                                     {document.title}
-                                    <span className="text-red-500">*</span>
+                                    <span className="text-red-500 ml-1">*</span>
                                 </p>
 
                                 {/* Selected File Name */}
@@ -793,15 +983,11 @@ export default function ResellerBasicDetails() {
                     </div>
                 </div>
 
-
-
-
                 <div className="flex justify-center mt-8">
                     <button
                         onClick={saveResellerDetails}
                         type="submit"
-                        className="bg-yellow-500 text-white px-5 py-2 rounded"
-                    >
+                        className="bg-[#fec931] text-black px-5 py-2 rounded">
                         Submit Application
                     </button>
                 </div>

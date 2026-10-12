@@ -1,7 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
 /* Layout */
 import Layout from "./components/Layout";
@@ -12,8 +12,13 @@ import ResellerBasicDetails from "./components/Reseller/ResellerBasicDetails";
 import ResellesViewDetails from "./components/Reseller/ResellesViewDetails";
 import ResellesEditDetails from "./components/Reseller/ResellesEditDetails";
 import ReditApprove from "./components/Reseller/ReditApprove";
+import ReportCrepto from "./pages/ReportCrepto";
+import CryptoDashboard from "./components/CryptoDashboard";
+
 
 /* Lazy Loaded Pages */
+
+
 const Login = lazy(() => import("./pages/Login"));
 const Forgot = lazy(() => import("./pages/ForgotPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -33,6 +38,14 @@ function ProtectedRoute({ children }) {
   const isLogin = localStorage.getItem("isLogin");
   if (!isLogin) return <Navigate to="/" replace />;
   return children;
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
 }
 
 function App() {
@@ -66,12 +79,12 @@ function App() {
         }
       />
 
-      {/* Suspense Wrapper for Lazy Loading */}
+      <ScrollToTop />
+
       {/* <Suspense fallback={<div>Loading...</div>}> */}
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot" element={<Forgot />} />
-
         <Route
           path="/app"
           element={
@@ -87,6 +100,8 @@ function App() {
           <Route path="merchants" element={<MerchantsViewedit />} />
           <Route path="merchant-webhook" element={<MerchantWebhook />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="reports-crepto" element={<ReportCrepto />} />
+          <Route path="crypto-dashboard" element={<CryptoDashboard />} />
           <Route path="upi-payment-processor" element={<UpiPaymentProcessor />} />
           <Route path="users" element={<User />} />
           <Route path="roles" element={<Role />} />
@@ -95,7 +110,6 @@ function App() {
           <Route path="reseller-view-details" element={<ResellesViewDetails />} />
           <Route path="reseller-edit-details" element={<ResellesEditDetails />} />
           <Route path="reseller-approvedit-details" element={<ReditApprove />} />
-
           <Route path="virtual-accounts" element={<VirtualAccounts />} />
         </Route>
 

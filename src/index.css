@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap');
 @import "tailwindcss";
 
+
 body {
-  font-family: "Figtree", sans-serif;
+  font-family: "Figtree", sans-serif; 
 }
 
 @keyframes custom-enter {
@@ -30,15 +32,15 @@ body {
 
 /* Hide scrollbar but keep scrolling working */
 .hide-scrollbar {
-  scrollbar-width: none;       /* Firefox */
-  -ms-overflow-style: none;    /* IE / old Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE / old Edge */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
   width: 0;
   height: 0;
-  display: none;               /* Chrome / Edge / Safari */
+  display: none;
+  /* Chrome / Edge / Safari */
 }
-
-
-

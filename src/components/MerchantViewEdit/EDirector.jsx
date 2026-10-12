@@ -10,8 +10,7 @@ import {
     CreditCard,
     ShieldCheck,
     Eye,
-    Upload
-    
+    Upload, ArrowRight, ArrowLeft
 } from "lucide-react";
 
 export default function EDirectorDetails({ refId,
@@ -32,7 +31,7 @@ export default function EDirectorDetails({ refId,
             try {
                 setUserData(JSON.parse(storedUser));
             } catch (error) {
-                console.error("Invalid user data in localStorage", error);
+                toast.error(error);
             }
         }
     },
@@ -60,7 +59,7 @@ export default function EDirectorDetails({ refId,
             const response = await axiosInstance.post(
                 `/merchant/kyc/view/director/${refId}`
             );
-            
+
             if (response.respCode === 0) {
                 const directors = response.respData?.directors || [];
                 // Number of directors coming from API
@@ -93,10 +92,7 @@ export default function EDirectorDetails({ refId,
             const formData = new FormData();
             // Basic information
             formData.append("refId", refId);
-            formData.append(
-                "updatedBy",
-                userData?.userName || userData?.username || ""
-            );
+            formData.append("updatedBy", userData?.userName || "");
 
             // ------------------------------------
             // DIRECTOR 1
@@ -104,44 +100,19 @@ export default function EDirectorDetails({ refId,
             const director1 = directorData?.[1];
 
             if (director1) {
-                formData.append(
-                    "director1Name",
-                    director1.directorName || ""
-                );
-
-                formData.append(
-                    "director1Designation",
-                    director1.directorDesignation || ""
-                );
-
-                formData.append(
-                    "director1AadharNo",
-                    director1.directorAadharNo || ""
-                );
-
-                formData.append(
-                    "director1PanNo",
-                    director1.directorPanNo || ""
-                );
-
+                formData.append("director1Name", director1.directorName || "");
+                formData.append("director1Designation", director1.directorDesignation || "");
+                formData.append("director1AadharNo", director1.directorAadharNo || "");
+                formData.append("director1PanNo", director1.directorPanNo || "");
                 // New uploaded files only
                 if (uploadedFiles?.[1]?.selfie) {
-                    formData.append(
-                        "director1Selfie",
-                        uploadedFiles[1].selfie
-                    );
+                    formData.append("director1Selfie", uploadedFiles[1].selfie);
                 }
                 if (uploadedFiles?.[1]?.pan) {
-                    formData.append(
-                        "director1Pan",
-                        uploadedFiles[1].pan
-                    );
+                    formData.append("director1Pan", uploadedFiles[1].pan);
                 }
                 if (uploadedFiles?.[1]?.aadhar) {
-                    formData.append(
-                        "director1Aadhar",
-                        uploadedFiles[1].aadhar
-                    );
+                    formData.append("director1Aadhar", uploadedFiles[1].aadhar);
                 }
             }
 
@@ -151,46 +122,21 @@ export default function EDirectorDetails({ refId,
             const director2 = directorData?.[2];
 
             if (director2) {
-                formData.append(
-                    "director2Name",
-                    director2.directorName || ""
-                );
-
-                formData.append(
-                    "director2Designation",
-                    director2.directorDesignation || ""
-                );
-
-                formData.append(
-                    "director2AadharNo",
-                    director2.directorAadharNo || ""
-                );
-
-                formData.append(
-                    "director2PanNo",
-                    director2.directorPanNo || ""
-                );
-
+                formData.append("director2Name", director2.directorName || "");
+                formData.append("director2Designation", director2.directorDesignation || "");
+                formData.append("director2AadharNo", director2.directorAadharNo || "");
+                formData.append("director2PanNo", director2.directorPanNo || "");
                 // New uploaded files only
                 if (uploadedFiles?.[2]?.selfie) {
-                    formData.append(
-                        "director2Selfie",
-                        uploadedFiles[2].selfie
-                    );
+                    formData.append("director2Selfie", uploadedFiles[2].selfie);
                 }
 
                 if (uploadedFiles?.[2]?.pan) {
-                    formData.append(
-                        "director2Pan",
-                        uploadedFiles[2].pan
-                    );
+                    formData.append("director2Pan", uploadedFiles[2].pan);
                 }
 
                 if (uploadedFiles?.[2]?.aadhar) {
-                    formData.append(
-                        "director2Aadhar",
-                        uploadedFiles[2].aadhar
-                    );
+                    formData.append("director2Aadhar", uploadedFiles[2].aadhar);
                 }
             }
 
@@ -202,29 +148,20 @@ export default function EDirectorDetails({ refId,
                 formData
             );
 
-            if (
-                response?.respCode === 0 ||
-                response?.respcode === 0
-            ) {
-                toast.success(
-                    response?.respMsg
-                );
+            if (response?.respCode === 0) {
+                toast.success(response?.respMsg);
 
                 // Refresh data after successful update
                 await VDirectorDetails(refId);
                 setUploadedFiles({});
             } else {
-                toast.error(
-                    response?.respMsg
-                );
+                toast.error(response?.respMsg);
             }
         } catch (error) {
             toast.error(error);
         }
     };
 
-
-    console.log("handleedit:", handleEditDirector);
     // Document File Api Call
     const handleViewFile = async (fileName) => {
         if (!refId || !fileName) {
@@ -599,18 +536,18 @@ export default function EDirectorDetails({ refId,
     // MAIN UI
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5">
-                {/* HEADER */}
-                <div className="flex items-center justify-between pb-5">
+            <div>
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#eef5f9]">
-                            <UserRound className="w-4 h-4 text-[#126aa8]" />
+                        <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+                            <UserRound className="w-5 h-5 text-yellow-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-[#173875]">
+                            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold">
                                 Edit Director Details
                             </h2>
-                            <p className="mt-0.5 text-sm text-gray-500">
+                            <p className="text-sm text-slate-700">
                                 Director information
                             </p>
                         </div>
@@ -620,18 +557,16 @@ export default function EDirectorDetails({ refId,
                 {/* DIRECTORS */}
                 <div className="mt-3 space-y-3">
                     {renderDirector(1)}
-
                     {directorCount >= 1 && renderDirector(2)}
                 </div>
-
 
                 {/* BACK & NEXT BUTTONS */}
                 <div className="flex justify-between items-center gap-4 mt-10">
                     <button
                         type="button"
                         onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
-                    >
+                        className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full">
+                        <ArrowLeft size={16} />
                         Back
                     </button>
 
@@ -648,9 +583,10 @@ export default function EDirectorDetails({ refId,
                     <button
                         type="button"
                         onClick={handleNext}
-                        className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                        className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
                     >
                         Next
+                        <ArrowRight size={16} />
                     </button>
                 </div>
             </div>

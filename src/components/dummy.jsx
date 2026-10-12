@@ -1,509 +1,1020 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import axiosInstance from "../../api/axios";
-import {
-    UserRound,
-    ChevronUp,
-    ChevronDown,
-    BriefcaseBusiness,
-    FileText,
-    CreditCard,
-    ShieldCheck,
-    Eye,
-    Upload
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../api/axios";
+import { FaSearch, FaFileExcel } from "react-icons/fa";
+import * as XLSX from "xlsx";
 
-export default function EDirectorDetails({ refId,
-    handleNext,
-    handleBack }) {
 
-    const [openDirector, setOpenDirector] = useState(1);
-    const [directorCount, setDirectorCount] = useState(1);
-    const [directorData, setDirectorData] = useState({});
-    const [userData, setUserData] = useState(null);
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Component
+// ─────────────────────────────────────────────────────────────────────────────
+export default function Reports() {
 
-    // Get logged-in user
-    useEffect(() => {
-        VDirectorDetails(refId);
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            try {
-                setUserData(JSON.parse(storedUser));
-            } catch (error) {
-                console.error("Invalid user data in localStorage", error);
-            }
+  // ───────────────────────────────────────────────────────────────────────────
+  // Date
+  // ───────────────────────────────────────────────────────────────────────────
+  const today = new Date().toISOString().split("T")[0];
+
+  const [fromDate, setFromDate] = useState(today);
+  const [toDate, setToDate] = useState(today);
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Active Report
+  // ONRAMP is default
+  // ───────────────────────────────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState("ONRAMP");
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Data
+  // ───────────────────────────────────────────────────────────────────────────
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Pagination
+  // ───────────────────────────────────────────────────────────────────────────
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Format date
+  // yyyy-mm-dd → dd/mm/yyyy
+  // ───────────────────────────────────────────────────────────────────────────
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [y, m, d] = dateStr.split("-");
+    return `${d}/${m}/${y}`;
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Get API according to active tab
+  // ───────────────────────────────────────────────────────────────────────────
+  const getReportApi = () => {
+    if (activeTab === "ONRAMP") {
+      return "/onRampTxnReport";
+    }
+
+    return "/offRampTxnReport";
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Fetch Report
+  // ───────────────────────────────────────────────────────────────────────────
+  const fetchData = async (
+    currentPage = 0,
+    currentSize = size,
+    reportType = activeTab
+  ) => {
+
+    if (!fromDate || !toDate) {
+      alert("Please select From Date and To Date");
+      return;
+    }
+
+    if (new Date(fromDate) > new Date(toDate)) {
+      alert("From Date cannot be greater than To Date");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const apiUrl =
+        reportType === "ONRAMP"
+          ? "/onRampTxnReport"
+          : "/offRampTxnReport";
+
+      console.log(
+        `${reportType} Report API: `,
+        apiUrl
+      );
+
+      const response = await axiosInstance.post(
+        `${apiUrl}?page = ${currentPage}& size=${currentSize} `,
+        {
+          fromDate: formatDate(fromDate),
+          toDate: formatDate(toDate),
         }
-    },
-        []);
+      );
 
 
-    // View Api Director Details
-    const VDirectorDetails = async (refId) => {
-        if (!refId) return;
+      console.log(`${reportType} Report Response: `, response);
 
-        try {
-            const response = await axiosInstance.post(
-                `/merchant/kyc/view/director/${1022}`
-            );
-            console.log("view response--->>", response);
 
-            if (response.respCode === 0) {
-                const directors = response.respData?.directors || [];
-                // Number of directors coming from API
-                const count = response.respData?.directorNumber
-                    || directors.length
-                    || 1;
-                setDirectorCount(count);
-                // Keep director data separately
-                const directorMap = {};
+      if (response?.respCode === 0) {
+        setData(response.data || []);
+        setTotalPages(response.totalPages || 0);
+        setTotalRecords(response.totalRecords || 0);
+        setPage(currentPage);
+        setSearched(true);
 
-                directors.forEach((director) => {
-                    directorMap[director.directorNumber] = director;
-                });
-                setDirectorData(directorMap);
-                // Open first director by default
-                setOpenDirector(1);
-            }
+      } else {
+        setData([]);
+        setTotalPages(0);
+        setTotalRecords(0);
+        setSearched(true);
+      }
 
-        } catch (error) {
-            toast.error(error);
-        }
-    };
+    } catch (error) {
+      setData([]);
+      setTotalPages(0);
+      setTotalRecords(0);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // handleEditDirector APi CAll
-    const handleEditDirector = async () => {
 
-        console.log("handleedit:", handleEditDirector);
-          
+  // ───────────────────────────────────────────────────────────────────────────
+  // Initial API call + tab switching
+  //
+  // When page opens:
+  // ONRAMP API automatically called
+  //
+  // When user changes:
+  // ONRAMP → OFFRAMP
+  // OFFRAMP → ONRAMP
+  //
+  // API automatically called
+  // ───────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    setPage(0);
+    setData([]);
+    setTotalPages(0);
+    setTotalRecords(0);
+    fetchData(0, size, activeTab);
+  }, [activeTab]);
 
-        try {
-            const formData = new FormData();
-            formData.append("refId", refId);
-            formData.append("updatedBy", userData?.userName || ""),
-            formData.append("director1Name", directors[1].name);
-            formData.append("director1Designation", directors[1].designation);
-            formData.append("director1AadharNo", directors[1].aadhaarNo);
-            formData.append("director1Selfie", directors[1].photograph);
-            formData.append("director1Pan", directors[1].panCard);
-            formData.append("director1PanNo", directors[1].panNo);
-            formData.append("director1Aadhar", directors[1].aadhaarCard);
 
-            formData.append("director2Name", directors[2].name);
-            formData.append("director2Designation", directors[2].designation);
-            formData.append("director2AadharNo", directors[2].aadhaarNo);
-            formData.append("director2Selfie", directors[2].photograph);
-            formData.append("director2Pan", directors[2].panCard);
-            formData.append("director2PanNo", directors[2].panNo);
-            formData.append("director2Aadhar", directors[2].aadhaarCard);
+  // ───────────────────────────────────────────────────────────────────────────
+  // Search
+  // ───────────────────────────────────────────────────────────────────────────
+  const handleSearch = () => {
+    setPage(0);
+    fetchData(0, size, activeTab);
+  };
 
-            const response = await axiosInstance.post(
-                "/merchant/kyc/edit/director",
-                formData
-            );
-            console.log("view Api save", response);
-            if (response?.respcode === 0) {
-                toast.success(response?.respMsg);
-            }
-            else {
 
-            }
-        } catch (error) {
+  // ───────────────────────────────────────────────────────────────────────────
+  // Pagination
+  // ───────────────────────────────────────────────────────────────────────────
+  const handlePageChange = (newPage) => {
 
-        }
+    if (
+      newPage < 0 ||
+      newPage >= totalPages ||
+      loading
+    ) {
+      return;
+    }
+
+    fetchData(newPage, size, activeTab);
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Page Size
+  // ───────────────────────────────────────────────────────────────────────────
+  const handleSizeChange = (newSize) => {
+    const parsedSize = Number(newSize);
+    setSize(parsedSize);
+    setPage(0);
+    fetchData(0, parsedSize, activeTab);
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Pagination numbers
+  // ───────────────────────────────────────────────────────────────────────────
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    if (totalPages === 0) {
+      return pages;
+    }
+
+    let start = Math.max(
+      0,
+      page - Math.floor(maxVisible / 2)
+    );
+
+    let end = Math.min(
+      totalPages - 1,
+      start + maxVisible - 1
+    );
+
+    if (
+      end - start <
+      maxVisible - 1
+    ) {
+
+      start = Math.max(
+        0,
+        end - maxVisible + 1
+      );
+    }
+
+    for (let i = start; i <= end; i++) {
+
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Excel Export
+  // ───────────────────────────────────────────────────────────────────────────
+  const exportToExcel = () => {
+
+    if (!data || data.length === 0) {
+      alert("No data available for export");
+      return;
     }
 
 
+    const exportData = data.map((item) => {
 
- console.log("handleedit:", handleEditDirector);
-    // Document File Api Call
-    const handleViewFile = async (fileName) => {
-        if (!refId || !fileName) {
-            toast.error("RefId or file name is missing");
-            return;
-        }
-        try {
-            const response = await axiosInstance.post(
-                "/merchant/kyc/viewKycDocs",
-                {},
-                {
-                    params: {
-                        refId: refId,
-                        fileName: fileName,
-                    },
-                    responseType: "blob",
-                }
-            );
-            const fileUrl = URL.createObjectURL(response);
-            window.open(fileUrl, "_blank");
+      if (activeTab === "ONRAMP") {
 
-            setTimeout(() => {
-                URL.revokeObjectURL(fileUrl);
-            }, 10000);
+        return {
+          "Merchant Ref ID":
+            item.merchant_ref_id ?? item.merchantRefId ?? "",
 
-        } catch (error) {
-            toast.error(error);
-        }
-    };
+          "Merchant Order ID":
+            item.merchant_order_id ??
+            item.merchantOrderId ??
+            "",
 
+          "Order ID":
+            item.order_id ??
+            item.orderId ??
+            "",
 
-    // INPUT CHANGE
-    const handleChange = (directorNumber, field, value) => {
-        setDirectors((prev) => ({
-            ...prev,
-            [directorNumber]: {
-                ...prev[directorNumber],
-                [field]: value,
-            },
-        }));
-    };
+          "Provider Order ID":
+            item.provider_order_id ??
+            item.providerOrderId ??
+            "",
 
-    // ACCORDION
-    const toggleDirector = (directorNumber) => {
-        setOpenDirector((prev) =>
+          "Buy Token Address":
+            item.buy_token_address ??
+            item.buyTokenAddress ??
+            "",
 
-            prev === directorNumber ? null : directorNumber
-        );
-    };
+          "Buy Token Symbol":
+            item.buy_token_symbol ??
+            item.buyTokenSymbol ??
+            "",
 
-    // DIRECTOR UI
-    const renderDirector = (directorNumber) => {
-        const isOpen = openDirector === directorNumber;
+          "Chain ID":
+            item.chain_id ??
+            item.chainId ??
+            "",
 
-        const currentDirector = directorData?.[directorNumber] || {};
+          "Fiat Amount":
+            item.fiat_amount ??
+            item.fiatAmount ??
+            "",
 
-        const selfie = currentDirector?.documents?.find(
-            (doc) => doc.fileType === "DIRECTOR_SELFIE"
-        );
+          "Fiat Currency":
+            item.fiat_currency ??
+            item.fiatCurrency ??
+            "",
 
-        const pan = currentDirector?.documents?.find(
-            (doc) => doc.fileType === "DIRECTOR_PAN"
-        );
+          "Payment Mode":
+            item.payment_mode ??
+            item.paymentMode ??
+            "",
 
-        const aadhar = currentDirector?.documents?.find(
-            (doc) => doc.fileType === "DIRECTOR_AADHAAR"
-        );
+          "Receiver Address":
+            item.receiver_address ??
+            item.receiverAddress ??
+            "",
 
+          "Email":
+            item.email_id ??
+            item.emailId ??
+            "",
 
-        return (
-            <>
-                <div
-                    key={directorNumber}
-                    className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-                    {/* Accordion Header */}
-                    <div
-                        onClick={() => toggleDirector(directorNumber)}
-                        className="flex items-center justify-between px-3 sm:px-4 py-3 bg-gray-50 cursor-pointer select-none"
-                    >
-                        <div className="flex items-center gap-2">
-                            {isOpen ? (
-                                <ChevronUp className="w-4 h-4 text-gray-500" />
-                            ) : (
-                                <ChevronDown className="w-4 h-4 text-gray-500" />
-                            )}
-                            <span className="text-sm font-semibold text-gray-800">
-                                Director {directorNumber}
-                            </span>
-                        </div>
-                    </div>
+          "UTR":
+            item.utr ?? "",
 
-                    {/* Accordion Body */}
-                    {isOpen && (
-                        <div className="border-t border-gray-200">
-                            <div className="p-3 sm:p-4">
-                                {/* First Row */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {/* Director Name */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-600 mb-1.5">
-                                            Director {directorNumber} Name
-                                            <span className="text-red-500 ml-0.5">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                            <input
-                                                type="text"
-                                                onChange={(e) =>
-                                                    handleChange(
-                                                        directorNumber,
-                                                        "name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                value={currentDirector?.directorName || ""}
-                                                placeholder="Enter director name"
-                                                className="w-full h-10 pl-9 pr-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
-                                            />
-                                        </div>
-                                    </div>
+          "Created At":
+            item.created_at ??
+            item.createdAt ??
+            "",
 
-                                    {/* Designation */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-600 mb-1.5">
-                                            Designation
-                                            <span className="text-red-500 ml-0.5">*</span>
-                                        </label>
+          "Response At":
+            item.response_at ??
+            item.responseAt ??
+            "",
 
-                                        <div className="relative">
-                                            <BriefcaseBusiness className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1169ad] pointer-events-none" />
-                                            <input
-                                                readOnly
-                                                value={currentDirector?.directorDesignation || ""}
-                                                className="appearance-none w-full h-10 pl-9 pr-8 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
+          "Status":
+            item.status ?? "",
+        };
 
-                                            >
-                                            </input>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Second Row */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                    {/* PAN */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                            PAN Number
-                                            <span className="text-red-400 ml-0.5">*</span>
-                                        </label>
-
-                                        <div className="relative">
-                                            <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                            <input
-
-                                                value={currentDirector?.directorPanNo || ""}
-                                                className="w-full h-10 pl-9 pr-3 text-xs text-gray-500 border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8] uppercase"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Aadhaar */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                            Aadhar Number
-                                            <span className="text-red-400 ml-0.5">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                            <input
-                                                value={currentDirector?.directorAadharNo || ""}
-
-                                                className="w-full h-10 pl-9 pr-20 text-xs text-gray-500 border border-gray-200 rounded-lg outline-none focus:border-[#1677c8] focus:ring-1 focus:ring-[#1677c8]"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Third Row */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                    {/* Photograph */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                            Director {directorNumber} Photograph
-                                            <span className="text-red-400 ml-0.5">*</span>
-                                        </label>
-
-                                        <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
-                                            <div className="w-full flex items-center justify-between">
-                                                {/* Left: File icon + File name */}
-                                                <div className="flex items-center min-w-0">
-                                                    <FileText className="w-4 h-4 ml-3 text-gray-300 shrink-0" />
-                                                    <span className="ml-2 text-xs text-gray-400 truncate">
-                                                        {selfie?.fileName || "No photograph uploaded"}
-                                                    </span>
-                                                </div>
-
-                                                {/* Right: View icon */}
-                                                <div className="mr-2 flex items-center gap-1">
-                                                    {/* View */}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleViewFile(selfie.fileName)}
-                                                        className="p-1.5 rounded-md bg-green-100 hover:bg-green-200 transition"
-                                                        title="View Photograph"
-                                                    >
-                                                        <Eye className="w-4 h-4 text-green-500" />
-                                                    </button>
-
-                                                    {/* Upload */}
-                                                    <label
-                                                        className="p-1.5 rounded-md bg-blue-100 hover:bg-blue-200 transition cursor-pointer"
-                                                        title="Upload Photograph"
-                                                    >
-                                                        <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
-
-                                                        <input
-                                                            type="file"
-                                                            className="hidden"
-                                                            accept="image/*"
-                                                            onChange={(e) => handleFileUpload(e, "selfie")}
-                                                        />
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-
-                                    {/* Pan Card */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                            Director {directorNumber} Pan Card
-                                            <span className="text-red-400 ml-0.5">*</span>
-                                        </label>
-
-                                        <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
-                                            <div className="w-full flex items-center justify-between">
-                                                {/* Left: File icon + File name */}
-                                                <div className="flex items-center min-w-0">
-                                                    <FileText className="w-4 h-4 ml-3 text-gray-300 shrink-0" />
-                                                    <span className="ml-2 text-xs text-gray-400 truncate">
-                                                        {pan?.fileName || "No PAN document uploaded"}
-                                                    </span>
-                                                </div>
-
-                                                {/* Right: View icon */}
-                                                <div className="mr-2 flex items-center gap-1">
-                                                    {/* View PAN */}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleViewFile(pan.fileName)}
-                                                        className="p-1.5 rounded-md bg-green-50 hover:bg-green-100 transition"
-                                                        title="View PAN Card"
-                                                    >
-                                                        <Eye className="w-4 h-4 text-green-500" />
-                                                    </button>
-
-                                                    {/* Upload PAN */}
-                                                    <label
-                                                        className="p-1.5 rounded-md bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
-                                                        title="Upload PAN Card"
-                                                    >
-                                                        <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
-
-                                                        <input
-                                                            type="file"
-                                                            className="hidden"
-                                                            accept=".pdf,.jpg,.jpeg,.png"
-                                                            onChange={(e) => handleFileUpload(e, "pan")}
-                                                        />
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-
-                                    {/* Aadhar Card */}
-                                    <div>
-                                        <label className="block text-[11px] font-medium text-gray-400 mb-1.5">
-                                            Director {directorNumber} Aadhar Card
-                                            <span className="text-red-400 ml-0.5">*</span>
-                                        </label>
-                                        <label className="relative flex items-center h-10 w-full border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-[#1677c8] transition">
-                                            <div className="w-full flex items-center justify-between">
-                                                {/* Left: File icon + File name */}
-                                                <div className="flex items-center min-w-0">
-                                                    <FileText className="w-4 h-4 ml-3 text-gray-300 shrink-0" />
-                                                    <span className="ml-2 text-xs text-gray-400 truncate">
-                                                        {aadhar?.fileName || "No Aadhaar document uploaded"}
-                                                    </span>
-                                                </div>
-                                                {/* Right: View icon */}
-                                                <div className="mr-2 flex items-center gap-1">
-                                                    {/* View Aadhar */}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleViewFile(aadhar.fileName)}
-                                                        className="p-1.5 rounded-md bg-green-50 hover:bg-green-100 transition"
-                                                        title="View Aadhar Card"
-                                                    >
-                                                        <Eye className="w-4 h-4 text-green-500" />
-                                                    </button>
-
-                                                    {/* Upload Aadhar */}
-                                                    <label
-                                                        className="p-1.5 rounded-md bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
-                                                        title="Upload Aadhar Card"
-                                                    >
-                                                        <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
-
-                                                        <input
-                                                            type="file"
-                                                            className="hidden"
-                                                            accept=".pdf,.jpg,.jpeg,.png"
-                                                            onChange={(e) => handleFileUpload(e, "aadhar")}
-                                                        />
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </>
-        );
-    };
-
-    // MAIN UI
-    return (
-        <div className="min-h-screen bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5">
-                {/* HEADER */}
-                <div className="flex items-center justify-between pb-5">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#eef5f9]">
-                            <UserRound className="w-4 h-4 text-[#126aa8]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-semibold text-[#173875]">
-                                Edit Director Details
-                            </h2>
-                            <p className="mt-0.5 text-sm text-gray-500">
-                                Director information
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* DIRECTORS */}
-                <div className="mt-3 space-y-3">
-                    {renderDirector(1)}
-
-                    {directorCount >= 1 && renderDirector(2)}
-                </div>
+      }
 
 
-                {/* BACK & NEXT BUTTONS */}
-                <div className="flex justify-between items-center gap-4 mt-10">
-                    <button
-                        type="button"
-                        onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
-                    >
-                        Back
-                    </button>
+      // ───────────────────────────────────────────────────────────────────────
+      // OFFRAMP
+      // Adjust these fields according to your OFFRAMP DTO
+      // ───────────────────────────────────────────────────────────────────────
+      return {
+        "Merchant Ref ID":
+          item.merchant_ref_id ??
+          item.merchantRefId ??
+          "",
 
-                    <div className="flex justify-center">
-                        <button
-                            type="button"
-                            onClick={handleEditDirector}
-                            className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
-                        >
-                            Update
-                        </button>
-                    </div>
+        "Merchant Order ID":
+          item.merchant_order_id ??
+          item.merchantOrderId ??
+          "",
 
-                    <button
-                        type="button"
-                        onClick={handleNext}
-                        className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
-        </div>
+        "Order ID":
+          item.order_id ??
+          item.orderId ??
+          "",
+
+        "Sell Token Symbol":
+          item.sell_token_symbol ??
+          item.sellTokenSymbol ??
+          "",
+
+        "Sell Token Address":
+          item.sell_token_address ??
+          item.sellTokenAddress ??
+          "",
+
+        "Chain ID":
+          item.chain_id ??
+          item.chainId ??
+          "",
+
+        "Crypto Amount":
+          item.crypto_amount ??
+          item.cryptoAmount ??
+          "",
+
+        "Fiat Amount":
+          item.fiat_amount ??
+          item.fiatAmount ??
+          "",
+
+        "Fiat Currency":
+          item.fiat_currency ??
+          item.fiatCurrency ??
+          "",
+
+        "Receiver Address":
+          item.receiver_address ??
+          item.receiverAddress ??
+          "",
+
+        "UTR":
+          item.utr ?? "",
+
+        "Created At":
+          item.created_at ??
+          item.createdAt ??
+          "",
+
+        "Response At":
+          item.response_at ??
+          item.responseAt ??
+          "",
+
+        "Status":
+          item.status ?? "",
+      };
+
+    });
+
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(exportData);
+
+    const workbook =
+      XLSX.utils.book_new();
+
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      activeTab
     );
-};
 
 
+    XLSX.writeFile(
+      workbook,
+      `${activeTab} _Crypto_Transaction_Report.xlsx`
+    );
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Table columns
+  // ───────────────────────────────────────────────────────────────────────────
+  const renderTableHeaders = () => {
+
+    if (activeTab === "ONRAMP") {
+
+      return (
+        <tr className="bg-yellow-400 text-black uppercase">
+          <th className="px-3 py-2.5 whitespace-nowrap">Merchant ID</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Merchant Order ID</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Order ID</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Provider Order ID</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Buy Token Symbol</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Chain ID</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Fiat Amount</th>
+                    <th className="px-3 py-2.5 whitespace-nowrap">PlateForm Fee</th>
+                              <th className="px-3 py-2.5 whitespace-nowrap">TDS Fee</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Currency</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Payment Mode</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Receiver Address</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">UTR</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Created At</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Response At</th>
+          <th className="px-3 py-2.5 whitespace-nowrap">Status</th>
+        </tr>
+      );
+    }
+
+    return (
+      <tr className="bg-yellow-400 text-black uppercase">
+        <th className="px-3 py-2.5 whitespace-nowrap">Merchant ID</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Merchant Order ID</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Order ID</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Provider Order ID</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Sell Token Symbol</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Sell Token Address</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Sell Token Amount</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Sender Wallet Address</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Chain ID</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Fiat Amount</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Currency</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Payment Mode</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Account Number</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Ifsc</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Created At</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Response At</th>
+        <th className="px-3 py-2.5 whitespace-nowrap">Status</th>
+      </tr>
+    );
+  };
+
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Table Row
+  // ───────────────────────────────────────────────────────────────────────────
+  const renderTableRow = (item, index) => {
+
+    const getValue = (snake, camel) =>
+      item?.[snake] ??
+      item?.[camel] ??
+      "";
+
+    return (
+      <tr key={index}>
+
+        <td className="px-3 py-2.5">{getValue("merchantId")}</td>
+        <td className="px-3 py-2.5">{getValue("merchantOrderId")}</td>
+        <td className="px-3 py-2.5">{getValue("orderId")}</td>
+
+        {activeTab === "ONRAMP" ? (
+          <>
+            <td className="px-3 py-2.5">{getValue("providerOrderId")}</td>
+            <td className="px-3 py-2.5">{getValue("buyTokenSymbol")}</td>
+            <td className="px-3 py-2.5">{getValue("chainId")}</td>
+            <td className="px-3 py-2.5">{getValue("fiatAmount")} </td>
+            <td className="px-3 py-2.5">{getValue("platformFee")} </td>
+            <td className="px-3 py-2.5">{getValue("tdsFee")} </td>
+            <td className="px-3 py-2.5">{getValue("fiatCurrency")}</td>
+            <td className="px-3 py-2.5">{getValue("paymentMode")}</td>
+            <td className="px-3 py-2.5">{item?.receiverAddress || "-"}</td>
+            <td className="px-3 py-2.5">{item?.utr || "-"}</td>
+            <td className="px-3 py-2.5 whitespace-nowrap">{getValue("createdAt")}</td>
+            <td className="px-3 py-2.5 whitespace-nowrap">{getValue("responseAt")}</td>
+            <td className="px-3 py-2.5">
+              <StatusBadge
+                status={item?.status}
+              />
+            </td>
+          </>
+        ) : (
+          <>
+            <td className="px-3 py-2.5">{getValue("providerOrderId")}</td>
+            <td className="px-3 py-2.5">{getValue("sellTokenSymbol")}</td>
+            <td className="px-3 py-2.5">{getValue("sellTokenAddress")}</td>
+            <td className="px-3 py-2.5">{getValue("sellTokenAmount")}</td>
+            <td className="px-3 py-2.5">{getValue("senderWalletAddress")}</td>
+            <td className="px-3 py-2.5">{getValue("chainId")}</td>
+            <td className="px-3 py-2.5">{getValue("fiatAmount")}</td>
+            <td className="px-3 py-2.5">{getValue("fiatCurrency")}</td>
+            <td className="px-3 py-2.5">{getValue("paymentMode")}</td>
+            <td className="px-3 py-2.5">{getValue("bankAccountNumber")}</td>
+            <td className="px-3 py-2.5">{getValue("bankIfsc")}</td>
+            <td className="px-3 py-2.5 whitespace-nowrap">{getValue("createdAt")}</td>
+            <td className="px-3 py-2.5 whitespace-nowrap">{getValue("responseAt")}</td>
+            <td className="px-3 py-2.5">
+              <StatusBadge
+                status={item?.status}
+              />
+            </td>
+          </>
+        )}
+      </tr>
+    );
+  };
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // JSX
+  // ───────────────────────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen p-4 w-full overflow-x-auto">
+
+      {/* ───────────────────────────────────────────────────────────────────────
+          Header
+      ─────────────────────────────────────────────────────────────────────── */}
+      <div className="mb-5">
+
+        <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
+          Crypto Transaction Report
+        </h1>
+        <p className="pb-3 text-sm text-black-500">
+          View and monitor crypto transaction records with detailed reports, status tracking, payment insights, and export options.
+        </p>
+      </div>
+      {/* ───────────────────────────────────────────────────────────────────────
+          ONRAMP / OFFRAMP TOGGLE
+      ─────────────────────────────────────────────────────────────────────── */}
+      <div className="mb-5">
+        <div className="flex items-center gap-8 border-b border-gray-200">
+
+          {/* ONRAMP */}
+          <button
+            type="button"
+            onClick={() => setActiveTab("ONRAMP")}
+            className={`
+        relative
+        px-2
+        pb-3
+        text-sm
+        font-semibold
+        transition-all
+        duration-200
+        ${activeTab === "ONRAMP"
+                ? "text-yellow-500"
+                : "text-gray-500 hover:text-gray-800"
+              }
+      `}
+          >
+            ONRAMP
+
+            {/* Active underline */}
+            {activeTab === "ONRAMP" && (
+              <span className="absolute left-0 right-0 -bottom-[1px] h-[3px] bg-yellow-400 rounded-t-full" />
+            )}
+          </button>
+
+
+          {/* OFFRAMP */}
+          <button
+            type="button"
+            onClick={() => setActiveTab("OFFRAMP")}
+            className={`
+        relative
+        px-2
+        pb-3
+        text-sm
+        font-semibold
+        transition-all
+        duration-200
+        ${activeTab === "OFFRAMP"
+                ? "text-yellow-500"
+                : "text-gray-500 hover:text-gray-800"
+              }
+      `}
+          >
+            OFFRAMP
+
+            {/* Active underline */}
+            {activeTab === "OFFRAMP" && (
+              <span className="absolute left-0 right-0 -bottom-[1px] h-[3px] bg-yellow-400 rounded-t-full" />
+            )}
+          </button>
+
+        </div>
+      </div>
+      {/* ───────────────────────────────────────────────────────────────────────
+          Filter Bar
+      ─────────────────────────────────────────────────────────────────────── */}
+
+      <div className="mb-5">
+        <div className="flex flex-col md:flex-row gap-4 items-end flex-wrap">
+          {/* From Date */}
+          <div className="w-full md:w-52">
+
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              From Date
+            </label>
+
+            <input
+              type="date"
+              value={fromDate}
+              max={today}
+              onChange={(e) =>
+                setFromDate(e.target.value)
+              }
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+
+          </div>
+
+          {/* To Date */}
+
+          <div className="w-full md:w-52">
+
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              To Date
+            </label>
+
+            <input
+              type="date"
+              value={toDate}
+              max={today}
+              onChange={(e) =>
+                setToDate(e.target.value)
+              }
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+
+          </div>
+
+
+          {/* Search */}
+
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={loading}
+            className="
+              bg-yellow-400
+              hover:bg-yellow-500
+              disabled:bg-gray-300
+              disabled:cursor-not-allowed
+              text-black
+              px-6
+              py-2.5
+              rounded-lg
+              flex
+              items-center
+              gap-2
+              text-sm
+              font-normal
+              shadow
+              transition
+            "
+          >
+
+            <FaSearch />
+
+            {loading
+              ? "Searching..."
+              : "Search"
+            }
+          </button>
+
+
+          {/* Excel */}
+          <button
+            type="button"
+            onClick={exportToExcel}
+            disabled={
+              loading ||
+              !data.length
+            }
+            className="
+              bg-green-600
+              hover:bg-green-700
+              disabled:bg-gray-400
+              disabled:cursor-not-allowed
+              text-white
+              px-6
+              py-2.5
+              rounded-lg
+              flex
+              items-center
+              gap-2
+              text-sm
+              font-semibold
+              shadow
+              transition
+            "
+          >
+
+            <FaFileExcel />
+            Excel
+          </button>
+        </div>
+      </div>
+
+
+      {/* ───────────────────────────────────────────────────────────────────────
+          Report Info
+      ─────────────────────────────────────────────────────────────────────── */}
+
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-lg font-semibold text-[#1A2233]">
+          {activeTab === "ONRAMP"
+            ? "ONRAMP Transactions"
+            : "OFFRAMP Transactions"
+          }
+        </h2>
+
+
+        {searched && (
+
+          <span className="text-sm text-gray-500">
+            Total Records:
+            <span className="font-semibold text-gray-800 ml-1">
+              {totalRecords}
+            </span>
+          </span>
+        )}
+      </div>
+      {/* ───────────────────────────────────────────────────────────────────────
+          Table
+      ─────────────────────────────────────────────────────────────────────── */}
+
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-100 text-gray-700">
+            {renderTableHeaders()}
+          </thead>
+          <tbody>
+
+            {/* Loading */}
+
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={
+                    activeTab === "ONRAMP"
+                      ? 12
+                      : 11
+                  }
+                  className="text-center py-10 text-gray-500"
+                >
+
+                  Loading {activeTab} transactions...
+                </td>
+              </tr>
+
+            ) : data.length === 0 ? (
+
+              <tr>
+
+                <td
+                  colSpan={
+                    activeTab === "ONRAMP"
+                      ? 12
+                      : 11
+                  }
+                  className="text-center py-10 text-gray-500"
+                >
+                  No {activeTab} transactions found.
+
+                </td>
+              </tr>
+
+            ) : (
+
+              data.map(
+                (item, index) =>
+                  renderTableRow(
+                    item,
+                    index
+                  )
+              )
+
+            )}
+
+          </tbody>
+        </table>
+      </div>
+
+
+      {/* ───────────────────────────────────────────────────────────────────────
+          Pagination
+      ─────────────────────────────────────────────────────────────────────── */}
+      {totalPages > 0 && (
+
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-5">
+          {/* Page Size */}
+
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span>Rows per page:</span>
+            <select
+              value={size}
+              onChange={(e) =>
+                handleSizeChange(
+                  e.target.value
+                )
+              }
+              className="border border-gray-300 rounded-lg px-3 py-2 outline-none"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+
+
+          {/* Page Buttons */}
+
+          <div className="flex items-center gap-1">
+            {/* Previous */}
+
+            <button
+              type="button"
+              disabled={
+                page === 0 ||
+                loading
+              }
+              onClick={() =>
+                handlePageChange(
+                  page - 1
+                )
+              }
+              className="
+                px-3
+                py-2
+                border
+                border-gray-300
+                rounded-lg
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+                hover:bg-gray-100
+              "
+            >
+              Previous
+            </button>
+
+            {/* Page Numbers */}
+
+            {getPageNumbers().map(
+              (pageNumber) => (
+
+                <button
+                  type="button"
+                  key={pageNumber}
+                  onClick={() =>
+                    handlePageChange(
+                      pageNumber
+                    )
+                  }
+                  disabled={loading}
+                  className={`
+min - w - [40px]
+px - 3
+py - 2
+rounded - lg
+border
+                    ${page === pageNumber
+                      ? "bg-yellow-400 border-yellow-400 text-black font-semibold"
+                      : "border-gray-300 hover:bg-gray-100"
+                    }
+`}
+                >
+
+                  {pageNumber + 1}
+
+                </button>
+
+              )
+            )}
+
+
+            {/* Next */}
+
+            <button
+              type="button"
+              disabled={
+                page >=
+                totalPages - 1 ||
+                loading
+              }
+              onClick={() =>
+                handlePageChange(
+                  page + 1
+                )
+              }
+              className="
+                px-3
+                py-2
+                border
+                border-gray-300
+                rounded-lg
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+                hover:bg-gray-100
+              "
+            >
+
+              Next
+            </button>
+          </div>
+
+
+          {/* Current Page */}
+
+          <div className="text-sm text-gray-500">
+            Page{" "}
+            <span className="font-semibold text-gray-800">
+              {page + 1}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-gray-800">
+              {totalPages}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Status Badge
+// ─────────────────────────────────────────────────────────────────────────────
+function StatusBadge({ status }) {
+
+  const normalizedStatus =
+    String(status || "")
+      .toUpperCase();
+
+
+  let className =
+    "bg-gray-100 text-gray-700";
+
+
+  if (
+    normalizedStatus === "SUCCESS" ||
+    normalizedStatus === "COMPLETED" ||
+    normalizedStatus === "SUCCESSFUL"
+  ) {
+
+    className =
+      "bg-green-100 text-green-700";
+  }
+
+
+  if (
+    normalizedStatus === "FAILED" ||
+    normalizedStatus === "FAILURE" ||
+    normalizedStatus === "REJECTED"
+  ) {
+
+    className =
+      "bg-red-100 text-red-700";
+  }
+
+
+  if (
+    normalizedStatus === "PAYMENT_PENDING" ||
+    normalizedStatus === "CRYPTO_PENDING"
+  ) {
+
+    className =
+      "bg-yellow-100 text-yellow-700";
+  }
+
+
+  return (
+    <span
+      className={`
+inline - flex
+px - 2.5
+py - 1
+rounded - full
+text - xs
+font - semibold
+        ${className}
+`}
+    >
+      {status || "-"}
+    </span>
+  );
+}

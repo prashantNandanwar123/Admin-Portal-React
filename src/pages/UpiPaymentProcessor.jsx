@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../api/axios";
 import { FaPlus, FaEdit, FaSave, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { FaSearch } from "react-icons/fa";
 
-
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ROWS_PER_PAGE = 10;
-
 
 const EMPTY_FORM = {
   processor: "",
@@ -41,7 +39,7 @@ const FORM_FIELDS = [
     label: "UPI Acquirer",
     type: "select",
     required: true,
-    options: ["UNLIMIT","ENKASH", "IDFC"],
+    options: ["UNLIMIT", "ENKASH", "ONMETA"],
   },
   {
     name: "midName",
@@ -52,8 +50,8 @@ const FORM_FIELDS = [
     patternMsg: "Only letters and spaces allowed",
   },
   { name: "mid", label: "Merchant / Secret ID", type: "text", required: true },
-  { name: "tid", label: "TID", type: "text", required: true },
-  { name: "mcc", label: "MCC", type: "text", required: true },
+  // { name: "tid", label: "TID", type: "text", required: true },
+  // { name: "mcc", label: "MCC", type: "text", required: true },
   {
     name: "currency",
     label: "Currency",
@@ -71,7 +69,7 @@ const FORM_FIELDS = [
     maxLength: 7,
   },
   { name: "saltKey", label: "Salt Key", type: "text", required: true },
-  { name: "secretKey", label: "Secret Key", type: "text", required: true },
+  { name: "secretKey", label: "Secret Key", type: "text", required: true,  maxLength: 20 },
   {
     name: "bankURL",
     label: "Bank URL",
@@ -83,30 +81,29 @@ const FORM_FIELDS = [
   },
   {
     name: "version",
-    label: "Version",
+    label: "API Version",
     type: "text",
     required: true,
-    pattern: "^[0-9.]+$",
-    patternMsg: "Only digits and dots allowed",
+    maxLength: 3
   },
-  {
-    name: "bankCode",
-    label: "Bank Code",
-    type: "text",
-    required: true,
-    pattern: "^[A-Za-z0-9]+$",
-    patternMsg: "Only alphanumeric characters allowed",
-    maxLength: 15,
-  },
-  {
-    name: "accessCode",
-    label: "Access Code",
-    type: "text",
-    required: true,
-    pattern: "^[A-Za-z0-9]+$",
-    patternMsg: "Only alphanumeric characters allowed",
-    maxLength: 15,
-  },
+  // {
+  //   name: "bankCode",
+  //   label: "Bank Code",
+  //   type: "text",
+  //   required: true,
+  //   pattern: "^[A-Za-z0-9]+$",
+  //   patternMsg: "Only alphanumeric characters allowed",
+  //   maxLength: 15,
+  // },
+  // {
+  //   name: "accessCode",
+  //   label: "Access Code",
+  //   type: "text",
+  //   required: true,
+  //   pattern: "^[A-Za-z0-9]+$",
+  //   patternMsg: "Only alphanumeric characters allowed",
+  //   maxLength: 15,
+  // },
   {
     name: "processorGST",
     label: "GST (%)",
@@ -241,6 +238,7 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
+
   const handleChange = (name, value) => {
     onChange(name, value);
     if (touched[name]) {
@@ -293,13 +291,12 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-700 rounded-t-2xl">
-          <h2 className="text-white font-bold text-lg uppercase tracking-wide">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#fec931] rounded-t-2xl">
+          <h2 className="text-black font-semibold text-lg uppercase tracking-wide">
             {isEdit ? "Edit UPI Processor" : "Add UPI Processor"}
           </h2>
-          <button onClick={onClose} className="text-white hover:text-blue-200 transition text-xl">
+          <button onClick={onClose} className="text-black transition text-xl">
             <FaTimes />
           </button>
         </div>
@@ -393,7 +390,7 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
+            className="bg-[#fec931] disabled:bg-black-400 text-black px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
           >
             <FaSave />
             {loading ? "Saving..." : isEdit ? "Update" : "Save"}
@@ -524,137 +521,135 @@ export default function UpiPaymentProcessor() {
   const totalRows = filteredData.length;
   const pagedData = filteredData.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
   const TABLE_COLS = [
-    "#", "UPI Processor", "UPI Acquirer", "MID Name", "Merchant ID",
-    "Currency", "Txn Limit", "Bank URL", "Bank Code",
+    "Sr.No", "UPI Processor", "UPI Acquirer", "MID Name", "Merchant ID",
+    "Currency", "Txn Limit", "Bank URL",
     "GST (%)", "Creation Date", "Status", "Action",
   ];
-  
+
 
   return (
-    <div className="min-h-screen  p-4 md:p-6">
+    <div className="min-h-screen p-4 md:p-6">
       {/* Header */}
       <div className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             UPI Payment Processor
           </h1>
-          <p className="pb-3 text-sm text-blue-900">
+          <p className="pb-3 text-sm text-slate-900">
             Process and manage UPI payments with real-time transaction handling and secure Payment routing.
           </p>
         </div>
         <button
           onClick={openAdd}
-          className="bg-yellow-500  text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm shadow transition self-start md:self-auto"
-        >
+          className="bg-[#fec931] text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto">
           <FaPlus />
           Add Processor
         </button>
       </div>
 
       {/* Table Card */}
-      <div className="w-full flex justify-end mb-4">
-        <div className="relative w-80">
-          <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
-          <input
-            type="text"
-            placeholder="Search merchant..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-            className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+        <div className="w-full flex justify-end mb-4">
+          <div className="relative">
+            <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="w-56 border border-slate-300 pl-10 pr-4 py-2 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+          </div>
         </div>
-      </div>
-      <div className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs whitespace-nowrap">
-            <thead>
-              <tr className="bg-orange-600 text-white">
-                {TABLE_COLS.map((col) => (
-                  <th key={col} className="px-3 py-3 text-left font-semibold tracking-wide">
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={TABLE_COLS.length} className="text-center py-14">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-9 w-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-gray-500 text-sm">Loading processors...</span>
-                    </div>
-                  </td>
+        <div className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs whitespace-nowrap">
+              <thead>
+                <tr className="bg-[#fec931] text-black uppercase">
+                  {TABLE_COLS.map((col) => (
+                    <th key={col} className="px-3 py-3 text-left font-semibold tracking-wide">
+                      {col}
+                    </th>
+                  ))}
                 </tr>
-              ) : pagedData.length > 0 ? (
-                pagedData.map((item, index) => {
-                  const globalIndex = (page - 1) * ROWS_PER_PAGE + index + 1;
-                  return (
-                    <tr
-                      key={item.id}
-                      className={`border-b hover:bg-blue-50 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        }`}
-                    >
-                      <td className="px-3 py-3 text-gray-500 font-medium">{globalIndex}</td>
-                      <td className="px-3 py-3 font-bold text-blue-700">{item.processor || "-"}</td>
-                      <td className="px-3 py-3">{item.acquirer || "-"}</td>
-                      <td className="px-3 py-3 font-semibold text-gray-700">{item.midName || "-"}</td>
-                      <td className="px-3 py-3 font-mono text-gray-600">{item.mid || "-"}</td>
-                      <td className="px-3 py-3">
-                        <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
-                          {item.currency || "INR"}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">₹{item.transactionLimit || "0"}</td>
-                      <td
-                        className="px-3 py-3 max-w-[160px] truncate text-gray-500"
-                        title={item.bankURL}
+              </thead>
+
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={TABLE_COLS.length} className="text-center py-14">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="h-9 w-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-gray-500 text-sm">Loading processors...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : pagedData.length > 0 ? (
+                  pagedData.map((item, index) => {
+                    const globalIndex = (page - 1) * ROWS_PER_PAGE + index + 1;
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`border-b hover:bg-blue-50 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          }`}
                       >
-                        {item.bankURL || "-"}
-                      </td>
-                      <td className="px-3 py-3">{item.bankCode || "-"}</td>
-                      <td className="px-3 py-3">{item.processorGST ?? "-"}</td>
-                      <td className="px-3 py-3">{item.creationDate ?? "-"}</td>
-                      <td className="px-3 py-3">
-                        <StatusBadge status={item.status} />
-                      </td>
-                      <td className="px-3 py-3">
-                        <button
-                          onClick={() => openEdit(item)}
-                          className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-semibold shadow transition"
+                        <td className="px-3 py-3 text-gray-500 font-medium">{globalIndex}</td>
+                        <td className="px-3 py-3 font-bold text-slate-800">{item.processor || "-"}</td>
+                        <td className="px-3 py-3">{item.acquirer || "-"}</td>
+                        <td className="px-3 py-3 font-semibold text-gray-700">{item.midName || "-"}</td>
+                        <td className="px-3 py-3 font-mono text-gray-600">{item.mid || "-"}</td>
+                        <td className="px-3 py-3">
+                          <span className="bg-yellow-200 text-black px-2 py-0.5 rounded font-semibold">
+                            {item.currency || "INR"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3">₹{item.transactionLimit || "0"}</td>
+                        <td
+                          className="px-3 py-3 max-w-[160px] truncate text-gray-500"
+                          title={item.bankURL}
                         >
-                          <FaEdit />
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={TABLE_COLS.length} className="text-center py-14 text-gray-400 text-sm">
-                    No UPI Processors Found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                          {item.bankURL || "-"}
+                        </td>
+                        {/* <td className="px-3 py-3">{item.bankCode || "-"}</td> */}
+                        <td className="px-3 py-3">{item.processorGST ?? "-"}</td>
+                        <td className="px-3 py-3">{item.creationDate ?? "-"}</td>
+                        <td className="px-3 py-3">
+                          <StatusBadge status={item.status} />
+                        </td>
+                        <td className="px-3 py-3">
+                          <button
+                            onClick={() => openEdit(item)}
+                            className="bg-[#fec931] text-black px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-normal shadow transition">
+                            <FaEdit />
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={TABLE_COLS.length} className="text-center py-14 text-gray-400 text-sm">
+                      No UPI Processors Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-          
+          {/* Pagination */}
+          {!loading && totalRows > 0 && (
+            <Pagination
+              total={totalRows}
+              page={page}
+              perPage={ROWS_PER_PAGE}
+              onChange={(p) => setPage(p)}
+            />
+          )}
         </div>
-
-        {/* Pagination */}
-        {!loading && totalRows > 0 && (
-          <Pagination
-            total={totalRows}
-            page={page}
-            perPage={ROWS_PER_PAGE}
-            onChange={(p) => setPage(p)}
-          />
-        )}
       </div>
 
       {/* Modal */}

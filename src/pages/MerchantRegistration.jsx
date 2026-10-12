@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MerchantRegistrationForm from "../components/MerchantRegistrationForm";
 import MerchantRegistrationPendingForm from "../components/MerchantRegistrationPending/MerchantRegistrationPendingForm";
 import { useLocation } from "react-router-dom";
 import axiosInstance from "../api/axios";
 import { LiaEyeSolid } from "react-icons/lia";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import {
   FaChevronLeft,
   FaChevronRight,
-  FaPlus,
   FaSearch,
-  FaUsers,
-  FaClock,
-  FaShieldAlt,
-  FaSyncAlt
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
 } from "react-icons/fa";
+import { Plus } from "lucide-react";
+
+
+import { User } from "lucide-react";
 
 export default function MerchantRegistration() {
   const [data, setData] = useState([]);
@@ -51,10 +51,52 @@ export default function MerchantRegistration() {
     indexOfFirst,
     indexOfLast
   );
-
   const totalPages = Math.ceil(
     filteredData.length / entriesPerPage
   );
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let page = 1; page <= totalPages; page++) {
+        pages.push(page);
+      }
+      return pages;
+    }
+
+    // First pages
+    pages.push(1);
+
+    // Current page is near the beginning
+    if (currentPage <= 4) {
+      pages.push(2);
+      pages.push(3);
+      pages.push(4);
+      pages.push("...");
+      pages.push(totalPages);
+      return pages;
+    }
+
+    // Current page is near the end
+    if (currentPage >= totalPages - 3) {
+      pages.push("...");
+      pages.push(totalPages - 3);
+      pages.push(totalPages - 2);
+      pages.push(totalPages - 1);
+
+      return pages;
+    }
+
+    // Current page is somewhere in the middle
+    pages.push("...");
+    pages.push(currentPage - 1);
+    pages.push(currentPage);
+    pages.push(currentPage + 1);
+    pages.push("...");
+    pages.push(totalPages);
+
+    return pages;
+  };
 
   // Route change hone pe list view pe reset
   useEffect(() => {
@@ -80,7 +122,7 @@ export default function MerchantRegistration() {
         setView("form");
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     } finally {
       setLoading(false);
     }
@@ -91,8 +133,8 @@ export default function MerchantRegistration() {
     setMerchantFormData({});
     setView("form");
   };
-  const handleEdit = (item) => {
-    setSelectedMerchant(item);
+  const handlePendingClick = (refId) => {
+    setSelectedMerchant(refId);
     setView("pending");
   };
 
@@ -117,55 +159,49 @@ export default function MerchantRegistration() {
       />
     );
   }
+
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-screen hide-scrollbar">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-5">
         <div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Merchant Registration
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Manage and onboard merchants to HelloPe.
+          <p className="text-sm text-slate-500 mt-1 max-w-4xl leading-6">
+            Register and onboard merchants to the HelloPe payment platform by capturing
+            their business, contact, banking, KYC, and compliance information.
           </p>
         </div>
         <button
           onClick={handleAddClick}
-          className="flex items-center justify-center gap-2 bg-amber-400  active:scale-[0.98] transition-all duration-150 text-black font-normal px-5 py-2.5 rounded-xl shadow-sm w-full sm:w-auto"
-        >
-          <FaPlus size={13} />
+          className="flex items-center justify-center gap-2 bg-[#fec931] text-black active:scale-[0.98] transition-all duration-150 font-normal px-4 py-2.5 rounded-xl shadow-sm w-full sm:w-auto">
+          <Plus size={14} strokeWidth={2} />
           Add Merchant
         </button>
       </div>
 
-      {/* Stats strip */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-5 text-sm">
-        <div className="flex items-center gap-2 text-slate-600">
-          <FaUsers className="text-blue-500" />
-          <span className="font-semibold text-slate-800">
-            {filteredData.length.toLocaleString()}
-          </span>
-          Total Merchants
-        </div>
-        <div className="flex items-center gap-2 text-slate-600">
-          <FaClock className="text-amber-500" />
-          <span className="font-semibold text-slate-800">
-            {filteredData.filter((item) => !item[5] || item[5] === "Pending").length}
-          </span>
-          Pending Review
-        </div>
-        <div className="flex items-center gap-2 text-slate-600">
-          <FaShieldAlt className="text-red-500" />
-          <span className="font-semibold text-slate-800">
-            {filteredData.filter((item) => item[5] === "Rejected" || item[5] === "High").length}
-          </span>
-          High Risk
+      {/* Stats Strip */}
+      <div className="mb-5">
+        <div className="inline-flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+          {/* Icon */}
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#fec931] text-black">
+            <User size={20} strokeWidth={2} />
+          </div>
+          {/* Content */}
+          <div className="flex flex-col">
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              Total Merchants
+            </span>
+            <span className="text-xl font-bold leading-tight text-slate-800">
+              {filteredData.length.toLocaleString()}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Main Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        {/* Top Controls */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 p-4 border-b border-slate-100 bg-white">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-slate-500">Show</span>
@@ -175,8 +211,7 @@ export default function MerchantRegistration() {
                 setEntriesPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="border border-slate-200 bg-slate-50 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
-            >
+              className="border border-slate-200 bg-slate-50 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400">
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -189,44 +224,41 @@ export default function MerchantRegistration() {
             <FaSearch className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 text-sm" />
             <input
               type="text"
-              placeholder="Search merchant by name, email or ID..."
+              placeholder="Search"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 focus:bg-white transition-all"
+              className="w-full border border-slate-200  pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#fec931] focus:bg-white transition-all"
             />
           </div>
         </div>
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[900px]">
-            <thead className="bg-slate-50 text-slate-500">
-              <tr>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+          <table className="w-full text-sm min-w-[900px] border-collapse border border-slate-200">
+            <thead className="bg-[#fec931] text-black border-t-0">
+              <tr className="uppercase">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   ID
                 </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Legal Name
                 </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Contact Person
                 </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Email
                 </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Mobile
                 </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Risk Status
                 </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
-                  Risk Remark
-                </th>
-                <th className="px-5 py-3 text-center font-semibold text-xs uppercase tracking-wide">
+                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Action
                 </th>
               </tr>
@@ -273,57 +305,55 @@ export default function MerchantRegistration() {
                       key={index}
                       className="border-t border-slate-100 hover:bg-slate-50 transition-all duration-150"
                     >
+
                       {/* ID */}
-                      <td className="px-5 py-4 text-center font-medium text-slate-500">
-                        #{item[0]}
+                      <td className="px-1 py-1 text-center font-medium text-slate-500 border border-slate-200">
+                        {item[0]}
                       </td>
 
                       {/* Legal Name */}
-                      <td className="px-5 py-4 text-center">
+                      <td className="px-3 py-2 text-center border border-slate-200">
                         <div className="flex items-center justify-center gap-3">
-                          <div
-                            className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-semibold ${avatarColor}`}
-                          >
-                            {initial}
-                          </div>
-
                           <span className="font-semibold text-slate-800">
-                            {item[1]}
+                            {item[1] || "-"}
                           </span>
                         </div>
                       </td>
 
                       {/* Contact Person */}
-                      <td className="px-5 py-4 text-center text-slate-600">
-                        {item[2]}
+                      <td className="text-center text-slate-600 border border-slate-200">
+                        {item[2] || "-"}
                       </td>
 
                       {/* Email */}
-                      <td className="px-5 py-4 text-center text-slate-600">
-                        {item[3]}
+                      <td className="text-center text-slate-600 border border-slate-200">
+                        {item[3] || "-"}
                       </td>
 
                       {/* Mobile */}
-                      <td className="px-5 py-4 text-center text-slate-600">
-                        {item[4]}
+                      <td className="text-center text-slate-600 border border-slate-200">
+                        {item[4] || "-"}
                       </td>
 
                       {/* Risk Status */}
-                      <td className="px-5 py-4 text-center">
+                      <td className="text-center border border-slate-200">
                         <span
-                          className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
-                        >
+                          className={`inline-block rounded-full text-xs font-semibold ${statusClass}`}>
                           {statusLabel}
                         </span>
                       </td>
-
-                      {/* Risk Remark */}
-                      <td className="px-5 py-4 text-center text-slate-500">
-                        {item[6] || "-"}
-                      </td>
-
                       {/* Action */}
-                      <td className="px-5 py-4 text-center relative">
+                      <td className="px-2 py-1 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handlePendingClick(item[4])}
+                          className="inline-flex items-center justify-center"
+                        >
+                          <LiaEyeSolid className="text-3xl text-green-500" />
+                        </button>
+                      </td>
+                      {/* Action */}
+                      {/* <td className="px-3 py-2 text-center relative">
                         <button
                           onClick={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
@@ -341,7 +371,7 @@ export default function MerchantRegistration() {
                         >
                           <BsThreeDotsVertical className="text-lg" />
                         </button>
-                      </td>
+                      </td> */}
                     </tr>
                   );
                 })
@@ -349,15 +379,12 @@ export default function MerchantRegistration() {
                 <tr>
                   <td
                     colSpan="8"
-                    className="text-center py-16 text-slate-500"
-                  >
+                    className="text-center py-16 text-slate-500">
                     <div className="flex flex-col items-center gap-3">
                       <div className="text-5xl">📄</div>
-
                       <p className="text-lg font-medium">
                         No Merchant Found
                       </p>
-
                       <p className="text-sm text-slate-400">
                         Try adjusting your search criteria
                       </p>
@@ -369,8 +396,9 @@ export default function MerchantRegistration() {
           </table>
         </div>
 
-        {/* Bottom */}
+        {/* Bottom Pagination */}
         <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-4 border-t border-slate-100 bg-white">
+          {/* Showing entries */}
           <div className="text-sm text-slate-500">
             Showing{" "}
             <span className="font-semibold text-slate-700">
@@ -380,14 +408,35 @@ export default function MerchantRegistration() {
             <span className="font-semibold text-slate-700">
               {Math.min(indexOfLast, filteredData.length)}
             </span>{" "}
-            of <span className="font-semibold text-slate-700">{filteredData.length}</span> entries
+            of{" "}
+            <span className="font-semibold text-slate-700">
+              {filteredData.length}
+            </span>{" "}
+            entries
           </div>
 
+          {/* Pagination */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-              className={`flex items-center gap-1 px-3 py-2 rounded-xl border text-sm transition-all ${currentPage === 1
+              type="button"
+              disabled={currentPage === 1 || totalPages === 0}
+              onClick={() => setCurrentPage(1)}
+              className={`w-9 h-9 flex items-center justify-center rounded-xl border text-sm transition-all ${currentPage === 1 || totalPages === 0
+                ? "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
+                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+            >
+              <FaAngleDoubleLeft size={13} />
+            </button>
+
+            {/* PREVIOUS */}
+            <button
+              type="button"
+              disabled={currentPage === 1 || totalPages === 0}
+              onClick={() =>
+                setCurrentPage((prev) => Math.max(prev - 1, 1))
+              }
+              className={`w-9 h-9 flex items-center justify-center rounded-xl border text-sm transition-all ${currentPage === 1 || totalPages === 0
                 ? "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
                 : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
@@ -395,28 +444,29 @@ export default function MerchantRegistration() {
               <FaChevronLeft size={11} />
             </button>
 
-            {[...Array(totalPages)].map((_, index) => {
-              const page = index + 1;
-              if (
-                page !== 1 &&
-                page !== totalPages &&
-                Math.abs(page - currentPage) > 1
-              ) {
-                if (page === 2 || page === totalPages - 1) {
-                  return (
-                    <span key={page} className="px-1 text-slate-400 text-sm">
-                      ...
-                    </span>
-                  );
-                }
-                return null;
+            {/* PAGE NUMBERS */}
+            {getPageNumbers().map((page, index) => {
+
+              // Dots
+              if (page === "...") {
+                return (
+                  <span
+                    key={`dots-${index}`}
+                    className="px-1 text-slate-400 text-sm"
+                  >
+                    ...
+                  </span>
+                );
               }
+
+              // Page button
               return (
                 <button
                   key={page}
+                  type="button"
                   onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${currentPage === page
-                    ? "bg-amber-400 text-white shadow-sm"
+                  className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-medium transition-all ${currentPage === page
+                    ? "bg-[#fec931] text-black shadow-sm"
                     : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                 >
@@ -425,64 +475,44 @@ export default function MerchantRegistration() {
               );
             })}
 
+            {/* NEXT */}
             <button
-              disabled={currentPage === totalPages || totalPages === 0}
-              onClick={() => setCurrentPage(currentPage + 1)}
-              className={`flex items-center gap-1 px-3 py-2 rounded-xl border text-sm transition-all ${currentPage === totalPages || totalPages === 0
+              type="button"
+              disabled={
+                currentPage === totalPages ||
+                totalPages === 0
+              }
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(prev + 1, totalPages)
+                )
+              }
+              className={`w-9 h-9 flex items-center justify-center rounded-xl border text-sm transition-all ${currentPage === totalPages || totalPages === 0
                 ? "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
                 : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
             >
               <FaChevronRight size={11} />
             </button>
+
+            {/* LAST PAGE */}
+            <button
+              type="button"
+              disabled={
+                currentPage === totalPages ||
+                totalPages === 0
+              }
+              onClick={() => setCurrentPage(totalPages)}
+              className={`w-9 h-9 flex items-center justify-center rounded-xl border text-sm transition-all ${currentPage === totalPages || totalPages === 0
+                ? "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
+                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+            >
+              <FaAngleDoubleRight size={13} />
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Action dropdown menu*/}
-      {openMenuIndex !== null && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpenMenuIndex(null)}
-          />
-          <div
-            style={{ top: menuPosition.top, left: menuPosition.left }}
-            className="fixed z-50 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-2 text-left"
-          >
-            <button
-              onClick={() => {
-                handleEdit(currentData[openMenuIndex]);
-                setOpenMenuIndex(null);
-              }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-            >
-              <LiaEyeSolid className="text-base" />
-              View Merchant
-            </button>
-
-            {/* <button
-              onClick={() => {
-                handleEdit(currentData[openMenuIndex]);
-                setOpenMenuIndex(null);
-              }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-            >
-              View Details
-            </button> */}
-
-            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
-              Review Documents
-            </button>
-            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-green-600 hover:bg-slate-50">
-              Approve Merchant
-            </button>
-            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-slate-50">
-              Reject Merchant
-            </button>
-          </div>
-        </>
-      )}
     </div>
   );
 }

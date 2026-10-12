@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Percent } from "lucide-react";
+import { BadgeIndianRupee, QrCode, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function EMSFFee({
   refId,
@@ -27,31 +27,54 @@ export default function EMSFFee({
     chargeType: "Both",
     enterGST: "",
     feeType: "MSF",
+    resellerCommission: "",
   };
 
   const [tableData, setTableData] = useState([]);
   const [midList, setMidList] = useState([]);
   const [showAddError, setShowAddError] = useState(false);
-
   const [showSaveError, setShowSaveError] = useState(false);
   const [activeTab, setActiveTab] = useState("UPI");
   const [form, setForm] = useState(initForm);
 
+  // 🔹 Convert YYYY-MM-DD → DD/MM/YYYY HH:mm:ss
+  const formatDateForInput = (date) => {
+    if (!date) return "";
 
+    // API: 2026-10-08
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+
+    // API: 08/10/2026
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+      const [day, month, year] = date.split("/");
+      return `${year}-${month}-${day}`;
+    }
+
+    // API: 08-10-2026
+    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
+      const [day, month, year] = date.split("-");
+      return `${year}-${month}-${day}`;
+    }
+
+    return "";
+  };
+
+
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (showAddError) {
       const timer = setTimeout(() => {
         setShowAddError(false);
       }, 2000);
-
       return () => clearTimeout(timer);
     }
   }, [showAddError]);
 
   useEffect(() => {
     if (!refId) return;
-
     // This Api are fetching Data
     const fetchData = async () => {
       try {
@@ -59,15 +82,13 @@ export default function EMSFFee({
           `rMerchantMsfConvenience/${refId}`
         );
 
-        console.log("Api response:::----", response);
         if (response?.respCode === 0) {
-
           const formattedData = (response?.respData || []).map((item) => ({
             acquirerBank: item.upiAcquirerBankName,
             processorMID: item.upiMID,
             slabUpto: item.upiSlabUpto,
-            effectiveFrom: item.upiEffectiveFrom,
-            effectiveTo: item.upiEffectiveTo,
+            effectiveFrom: formatDateForInput(item.upiEffectiveFrom),
+            effectiveTo: formatDateForInput(item.upiEffectiveTo),
             internationalFixed: item.upiInternationalFixed,
             internationalPer: item.upiInternationalPer,
             domesticOnusFixed: item.upiDomesticOnusFixed,
@@ -77,42 +98,35 @@ export default function EMSFFee({
             chargeType: item.upiChargeType,
             enterGST: item.upiGstper,
             feeType: item.upiFeeType,
+            resellerCommission: item.recommission,
           }));
 
           setTableData(formattedData);
         }
       } catch (err) {
-        console.error("API ERROR:", err);
-        toast.error("Failed to fetch data");
+        toast.error(err);
       }
     };
-
     fetchData();
   }, [refId]);
+
 
   // fetch Mid List
   const fetchMIDList = async (AcqBankName) => {
     try {
-      const response =
-        await axiosInstance.post(
-          `/getMSFUpiMID/${AcqBankName}`
-        );
-
-      const apiData =
-        response?.data?.respData ||
-        response?.respData ||
-        {};
+      const response = await axiosInstance.post(`/getMSFUpiMID/${AcqBankName}`);
+      const apiData = response?.data?.respData;
+      // const apiData = response?.respData || response?.data?.respData;
 
       // convert object → "key-value" string array
-      const list = Object.entries(
-        apiData || {}
+      const list = Object.entries(apiData || {}
       ).map(
         ([key, value]) =>
           `${key}-${value}`
       );
       setMidList(list);
     } catch (error) {
-      setMidList([]);
+      setMidList(list);
     }
   };
 
@@ -153,7 +167,8 @@ export default function EMSFFee({
       !form.domesticOffusPer ||
       !form.chargeType ||
       !form.enterGST ||
-      !form.feeType
+      !form.feeType ||
+      !form.resellerCommission
     ) {
       setShowAddError(true);
       return;
@@ -201,10 +216,7 @@ export default function EMSFFee({
   const handleSaveAndNext =
     async () => {
       try {
-
-        if (
-          tableData.length === 0
-        ) {
+        if (tableData.length === 0) {
           setShowSaveError(true);
           return;
         }
@@ -212,134 +224,34 @@ export default function EMSFFee({
 
         const payload = {
           ref_id: refId,
-          upiAcquirerBankName:
-            tableData
-              .map(
-                (row) =>
-                  row.acquirerBank
-              )
-              .join(","),
-
-          upiMID: tableData
-            .map(
-              (row) =>
-                row.processorMID
-            )
-            .join(","),
-
-          upiSlabUpto:
-            tableData
-              .map(
-                (row) =>
-                  row.slabUpto
-              )
-              .join(","),
-
-          upiEffectiveFrom:
-            tableData
-              .map(
-                (row) =>
-                  row.effectiveFrom
-              )
-              .join(","),
-
-          upiEffectiveTo:
-            tableData
-              .map(
-                (row) =>
-                  row.effectiveTo
-              )
-              .join(","),
-
-          upiInternationalFixed:
-            tableData
-              .map(
-                (row) =>
-                  row.internationalFixed
-              )
-              .join(","),
-
-          upiInternationalPer:
-            tableData
-              .map(
-                (row) =>
-                  row.internationalPer
-              )
-              .join(","),
-
-          upiDomesticOnusFixed:
-            tableData
-              .map(
-                (row) =>
-                  row.domesticOnusFixed
-              )
-              .join(","),
-
-          upiDomesticOnusper:
-            tableData
-              .map(
-                (row) =>
-                  row.domesticOnusPer
-              )
-              .join(","),
-
-          upiDomesticOffusFixed:
-            tableData
-              .map(
-                (row) =>
-                  row.domesticOffusFixed
-              )
-              .join(","),
-
-          upiDomesticOffusper:
-            tableData
-              .map(
-                (row) =>
-                  row.domesticOffusPer
-              )
-              .join(","),
-
-          upiChargeType:
-            tableData
-              .map(
-                (row) =>
-                  row.chargeType
-              )
-              .join(","),
-
-          upiFeeType:
-            tableData
-              .map(
-                (row) =>
-                  row.feeType
-              )
-              .join(","),
-
-          upiGstper:
-            tableData
-              .map(
-                (row) =>
-                  row.enterGST
-              )
-              .join(","),
+          upiAcquirerBankName: tableData.map((row) => row.acquirerBank).join(","),
+          upiMID: tableData.map((row) => row.processorMID).join(","),
+          upiSlabUpto: tableData.map((row) => row.slabUpto).join(","),
+          upiEffectiveFrom: tableData.map((row) => row.effectiveFrom).join(","),
+          upiEffectiveTo: tableData.map((row) => row.effectiveTo).join(","),
+          upiInternationalFixed: tableData.map((row) => row.internationalFixed).join(","),
+          upiInternationalPer: tableData.map((row) => row.internationalPer).join(","),
+          upiDomesticOnusFixed: tableData.map((row) => row.domesticOnusFixed).join(","),
+          upiDomesticOnusper: tableData.map((row) => row.domesticOnusPer).join(","),
+          upiDomesticOffusFixed: tableData.map((row) => row.domesticOffusFixed).join(","),
+          upiDomesticOffusper: tableData.map((row) => row.domesticOffusPer).join(","),
+          upiChargeType: tableData.map((row) => row.chargeType).join(","),
+          upiFeeType: tableData.map((row) => row.feeType).join(","),
+          upiGstper: tableData.map((row) => row.enterGST).join(","),
+          recommission: tableData.map((row) => row.resellerCommission).join(","),
         };
 
-        const response =
-          await axiosInstance.post(
-            "/saveEditMsfConUpi",
-            payload,
-            {
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-            }
-          );
+        const response = await axiosInstance.post("/saveEditMsfConUpi",
+          payload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         const resData = response;
-        if (
-          resData?.respCode === 0
-        ) {
+        if (resData?.respCode === 0) {
           toast.success(resData?.respMsg);
           setData((prev) => ({
             ...prev,
@@ -347,19 +259,10 @@ export default function EMSFFee({
           }));
 
         } else {
-          if (
-            typeof resData?.respData ===
-            "object"
-          ) {
-            Object.values(
-              resData.respData
-            ).forEach((msg) => {
-              toast.error(msg);
-            });
+          if (typeof resData?.respData === "object") {
+            Object.values(resData.respData).forEach((msg) => { toast.error(msg); });
           } else {
-            toast.error(
-              resData?.respMsg
-            );
+            toast.error(resData?.respMsg);
           }
         }
       } catch (error) {
@@ -369,347 +272,332 @@ export default function EMSFFee({
   const inputClass =
     "w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-400 bg-white";
 
-  const labelClass =
-    "block text-sm text-gray-700 mb-1";
-
-  const req =
-    <span className="text-red-500">*</span>;
+  const labelClass = "block text-sm text-gray-700 mb-1";
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
     <>
       <div>
-        <div className="flex items-center gap-3 pt-3">
-          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
-            <Percent className="w-5 h-5 text-yellow-600" />
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+              <BadgeIndianRupee size={18} />
+            </span>
+            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+              Edit MSF / Convenience Fee
+            </h2>
           </div>
-       <h2 className="text-xl text-blue-900 font-semibold">
-            Edit MSF / Convenience Fee
-          </h2>
+          <p className="ml-12 text-sm text-slate-700 -mt-3">
+            Edit Configure and update the applicable MSF and convenience fee settings.
+          </p>
         </div>
-               <p className="ml-12 pb-1 text-sm text-blue-900">
-          Configure and update the applicable MSF and convenience fee settings.
-        </p>
 
         {/* ALL FIELDS */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-3">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-3">
-            {/* Acquirer Bank */}
-            <div>
-              <label className={labelClass}>
-                Acquirer Bank {req}
-              </label>
-              <select
-                className={inputClass}
-                value={form.acquirerBank}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  u("acquirerBank", value);
-                  fetchMIDList(value);
-                }}
-              >
-                <option value="">-- Select --</option>
-                {data?.selectedAcquirer && (
-                  <option value={data.selectedAcquirer}>
-                    {data.selectedAcquirer}
-                  </option>
-                )}
-              </select>
+          <div>
+            <div className="bg-[#fec931] text-black px-4 py-3 rounded-md mb-6 flex items-center gap-3">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black">
+                <QrCode size={16} />
+              </span>
+              <h2 className="text-lg font-semibold">{activeTab}</h2>
             </div>
-            {/* Processor MID */}
-            <div>
-              <label className={labelClass}>
-                Processor MID {req}
-              </label>
-              <select
-                className={inputClass}
-                value={form.processorMID}
-                onChange={(e) =>
-                  u("processorMID", e.target.value)
-                }
-              >
-                <option value="">-- Select --</option>
-                {midList.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* Slab Upto */}
-            <div>
-              <label className={labelClass}>
-                Slab Upto {req}
-              </label>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-3">
+              {/* Acquirer Bank */}
+              <div>
+                <label className={labelClass}>Acquirer Bank {req}</label>
+                <select
+                  className={inputClass}
+                  value={form.acquirerBank}
+                  onChange={(e) => {
+                    const value = e.target.value;
 
-              <input
-                type="text"
-                className={inputClass}
-                value={form.slabUpto}
-                maxLength={8}
-                onChange={(e) => {
-                  const value = e.target.value;
+                    u("acquirerBank", value);
+                    fetchMIDList(value);
+                  }}
+                >
+                  <option value="">-- Select --</option>
+                  {data?.selectedAcquirer && (
+                    <option value={data.selectedAcquirer}>
+                      {data.selectedAcquirer}
+                    </option>
+                  )}
+                </select>
+              </div>
 
-                  if (/^\d*$/.test(value)) {
-                    u("slabUpto", value);
+              {/* Processor MID */}
+              <div>
+                <label className={labelClass}>Processor MID{req}</label>
+                <select
+                  className={inputClass}
+                  value={form.processorMID}
+                  onChange={(e) =>
+                    u("processorMID", e.target.value)
                   }
-                }}
-              />
-            </div>
-            {/* Effective From */}
-            <div>
-              <label className={labelClass}>
-                Effective From {req}
-              </label>
+                >
+                  <option value="">-- Select --</option>
+                  {midList.map((item, index) => (
+                    <option key={index} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <input
-                type="date"
-                className={inputClass}
-                value={form.effectiveFrom}
-                onChange={(e) =>
-                  u("effectiveFrom", e.target.value)
-                }
-              />
-            </div>
-            {/* Effective To */}
-            <div>
-              <label className={labelClass}>
-                Effective To {req}
-              </label>
+              {/* Slab Upto */}
+              <div>
+                <label className={labelClass}>Slab Upto {req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.slabUpto}
+                  maxLength={8}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("slabUpto", value);
+                    }
+                  }}
+                />
+              </div>
 
-              <input
-                type="date"
-                className={inputClass}
-                value={form.effectiveTo}
-                onChange={(e) =>
-                  u("effectiveTo", e.target.value)
-                }
-              />
-            </div>
-            {/* International Fixed */}
-            <div>
-              <label className={labelClass}>
-                International Fixed {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                maxLength={3}
-                value={form.internationalFixed}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  if (/^\d*$/.test(value)) {
-                    u("internationalFixed", value);
+              {/* Effective From */}
+              <div>
+                <label className={labelClass}>Effective From{req}</label>
+                <input
+                  type="date"
+                  max={today}
+                  className={inputClass}
+                  value={form.effectiveFrom}
+                  onChange={(e) =>
+                    u("effectiveFrom", e.target.value)
                   }
-                }}
-              />
+                />
+              </div>
+
+              {/* Effective To */}
+              <div>
+                <label className={labelClass}>Effective To{req}</label>
+                <input
+                  type="date"
+                  max={today}
+                  className={inputClass}
+                  value={form.effectiveTo}
+                  onChange={(e) =>
+                    u("effectiveTo", e.target.value)
+                  }
+                />
+              </div>
+
+              {/* International Fixed */}
+              <div>
+                <label className={labelClass}>International Fixed{req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  maxLength={3}
+                  value={form.internationalFixed}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("internationalFixed", value.replace(/\D/g, "").slice(0));
+                    }
+                  }}
+                />
+              </div>
+
+              {/* International Per */}
+              <div>
+                <label className={labelClass}>International Per(%){req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.internationalPer}
+                  maxLength={6}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("internationalPer", value);
+                      return;
+                    }
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num <= 100) {
+                      u("internationalPer", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Onus Fixed */}
+              <div>
+                <label className={labelClass}>Domestic Onus Fixed{req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  maxLength={3}
+                  value={form.domesticOnusFixed}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("domesticOnusFixed", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Onus Per */}
+              <div>
+                <label className={labelClass}>
+                  Domestic Onus Per (%){req}
+                </label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.domesticOnusPer}
+                  maxLength={6}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("domesticOnusPer", value);
+                      return;
+                    }
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num <= 100) {
+                      u("domesticOnusPer", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Offus Fixed */}
+              <div>
+                <label className={labelClass}>
+                  Domestic Offus Fixed{req}
+                </label>
+
+                <input
+                  type="text"
+                  className={inputClass}
+                  maxLength={3}
+                  value={form.domesticOffusFixed}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("domesticOffusFixed", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Offus Per */}
+              <div>
+                <label className={labelClass}>Domestic Offus Per (%){req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.domesticOffusPer}
+                  maxLength={6}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("domesticOffusPer", value);
+                      return;
+                    }
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num <= 100) {
+                      u("domesticOffusPer", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Charge Type */}
+              <div>
+                <label className={labelClass}>Charge Type</label>
+                <select
+                  className={inputClass}
+                  value={form.chargeType}
+                  onChange={(e) =>
+                    u("chargeType", e.target.value)
+                  }
+                >
+                  <option value="Both">Both</option>
+                  <option value="Whichever Higher"> Whichever Higher</option>
+                  <option value="Whichever Lower">Whichever Lower</option>
+                </select>
+              </div>
+
+              {/* GST */}
+              <div>
+                <label className={labelClass}>
+                  Enter GST in Percentage(%){req}
+                </label>
+
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.enterGST}
+                  maxLength={3}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("enterGST", value);
+                      return;
+                    }
+                    const num = Number(value);
+                    if (num <= 100) {
+                      u("enterGST", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Fee Type */}
+              <div>
+                <label className={labelClass}>
+                  Fee Type{req}
+                </label>
+                <select
+                  className={inputClass}
+                  value={form.feeType}
+                  onChange={(e) =>
+                    u("feeType", e.target.value)
+                  }
+                >
+                  <option value="MSF">MSF</option>
+                  <option value="Convenience">Convenience</option>
+                </select>
+              </div>
+              {/* Reseller Commission */}
+              <div>
+                <label className={labelClass}>
+                  Enter Reseller Commi in Per(%){req}
+                </label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  placeholder="0.20"
+                  value={form.resellerCommission}
+                  maxLength={4}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("resellerCommission", value);
+                      return;
+                    }
+                    const num = Number(value);
+                    if (num <= 100) {
+                      u("resellerCommission", value);
+                    }
+                  }}
+                />
+              </div>
             </div>
-            {/* International Per */}
-            <div>
-              <label className={labelClass}>
-                International Per(%) {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                value={form.internationalPer}
-                maxLength={6}
-                onChange={(e) => {
-                  let value = e.target.value;
-
-                  if (!/^\d*\.?\d*$/.test(value)) return;
-
-                  if (value === "") {
-                    u("internationalPer", value);
-                    return;
-                  }
-
-                  const num = parseFloat(value);
-
-                  if (!isNaN(num) && num <= 100) {
-                    u("internationalPer", value);
-                  }
-                }}
-              />
-            </div>
-
-            {/* Domestic Onus Fixed */}
-            <div>
-              <label className={labelClass}>
-                Domestic Onus Fixed {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                maxLength={3}
-                value={form.domesticOnusFixed}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  if (/^\d*$/.test(value)) {
-                    u("domesticOnusFixed", value);
-                  }
-                }}
-              />
-            </div>
-
-            {/* Domestic Onus Per */}
-            <div>
-              <label className={labelClass}>
-                Domestic Onus Per (%) {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                value={form.domesticOnusPer}
-                maxLength={6}
-                onChange={(e) => {
-                  let value = e.target.value;
-
-                  if (!/^\d*\.?\d*$/.test(value)) return;
-
-                  if (value === "") {
-                    u("domesticOnusPer", value);
-                    return;
-                  }
-
-                  const num = parseFloat(value);
-
-                  if (!isNaN(num) && num <= 100) {
-                    u("domesticOnusPer", value);
-                  }
-                }}
-              />
-            </div>
-            {/* Domestic Offus Fixed */}
-            <div>
-              <label className={labelClass}>
-                Domestic Offus Fixed {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                maxLength={3}
-                value={form.domesticOffusFixed}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  if (/^\d*$/.test(value)) {
-                    u("domesticOffusFixed", value);
-                  }
-                }}
-              />
-            </div>
-
-            {/* Domestic Offus Per */}
-            <div>
-              <label className={labelClass}>
-                Domestic Offus Per (%) {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                value={form.domesticOffusPer}
-                maxLength={6}
-                onChange={(e) => {
-                  let value = e.target.value;
-
-                  if (!/^\d*\.?\d*$/.test(value)) return;
-
-                  if (value === "") {
-                    u("domesticOffusPer", value);
-                    return;
-                  }
-
-                  const num = parseFloat(value);
-
-                  if (!isNaN(num) && num <= 100) {
-                    u("domesticOffusPer", value);
-                  }
-                }}
-              />
-            </div>
-
-            {/* Charge Type */}
-            <div>
-              <label className={labelClass}>
-                Charge Type
-              </label>
-
-              <select
-                className={inputClass}
-                value={form.chargeType}
-                onChange={(e) =>
-                  u("chargeType", e.target.value)
-                }
-              >
-                <option value="Both">Both</option>
-                <option value="Whichever Higher">
-                  Whichever Higher
-                </option>
-                <option value="Whichever Lower">
-                  Whichever Lower
-                </option>
-              </select>
-            </div>
-
-            {/* GST */}
-            <div>
-              <label className={labelClass}>
-                Enter GST in Percentage(%) {req}
-              </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                value={form.enterGST}
-                maxLength={3}
-                onChange={(e) => {
-                  let value = e.target.value;
-
-                  if (!/^\d*$/.test(value)) return;
-
-                  if (value === "") {
-                    u("enterGST", value);
-                    return;
-                  }
-
-                  const num = Number(value);
-
-                  if (num <= 100) {
-                    u("enterGST", value);
-                  }
-                }}
-              />
-            </div>
-
-            {/* Fee Type */}
-            <div>
-              <label className={labelClass}>
-                Fee Type {req}
-              </label>
-
-              <select
-                className={inputClass}
-                value={form.feeType}
-                onChange={(e) =>
-                  u("feeType", e.target.value)
-                }
-              >
-                <option value="MSF">MSF</option>
-                <option value="Convenience">
-                  Convenience
-                </option>
-              </select>
-            </div>
-
           </div>
         </div>
       </div>
@@ -725,7 +613,6 @@ export default function EMSFFee({
           </div>
         </div>
       )}
-
 
       {/* ADD ROW BUTTON */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-5">
@@ -744,51 +631,22 @@ export default function EMSFFee({
           <table className="min-w-full border border-gray-300 text-sm">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border p-2">
-                  Acquirer Bank
-                </th>
-                <th className="border p-2">
-                  Processor MID
-                </th>
-                <th className="border p-2">
-                  Slab Upto
-                </th>
-                <th className="border p-2">
-                  Effective From
-                </th>
-                <th className="border p-2">
-                  Effective To
-                </th>
-                <th className="border p-2">
-                  International Fixed
-                </th>
-                <th className="border p-2">
-                  International Per
-                </th>
-                <th className="border p-2">
-                  Domestic Onus Fixed
-                </th>
-                <th className="border p-2">
-                  Domestic Onus Per
-                </th>
-                <th className="border p-2">
-                  Domestic Offus Fixed
-                </th>
-                <th className="border p-2">
-                  Domestic Offus Per
-                </th>
-                <th className="border p-2">
-                  Charge Type
-                </th>
-                <th className="border p-2">
-                  GST %
-                </th>
-                <th className="border p-2">
-                  Fee Type
-                </th>
-                <th className="border p-2">
-                  Action
-                </th>
+                <th className="border p-2 whitespace-nowrap">Acquirer Bank</th>
+                <th className="border p-2 whitespace-nowrap">Processor MID</th>
+                <th className="border p-2 whitespace-nowrap">Slab Upto</th>
+                <th className="border p-2 whitespace-nowrap">Effective From</th>
+                <th className="border p-2 whitespace-nowrap">Effective To</th>
+                <th className="border p-2 whitespace-nowrap">International Fixed</th>
+                <th className="border p-2 whitespace-nowrap">International Per</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Onus Fixed</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Onus Per</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Offus Fixed</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Offus Per</th>
+                <th className="border p-2 whitespace-nowrap">Charge Type</th>
+                <th className="border p-2 whitespace-nowrap">GST %</th>
+                <th className="border p-2 whitespace-nowrap">Fee Type</th>
+                <th className="border p-2 whitespace-nowrap">Reseller Commission %</th>
+                <th className="border p-2 ">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -807,7 +665,7 @@ export default function EMSFFee({
                             handleRowChange(
                               index,
                               "acquirerBank",
-                              e.target.value
+                              e.target.value.replace(/[^a-zA-Z\s]/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -817,9 +675,7 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.processorMID
-                          }
+                          value={row.processorMID}
                           onChange={(e) =>
                             handleRowChange(
                               index,
@@ -834,14 +690,12 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.slabUpto
-                          }
+                          value={row.slabUpto}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "slabUpto",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -850,10 +704,9 @@ export default function EMSFFee({
 
                       <td className="border p-2">
                         <input
-                          type="text"
-                          value={
-                            row.effectiveFrom
-                          }
+                          type="date"
+                          max={today}
+                          value={row.effectiveFrom || ""}
                           onChange={(e) =>
                             handleRowChange(
                               index,
@@ -861,16 +714,18 @@ export default function EMSFFee({
                               e.target.value
                             )
                           }
+                          onClick={(e) => {
+                            e.currentTarget.showPicker?.();
+                          }}
                           className="w-full outline-none"
                         />
                       </td>
 
                       <td className="border p-2">
                         <input
-                          type="text"
-                          value={
-                            row.effectiveTo
-                          }
+                          type="date"
+                          max={today}
+                          value={row.effectiveTo || ""}
                           onChange={(e) =>
                             handleRowChange(
                               index,
@@ -878,21 +733,23 @@ export default function EMSFFee({
                               e.target.value
                             )
                           }
+                          onClick={(e) => {
+                            e.currentTarget.showPicker?.();
+                          }}
                           className="w-full outline-none"
                         />
                       </td>
 
-                      <td className="border p-2">
+                      <td className="border p-2 text-center">
                         <input
                           type="text"
-                          value={
-                            row.internationalFixed
-                          }
+                          value={row.internationalFixed}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "internationalFixed",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -902,14 +759,13 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.internationalPer
-                          }
+                          value={row.internationalPer}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "internationalPer",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -919,14 +775,13 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.domesticOnusFixed
-                          }
+                          value={row.domesticOnusFixed}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "domesticOnusFixed",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -936,14 +791,13 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.domesticOnusPer
-                          }
+                          value={row.domesticOnusPer}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "domesticOnusPer",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -953,14 +807,13 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.domesticOffusFixed
-                          }
+                          value={row.domesticOffusFixed}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "domesticOffusFixed",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -970,14 +823,13 @@ export default function EMSFFee({
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.domesticOffusPer
-                          }
+                          value={row.domesticOffusPer}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "domesticOffusPer",
-                              e.target.value
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -985,50 +837,63 @@ export default function EMSFFee({
                       </td>
 
                       <td className="border p-2">
-                        <input
-                          type="text"
-                          value={
-                            row.chargeType
-                          }
+                        <select
+                          value={row.chargeType}
+                          maxLength={10}
                           onChange={(e) =>
-                            handleRowChange(
-                              index,
-                              "chargeType",
-                              e.target.value
-                            )
+                            handleRowChange(index, "chargeType", e.target.value)
                           }
-                          className="w-full outline-none"
-                        />
+                          className="w-full outline-none bg-white"
+                        >
+                          <option value="">Select Charge Type</option>
+                          <option value="Both">Both</option>
+                          <option value="Whichever Higher">Whichever Higher</option>
+                          <option value="Whichever Lower">Whichever Lower</option>
+                        </select>
                       </td>
 
                       <td className="border p-2">
                         <input
                           type="text"
-                          value={
-                            row.enterGST
-                          }
+                          value={row.enterGST}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
                               "enterGST",
-                              e.target.value
+                              e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
                             )
                           }
                           className="w-full outline-none"
                         />
                       </td>
 
-                      <td className="border p-2">
+                      <td className="border p-2 ">
+                        <select
+                          value={row.feeType}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(index, "feeType", e.target.value)
+                          }
+                          className="w-full outline-none bg-white"
+                        >
+                          <option value="">Select Fee Type</option>
+                          <option value="MSF">MSF</option>
+                          <option value="Convenience">Convenience</option>
+                        </select>
+                      </td>
+
+
+                      <td className="border p-2 text-center">
                         <input
                           type="text"
-                          value={
-                            row.feeType
-                          }
+                          value={row.resellerCommission}
+                          maxLength={10}
                           onChange={(e) =>
                             handleRowChange(
                               index,
-                              "feeType",
-                              e.target.value
+                              "resellerCommission",
+                              e.target.value.replace(/\D/g, "")
                             )
                           }
                           className="w-full outline-none"
@@ -1038,6 +903,7 @@ export default function EMSFFee({
                       <td className="border p-2 text-center">
                         <button
                           type="button"
+                          maxLength={10}
                           onClick={() =>
                             handleDeleteRow(
                               index
@@ -1053,10 +919,7 @@ export default function EMSFFee({
                 )
               ) : (
                 <tr>
-                  <td
-                    colSpan="15"
-                    className="text-center py-4 text-gray-400"
-                  >
+                  <td colSpan="15" className="text-center py-4 text-gray-400">
                     No Records Added
                   </td>
                 </tr>
@@ -1071,8 +934,8 @@ export default function EMSFFee({
         <button
           type="button"
           onClick={handleBack}
-         className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
-        >
+          className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full">
+          <ArrowLeft size={16} />
           Back
         </button>
         <div className="flex justify-center">
@@ -1090,8 +953,9 @@ export default function EMSFFee({
           <button
             type="button"
             onClick={handleNext}
-  className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"          >
+            className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition">
             Next
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>

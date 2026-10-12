@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import {
   User, CalendarDays,
-  UserPlus, UserRound, FileText, MapPin
+  UserPlus, UserRound, FileText, MapPin, Building2, Handshake, BriefcaseBusiness, ReceiptText,
+  Eye, ArrowRight,
 } from "lucide-react";
 
-export default function BasicDetails({ refId, handleNext }) {
+export default function RBasicDetails({ refId, handleNext }) {
   const [apiData, setApiData] = useState({});
 
 
@@ -19,7 +20,7 @@ export default function BasicDetails({ refId, handleNext }) {
           `/rMerchantBasicDetails/${refId}`
         );
         if (response?.respCode === 0) {
-          toast.success(response?.respMsg);         
+          toast.success(response?.respMsg);
           setApiData(response?.respData || {});
         }
       } catch (error) {
@@ -29,6 +30,35 @@ export default function BasicDetails({ refId, handleNext }) {
     fetchData();
   }, [refId]);
 
+  // Document File Api Call
+  const handleViewFile = async (fileName) => {
+    if (!refId || !fileName) {
+      toast.error("RefId or file name is missing");
+      return;
+    }
+    try {
+      const response = await axiosInstance.post(
+        "/merchant/kyc/viewKycDocs",
+        {},
+        {
+          params: {
+            refId: refId,
+            fileName: fileName,
+          },
+          responseType: "blob",
+        }
+      );
+      const fileUrl = URL.createObjectURL(response);
+      window.open(fileUrl, "_blank");
+
+      setTimeout(() => {
+        URL.revokeObjectURL(fileUrl);
+      }, 10000);
+
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   const documentOptions = [
     { label: "Aadhar No", name: "bddDocument", value: "AadharNo" },
@@ -43,80 +73,74 @@ export default function BasicDetails({ refId, handleNext }) {
   return (
     <>
       <div className="p-2">
-        <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[40px]">
-          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500">
-            <div className="flex items-center gap-3 mt-2 ml-3">
-              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
-                <UserPlus size={18} 
-                />
-              </span>
-              <h2 className="text-xl sm:text-xl text-blue-900 font-semibold">
-                Review Merchant Onboarding Details
-              </h2>
-            </div>
-            <p className="ml-15 text-md text-blue-900 mb-4">Review and approve merchant risk details</p>
+        <div className="mb-4 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+              <UserPlus size={18} />
+            </span>
+            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-2">
+              Review and manage the merchant onboarding information and business details.
+            </h2>
           </div>
+          <p className="ml-12 pb-1 text-sm text-slate-500 font-normal -mt-2">
+            Review and approve merchant risk details
+          </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-stretch">
-            {/* Highlighted meta strip */}
-            <div className="lg:col-span-2 bg-amber-50 rounded-xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-              <div className="flex items-center gap-3">
-                <span className="bg-amber-100 text-amber-600 rounded-full p-2 flex items-center justify-center shrink-0">
-                  <User size={16} />
-                </span>
-                <label className="text-gray-700 text-[13px] sm:text-[15px] leading-tight">
-                  <span className="block text-gray-500 text-xs">Created By</span>
-                  {apiData?.createdBy}
-                </label>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="bg-amber-100 text-amber-600 rounded-full p-2 flex items-center justify-center shrink-0">
-                  <CalendarDays size={16} />
-                </span>
-                <label className="text-gray-700 text-[13px] sm:text-[15px] leading-tight">
-                  <span className="block text-gray-500 text-xs">Created Date</span>
-                  {apiData?.createdAt}
-                </label>
-              </div>
+        <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#fec931] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+              <User className="w-4 h-4 text-black" />
+            </span>
+            <div>
+              <p className="text-lg sm:text-xs text-slate-900 font-medium">Created By</p>
+              <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                {apiData?.createdBy}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+              <CalendarDays className="w-4 h-4 text-black" />
+            </span>
+            <div>
+              <p className="text-xs sm:text-xs text-slate-900 font-medium">
+                Created Date
+              </p>
+              <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
+                {apiData?.createdAt}
+              </p>
             </div>
           </div>
         </div>
 
         {/* ── Contact Person Details ───────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 pb-4 mt-3">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 pb-4 mt-5">
           <div className="rounded-md mt-5">
-            {/* Heading */}
             <div className="flex items-center gap-2 mb-4">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-yellow-100 text-yellow-600">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
                 <UserRound size={15} />
               </span>
-              <h2 className="text-sm font-semibold text-gray-900 uppercase">
+              <h2 className="text-md font-semibold text-gray-900 uppercase">
                 Contact Person Details
               </h2>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-              {/* Full Name */}
               <div>
-                <label className="block text-gray-700 font-medium text-xs mb-1">
-                  Full Name
+                <label className="block text-gray-700 font-medium text-sm mb-1">
+                  Full Name<span className="text-red-500 ml-1">*</span>
                 </label>
-
                 <div className="flex">
                   <input
                     type="text"
-                    className="w-12 h-8 border border-gray-300 rounded-l px-2 py-1.5 text-[11px] bg-gray-100"
+                    className="w-12 h-10 border border-gray-300 rounded-l px-2 py-1.5 text-md bg-gray-100"
                     value={apiData?.cpdNameTitle || ""}
                     readOnly
                   />
-
                   <input
                     type="text"
-                    className="w-70 h-8 border border-l-0 border-gray-300 rounded-r px-2 py-1 text-[11px] bg-gray-100"
+                    className="w-70 h-10 border border-l-0 border-gray-300 rounded-r px-2 py-1 text-md bg-gray-100"
                     value={apiData?.cpdName || ""}
                     readOnly
                   />
@@ -125,13 +149,12 @@ export default function BasicDetails({ refId, handleNext }) {
 
               {/* Date of Birth */}
               <div>
-                <label className="block text-gray-700 font-medium text-xs mb-1">
+                <label className="block text-gray-700 font-medium text-sm mb-1">
                   Date of Birth
                 </label>
-
                 <input
                   type="text"
-                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
+                  className="w-full h-10 border border-gray-300 rounded px-2 py-1 text-md bg-gray-100"
                   value={apiData?.cpdDateOfBirth || ""}
                   readOnly
                 />
@@ -139,13 +162,12 @@ export default function BasicDetails({ refId, handleNext }) {
 
               {/* Mobile */}
               <div>
-                <label className="block text-gray-700 font-medium text-xs mb-1">
-                  Mobile No
+                <label className="block text-gray-700 font-medium text-sm mb-1">
+                  Mobile No<span className="text-red-500 ml-1">*</span>
                 </label>
-
                 <input
                   type="text"
-                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
+                  className="w-full h-10 border border-gray-300 rounded px-2 py-1 text-md bg-gray-100"
                   value={apiData?.cpdMobile || ""}
                   readOnly
                 />
@@ -153,13 +175,12 @@ export default function BasicDetails({ refId, handleNext }) {
 
               {/* Primary Email */}
               <div>
-                <label className="block text-gray-700 font-medium text-xs mb-1">
-                  Primary Email Id
+                <label className="block text-gray-700 font-medium text-sm mb-1">
+                  Primary Email Id<span className="text-red-500 ml-1">*</span>
                 </label>
-
                 <input
                   type="email"
-                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
+                  className="w-full h-10 border border-gray-300 rounded px-2 py-1 text-md bg-gray-100"
                   value={apiData?.cpdPrimaryEmailId || ""}
                   readOnly
                 />
@@ -167,13 +188,12 @@ export default function BasicDetails({ refId, handleNext }) {
 
               {/* Secondary Email */}
               <div>
-                <label className="block text-gray-700 font-medium text-xs mb-1">
+                <label className="block text-gray-700 font-medium text-sm mb-1">
                   Secondary Email Id
                 </label>
-
                 <input
                   type="email"
-                  className="w-full h-8 border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-100"
+                  className="w-full h-10 border border-gray-300 rounded px-2 py-1 text-xs bg-gray-100"
                   value={apiData?.cpdSecondaryEmailId || ""}
                   readOnly
                 />
@@ -181,34 +201,30 @@ export default function BasicDetails({ refId, handleNext }) {
 
               {/* Sourcing Channel */}
               <div className="flex flex-col justify-center gap-1">
-                <label className="text-gray-700 font-medium text-xs">
-                  Reseller Partner<span className="text-red-500">*</span>
+                <label className="text-gray-700 font-medium text-sm">
+                  Reseller Partner<span className="text-red-500 ml-1">*</span>
                 </label>
-
                 <input
                   type="text"
-                  className="w-full h-8 border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-700 text-[11px] focus:outline-none"
+                  className="w-full h-10 border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-700 text-md focus:outline-none"
                   value={apiData?.basicSrcChannel || ""}
                   readOnly
                 />
               </div>
-
             </div>
           </div>
         </div>
 
-
         {/* ── Basic Document Details ───────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-yellow-500" />
-            </div>
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+              <FileText className="w-4 h-4" />
+            </span>
             <h2 className="text-base font-semibold text-gray-900 uppercase">
               Basic Document Details
             </h2>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Documents radio */}
             <div>
@@ -220,6 +236,7 @@ export default function BasicDetails({ refId, handleNext }) {
                   <label key={doc.value} className="flex items-center gap-2">
                     <input
                       type="radio"
+                      className="accent-yellow-500"
                       checked={apiData?.bddDocument === doc.value}
                       readOnly
                     />
@@ -232,7 +249,7 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* Aadhar No */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Aadhar No.
+                Aadhar No.<span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="text"
@@ -247,12 +264,20 @@ export default function BasicDetails({ refId, handleNext }) {
               <label className="block text-gray-700 font-medium mb-2">
                 SEZ Detail
               </label>
-              <div className="border border-gray-300 rounded-full px-5 py-4 flex items-center gap-6 bg-white">
+              <div className="border border-gray-200 rounded-full px-4 sm:px-5 py-3 flex flex-wrap items-center gap-4 sm:gap-6 bg-white">
                 {sezOptions.map((item) => (
-                  <label key={item.value} className="flex items-center gap-2">
+                  <label key={item.value} className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="radio"
-                      checked={apiData?.bddSez === item.value}
+                      className="accent-yellow-500"
+                      checked={
+                        (item.value === "BDD_SEZDetail" &&
+                          apiData.bddSez === "BDD_SEZDetail" ||
+                          (item.value === "BDD_GSTDetail" &&
+                            apiData?.bddGst === "BDD_GSTDetail"
+                          )
+                        )
+                      }
                       readOnly
                     />
                     {item.label}
@@ -264,7 +289,7 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* GSTN No */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                GSTN No.
+                GSTN No.<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -278,7 +303,7 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* Pan No */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Pan No
+                Pan No<span className="text-red-500 ml-1">*</span>
               </label>
 
               <input
@@ -292,9 +317,8 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* Risk Check */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Risk Check
+                Risk Check<span className="text-red-500 ml-1">*</span>
               </label>
-
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
@@ -319,7 +343,7 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* MCC */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                MCC
+                MCC<span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="text"
@@ -342,19 +366,6 @@ export default function BasicDetails({ refId, handleNext }) {
               />
             </div>
 
-            {/* Merchant Business Type */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Merchant Business Type
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.bddMerchantBusinessType || ""}
-                readOnly
-              />
-            </div>
-
             {/* Merchant Website URL */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
@@ -372,7 +383,7 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* Partner Logo Check */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Partner Logo Check
+                Partner Logo Check<span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="text"
@@ -386,19 +397,45 @@ export default function BasicDetails({ refId, handleNext }) {
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 Partner Logo
+                <span className="text-xs text-gray-500 font-normal ml-1">
+                  (jpg or png)
+                </span>
               </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                value={apiData?.partnerLogoPath || ""}
-                readOnly
-              />
+
+              <div className="flex items-center justify-between w-full h-[44px] px-3 border border-gray-200 rounded-lg bg-white">
+                {/* Left: File Icon + File Name */}
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="text-sm text-gray-500 truncate">
+                    {apiData?.partnerLogoName || "No Logo uploaded"}
+                  </span>
+                </div>
+
+                {/* Right: View Icon */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleViewFile(apiData?.partnerLogoName || "")
+                  }
+                  disabled={!apiData?.partnerLogoName}
+                  className={`
+        p-1.5 rounded-md transition shrink-0
+        ${apiData?.partnerLogoName
+                      ? "text-gray-400 hover:text-[#1677c8] hover:bg-blue-50 cursor-pointer"
+                      : "text-gray-300 cursor-not-allowed"
+                    }
+      `}
+                  title="View Partner Logo"
+                >
+                  <Eye className="w-4 h-4 text-green-400" />
+                </button>
+              </div>
             </div>
 
             {/* Store Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Company Name (Business Name)
+                Company Name (Business Name)<span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="text"
@@ -411,7 +448,7 @@ export default function BasicDetails({ refId, handleNext }) {
             {/* Legal Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Company Legal Name
+                Company Legal Name<span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="text"
@@ -423,119 +460,347 @@ export default function BasicDetails({ refId, handleNext }) {
           </div>
         </div>
 
-        {/*  Company Address */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
-          <div>
-            <div className="flex items-center gap-2 pb-3">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
-                <MapPin size={18} />
-              </span>
+        {/* ── Selected Business Type ─────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-6">
+          <div className="flex items-center gap-3 mb-5">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+              <Building2 className="w-4 h-4" />
+            </span>
+            <div>
               <h2 className="text-base font-semibold text-gray-900 uppercase">
-                Company Address
+                Select Business Type
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-              {/* Address 1 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 1
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addStoreAddress1 || ""}
-                  readOnly
-                />
-              </div>
+          </div>
 
-              {/* Address 2 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 2
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addStoreAddress2 || ""}
-                  readOnly
-                />
-              </div>
+          {/* ───────────────── Business Entity Type ───────────────── */}
+          <div className="mb-6">
+            <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
+              Business Entity Type
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                {
+                  value: "Company",
+                  subtitle: "Pvt Ltd / OPC / LLC",
+                  icon: Building2,
+                },
+                {
+                  value: "LLP",
+                  subtitle: "Limited Liability",
+                  icon: Handshake,
+                },
+                {
+                  value: "Firm",
+                  subtitle: "Partnership",
+                  icon: BriefcaseBusiness,
+                },
+                {
+                  value: "Proprietor",
+                  subtitle: "Individual",
+                  icon: UserRound,
+                },
+              ].map((item) => {
 
-              {/* Address 3 */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Address 3
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addStoreAddress3 || ""}
-                  readOnly
-                />
-              </div>
+                const Icon = item.icon;
 
-              {/* Country */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addCountry || ""}
-                  readOnly
-                />
-              </div>
+                const selected =
+                  apiData?.bddMerchantBusinessType === item.value;
 
-              {/* State */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  State
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addState || ""}
-                  readOnly
-                />
-              </div>
+                return (
+                  <div
+                    key={item.value}
+                    className={`
+              relative h-[84px] rounded-xl border
+              flex flex-col items-center justify-center
+              ${selected
+                        ? "border-blue-600 bg-blue-50"
+                        : "border-gray-200 bg-gray-50 opacity-50"
+                      }
+            `}
+                  >
 
-              {/* City */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  City
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addCity || ""}
-                  readOnly
-                />
-              </div>
+                    {/* Selected Indicator */}
+                    <div
+                      className={`
+                absolute top-2 right-2
+                w-4 h-4 rounded-full border
+                flex items-center justify-center
+                ${selected
+                          ? "border-blue-600"
+                          : "border-gray-300"
+                        }
+              `}
+                    >
+                      {selected && (
+                        <div className="w-2 h-2 rounded-full bg-blue-600" />
+                      )}
+                    </div>
 
-              {/* Zip Code */}
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Zip Code
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-                  value={apiData?.addZipcode || ""}
-                  readOnly
-                />
-              </div>
+
+                    {/* Icon */}
+                    <div
+                      className={`
+                w-8 h-8 rounded-lg
+                flex items-center justify-center mb-1
+                ${selected
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 text-gray-400"
+                        }
+              `}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+
+
+                    {/* Title */}
+                    <span
+                      className={`
+                text-xs font-semibold
+                ${selected
+                          ? "text-blue-700"
+                          : "text-gray-500"
+                        }
+              `}
+                    >
+                      {item.value}
+                    </span>
+
+
+                    {/* Subtitle */}
+                    <span className="text-[9px] text-gray-400 mt-0.5">
+                      {item.subtitle}
+                    </span>
+
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Divider */}
+          <div className="border-t border-gray-100 mb-6" />
+
+
+          {/* ───────────────── Company Type ───────────────── */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
+              Company Type
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+
+              {[
+                {
+                  value: "Private Limited",
+                  icon: Building2,
+                },
+                {
+                  value: "One Person Company",
+                  icon: UserRound,
+                },
+                {
+                  value: "Public Limited",
+                  icon: Building2,
+                },
+                {
+                  value: "LLC",
+                  icon: Building2,
+                },
+              ].map((item) => {
+
+                const Icon = item.icon;
+
+                const selected =
+                  apiData?.companyType === item.value;
+
+                return (
+                  <div
+                    key={item.value}
+                    className={`
+              relative h-[72px] rounded-xl border
+              flex items-center gap-3 px-3
+              ${selected
+                        ? "border-blue-600 bg-blue-50"
+                        : "border-gray-200 bg-gray-50 opacity-50"
+                      }
+            `}
+                  >
+
+                    {/* Radio */}
+                    <div
+                      className={`
+                w-4 h-4 rounded-full border shrink-0
+                flex items-center justify-center
+                ${selected
+                          ? "border-blue-600"
+                          : "border-gray-300"
+                        }
+              `}
+                    >
+                      {selected && (
+                        <div className="w-2 h-2 rounded-full bg-blue-600" />
+                      )}
+                    </div>
+
+
+                    {/* Icon */}
+                    <Icon
+                      className={`
+                w-4 h-4
+                ${selected
+                          ? "text-blue-600"
+                          : "text-gray-400"
+                        }
+              `}
+                    />
+
+
+                    {/* Text */}
+                    <div>
+
+                      <p
+                        className={`
+                  text-xs font-semibold
+                  ${selected
+                            ? "text-blue-700"
+                            : "text-gray-500"
+                          }
+                `}
+                      >
+                        {item.value}
+                      </p>
+
+                      {selected && (
+                        <p className="text-[9px] text-blue-500 mt-0.5">
+                          Selected
+                        </p>
+                      )}
+
+                    </div>
+
+                  </div>
+                );
+              })}
+
+            </div>
+
+          </div>
+
+        </div>
+        {/* ── Store Address ─────────────────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-8">
+          <h2 className="text-base font-semibold text-gray-900 uppercase text-gray-700 font-semibold pb-3 flex items-center gap-2 uppercase">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+              <MapPin className="w-4 h-4 text-yellow-600" />
+            </span>
+            Company Address
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-7">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 1<span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addStoreAddress1 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Address 2 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 2
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addStoreAddress2 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Address 3 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Address 3
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addStoreAddress3 || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Country<span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addCountry || ""}
+                readOnly
+              />
+            </div>
+
+            {/* State */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                State<span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addState || ""}
+                readOnly
+              />
+            </div>
+
+            {/* City */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                City<span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addCity || ""}
+                readOnly
+              />
+            </div>
+
+            {/* Zip Code */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2 text-sm">
+                Zip Code<span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700 text-sm focus:outline-none"
+                value={apiData?.addZipcode || ""}
+                readOnly
+              />
             </div>
           </div>
         </div>
-
-
         {/* ── Billing Address ──────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
           <div className="rounded-md pb-4">
-            <div className="flex items-center gap-2 pb-4">
+            <div className="flex items-center gap-3 mb-5 pb-3">
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
-                <MapPin size={18} />
+                <ReceiptText className="w-4 h-4 text-yellow-600" />
               </span>
               <h2 className="text-base font-semibold text-gray-900 uppercase">
                 Billing Address
@@ -545,7 +810,7 @@ export default function BasicDetails({ refId, handleNext }) {
               {/* Address 1 */}
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
-                  Address 1
+                  Address 1<span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
@@ -583,7 +848,7 @@ export default function BasicDetails({ refId, handleNext }) {
               {/* Country */}
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
-                  Country
+                  Country<span className="text-red-500 ml-1">*</span>
                 </label>
 
                 <input
@@ -597,7 +862,7 @@ export default function BasicDetails({ refId, handleNext }) {
               {/* State */}
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
-                  State
+                  State<span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
@@ -610,7 +875,7 @@ export default function BasicDetails({ refId, handleNext }) {
               {/* City */}
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
-                  City
+                  City<span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
@@ -623,7 +888,7 @@ export default function BasicDetails({ refId, handleNext }) {
               {/* Zip Code */}
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
-                  Zip Code
+                  Zip Code<span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
@@ -636,15 +901,15 @@ export default function BasicDetails({ refId, handleNext }) {
           </div>
         </div>
 
-
-        {/* SAVE BUTTON */}
+        {/* Handle BUTTON */}
         <div className="flex justify-end mt-10">
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+            className="inline-flex items-center gap-2 bg-[#fec931] font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Next
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>

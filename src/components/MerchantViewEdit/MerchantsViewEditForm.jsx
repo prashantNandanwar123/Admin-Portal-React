@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
 import {
   User,
   Landmark,
-  CreditCard,
+  QrCode,
   IndianRupee,
   ClipboardCheck,
   Upload,
@@ -13,13 +13,12 @@ import {
 
 
 import VBasicDetails from "./VBasicDetails";
+import VDirectorDetails from "./VDirectorDetails";
 import VAcquiringBank from "./VAcquiringBank";
 import VPaymentType from "./VPaymentType";
 import VMSFFee from "./VMSFFee";
-
 import VCompanyDocs from "./VCompanyDocs";
 import VIPGConfig from "./VIPGConfig";
-import VDirectorDetails from "./VDirectorDetails";
 
 export default function MerchantsViewEditForm({
   merchantData,
@@ -31,45 +30,14 @@ export default function MerchantsViewEditForm({
 
   //  STEP CONFIG
   const steps = [
-    {
-      title: "Basic Details",
-      component: VBasicDetails,
-      icon: User,
-    },
-    {
-      title: "Director Details",
-      component: VDirectorDetails,
-      icon: User,
-    },
-    {
-      title: "Acquiring Bank",
-      component: VAcquiringBank,
-      icon: Landmark,
-    },
-    {
-      title: "Payment Type",
-      component: VPaymentType,
-      icon: CreditCard,
-    },
-    {
-      title: "MSF Fee",
-      component: VMSFFee,
-      icon: IndianRupee,
-    },
-
-
-      {
-      title: "Company Documents",
-      component: VCompanyDocs,
-      icon: Upload,
-    },
-    {
-      title: "IPG Config",
-      component: VIPGConfig,
-      icon: Settings,
-    },
+    { title: "Basic Details", component: VBasicDetails, icon: User },
+    { title: "Director Details", component: VDirectorDetails, icon: User },
+    { title: "Acquiring Bank", component: VAcquiringBank, icon: Landmark },
+    { title: "Payment Type", component: VPaymentType, icon: QrCode },
+    { title: "MSF Fee", component: VMSFFee, icon: IndianRupee },
+    { title: "Company Documents", component: VCompanyDocs, icon: Upload },
+    { title: "IPG Config", component: VIPGConfig, icon: Settings },
   ];
-
 
   const CurrentComponent = steps[currentStep].component;
 

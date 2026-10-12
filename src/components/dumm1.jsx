@@ -1,455 +1,973 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Eye } from "lucide-react";
+import { BadgeIndianRupee, QrCode, ArrowRight, ArrowLeft } from "lucide-react";
 
-export default function ECompanyDocs({ refId, handleNext, handleBack }) {
+export default function EMSFFee({
+  refId,
+  data,
+  setData,
+  errors,
+  handleNext,
+  handleBack,
+}) {
 
-    const [documents, setDocuments] = useState({
-        AOA: "",
-        COMPANY_PAN: "",
-        MOA: "",
-        GST: "",
-        COI: "",
-        CANCELLED_CHEQUE: "",
-        SIGNAGE: "",
-        OFFICE_SHOP_PHOTO_1: "",
-        OFFICE_SHOP_PHOTO_2: ""
+  const initForm = {
+    acquirerBank: "",
+    processorMID: "",
+    slabUpto: "",
+    effectiveFrom: "",
+    effectiveTo: "",
+    internationalFixed: "",
+    internationalPer: "",
+    domesticOnusFixed: "",
+    domesticOnusPer: "",
+    domesticOffusFixed: "",
+    domesticOffusPer: "",
+    chargeType: "Both",
+    enterGST: "",
+    feeType: "MSF",
+    resellerCommission: "",
+  };
 
-    });
+  const [tableData, setTableData] = useState([]);
+  const [midList, setMidList] = useState([]);
+  const [showAddError, setShowAddError] = useState(false);
+  const [showSaveError, setShowSaveError] = useState(false);
+  const [activeTab, setActiveTab] = useState("UPI");
+  const [form, setForm] = useState(initForm);
 
-    useEffect(() => {
-        viewCompanyDocs(refId);
-    }, []);
+  // 🔹 Convert YYYY-MM-DD → DD/MM/YYYY HH:mm:ss
+  const formatDateForInput = (date) => {
+    if (!date) return "";
 
-    const viewCompanyDocs = async (refId) => {
-        try {
-            const response = await axiosInstance.post(
-                `/merchant/kyc/viewCompanyDocs/${10001}`
-            );
-
-            console.log("company REsponse -->>>", response);
-
-            if (response?.respCode === 0) {
-                toast.success(response?.respMsg);
-                // Documents
-                const apiDocuments = response?.respData?.documents || [];
-
-                const documentMap = {
-                    AOA: null,
-                    COMPANY_PAN: null,
-                    MOA: null,
-                    GST: null,
-                    COI: null,
-                    CANCELLED_CHEQUE: null,
-                    SIGNAGE: null,
-                    OFFICE_SHOP_PHOTO_1: null,
-                    OFFICE_SHOP_PHOTO_2: null,
-                };
-
-                apiDocuments.forEach((doc) => {
-                    documentMap[doc.fileType] = {
-                        fileName: doc.fileName,
-                    };
-                });
-
-                setDocuments(documentMap);
-            } else {
-                toast.error(response?.respMsg);
-                setData({});
-            }
-        } catch (error) {
-            toast.error(error);
-            setData({});
-        }
-    };
-
-    const [userData, setUserData] = useState(null);
-
-    // Get logged-in user
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-
-        if (storedUser) {
-            try {
-                setUserData(JSON.parse(storedUser));
-            } catch (error) {
-                console.error("Invalid user data in localStorage", error);
-            }
-        }
-    }, []);
-
-
-    // handleSaveEditCompany  APi
-    const handleSaveEditCompany = async () => {
-        try {
-            const formData = new FormData();
-
-            formData.append("refId", refId);
-            formData.append("updatedBy", userData?.userName || "");
-
-            if (companyPan) {
-                formData.append("companyPan", companyPan);
-            }
-
-            if (aoa) {
-                formData.append("aoa", aoa);
-            }
-
-            if (moa) {
-                formData.append("moa", moa);
-            }
-
-            if (gst) {
-                formData.append("gst", gst);
-            }
-
-            if (coi) {
-                formData.append("coi", coi);
-            }
-
-            if (cancelledCheque) {
-                formData.append("cancelledCheque", cancelledCheque);
-            }
-
-            if (signage) {
-                formData.append("signage", signage);
-            }
-
-            if (officeShopPhoto1) {
-                formData.append("officeShopPhoto1", officeShopPhoto1);
-            }
-
-            if (officeShopPhoto2) {
-                formData.append("officeShopPhoto2", officeShopPhoto2);
-            }
-
-            console.log("Form Data payload : " + formData);
-
-            const response = await axiosInstance.post(
-                `/merchant/kyc/edit/companyDocs`,
-                formData, {
-                headers: {
-                    "content-type": "multipart/form-data",
-                },
-            }
-            );
-            const resData = response;
-
-            if (resData?.respCode === 0) {
-                toast.success(resData?.respMsg);
-            } else {
-                toast.error(resData?.respMsg);
-            }
-        } catch (error) {
-            toast.error(error);
-        }
+    // API: 2026-10-08
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
     }
 
-    const documentList = [
-        {
-            title: "Articles of Association (AOA)",
-            documentType: "AOA",
-        },
-        {
-            title: "Company Pan Card",
-            documentType: "COMPANY_PAN",
-        },
-        {
-            title: "Memorandum of Association (MOA)",
-            documentType: "MOA",
-        },
-        {
-            title: "Company GST Certificate",
-            documentType: "GST",
-        },
-        {
-            title: "Certificate of Incorporation (COI)",
-            documentType: "COI",
-        },
-        {
-            title: "Cancel check",
-            documentType: "CANCELLED_CHEQUE",
-        },
-        {
-            title: "Company Signature",
-            documentType: "SIGNAGE",
-        },
-        {
-            title: "Office / Shop Photo 1",
-            documentType: "OFFICE_SHOP_PHOTO_1",
-        },
-        {
-            title: "Office / Shop Photo 2",
-            documentType: "OFFICE_SHOP_PHOTO_2",
-        },
+    // API: 08/10/2026
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+      const [day, month, year] = date.split("/");
+      return `${year}-${month}-${day}`;
+    }
 
+    // API: 08-10-2026
+    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
+      const [day, month, year] = date.split("-");
+      return `${year}-${month}-${day}`;
+    }
+
+    return "";
+  };
+
+
+  const today = new Date().toISOString().split("T")[0];
+
+  useEffect(() => {
+    if (showAddError) {
+      const timer = setTimeout(() => {
+        setShowAddError(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showAddError]);
+
+  useEffect(() => {
+    if (!refId) return;
+    // This Api are fetching Data
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.post(
+          `rMerchantMsfConvenience/${refId}`
+        );
+
+        if (response?.respCode === 0) {
+          const formattedData = (response?.respData || []).map((item) => ({
+            acquirerBank: item.upiAcquirerBankName,
+            processorMID: item.upiMID,
+            slabUpto: item.upiSlabUpto,
+            effectiveFrom: formatDateForInput(item.upiEffectiveFrom),
+            effectiveTo: formatDateForInput(item.upiEffectiveTo),
+            internationalFixed: item.upiInternationalFixed,
+            internationalPer: item.upiInternationalPer,
+            domesticOnusFixed: item.upiDomesticOnusFixed,
+            domesticOnusPer: item.upiDomesticOnusper,
+            domesticOffusFixed: item.upiDomesticOffusFixed,
+            domesticOffusPer: item.upiDomesticOffusper,
+            chargeType: item.upiChargeType,
+            enterGST: item.upiGstper,
+            feeType: item.upiFeeType,
+            resellerCommission: item.recommission,
+          }));
+
+          setTableData(formattedData);
+        }
+      } catch (err) {
+        toast.error(err);
+      }
+    };
+    fetchData();
+  }, [refId]);
+
+
+  // fetch Mid List
+  const fetchMIDList = async (AcqBankName) => {
+    if (!AcqBankName) {
+      setMidList([]);
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        `/getMSFUpiMID/${encodeURIComponent(AcqBankName)}`
+      );
+
+      const apiData = response?.data?.respData;
+
+      const list = Object.entries(apiData || {}).map(
+        ([key, value]) => ({
+          key,
+          value,
+        })
+      );
+
+      setMidList(list);
+    } catch (error) {
+      console.error("MID API error:", error);
+      setMidList([]);
+    }
+  };
+
+  // COMMON HANDLE CHANGE
+  const handleChange = (
+    field,
+    value
+  ) => {
+    setData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // FORM HANDLE CHANGE
+  const u = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // ADD ROW
+  const handleAddRow = () => {
+
+    // VALIDATION
+    if (
+      !form.acquirerBank ||
+      !form.processorMID ||
+      !form.slabUpto ||
+      !form.effectiveFrom ||
+      !form.effectiveTo ||
+      !form.internationalFixed ||
+      !form.internationalPer ||
+      !form.domesticOnusFixed ||
+      !form.domesticOnusPer ||
+      !form.domesticOffusFixed ||
+      !form.domesticOffusPer ||
+      !form.chargeType ||
+      !form.enterGST ||
+      !form.feeType ||
+      !form.resellerCommission
+    ) {
+      setShowAddError(true);
+      return;
+    }
+
+    // ADD DATA INTO TABLE
+    setTableData((prev) => [
+      ...prev,
+      {
+        ...form,
+      },
+    ]);
+
+    // RESET FORM
+    setForm(initForm);
+    setShowAddError(false);
+  };
+
+  // DELETE ROW
+  const handleDeleteRow = (
+    index
+  ) => {
+    const updatedRows = [
+      ...tableData,
     ];
 
-    // View document
-    const viewFile = async (fileName) => {
-        if (!refId || !fileName) {
-            toast.error("RefId or file name is missing");
-            return;
-        }
-        try {
-            const response = await axiosInstance.post(
-                "/merchant/kyc/viewKycDocs",
-                {},
-                {
-                    params: {
-                        refId: refId,
-                        fileName: fileName,
-                    },
-                    responseType: "blob",
-                }
-            );
+    updatedRows.splice(index, 1);
+    setTableData(updatedRows);
+  };
 
-            const blobUrl = URL.createObjectURL(response);
-            window.open(blobUrl, "_blank");
-            // Optional: free memory after some time
-            setTimeout(() => {
-                window.URL.revokeObjectURL(blobUrl);
-            }, 5000);
+  // HANDLE ROW CHANGE
+  const handleRowChange = (
+    index,
+    field,
+    value
+  ) => {
+    const updatedRows = [
+      ...tableData,
+    ];
+    updatedRows[index][field] = value;
+    setTableData(updatedRows);
+  };
 
-        } catch (error) {
-            toast.error(error);
+  // This Api Are Save Edited Data
+  const handleSaveAndNext =
+    async () => {
+      try {
+        if (tableData.length === 0) {
+          setShowSaveError(true);
+          return;
         }
+        setShowSaveError(false);
+
+        const payload = {
+          ref_id: refId,
+          upiAcquirerBankName: tableData.map((row) => row.acquirerBank).join(","),
+          upiMID: tableData.map((row) => row.processorMID).join(","),
+          upiSlabUpto: tableData.map((row) => row.slabUpto).join(","),
+          upiEffectiveFrom: tableData.map((row) => row.effectiveFrom).join(","),
+          upiEffectiveTo: tableData.map((row) => row.effectiveTo).join(","),
+          upiInternationalFixed: tableData.map((row) => row.internationalFixed).join(","),
+          upiInternationalPer: tableData.map((row) => row.internationalPer).join(","),
+          upiDomesticOnusFixed: tableData.map((row) => row.domesticOnusFixed).join(","),
+          upiDomesticOnusper: tableData.map((row) => row.domesticOnusPer).join(","),
+          upiDomesticOffusFixed: tableData.map((row) => row.domesticOffusFixed).join(","),
+          upiDomesticOffusper: tableData.map((row) => row.domesticOffusPer).join(","),
+          upiChargeType: tableData.map((row) => row.chargeType).join(","),
+          upiFeeType: tableData.map((row) => row.feeType).join(","),
+          upiGstper: tableData.map((row) => row.enterGST).join(","),
+          recommission: tableData.map((row) => row.resellerCommission).join(","),
+        };
+
+        const response = await axiosInstance.post("/saveEditMsfConUpi",
+          payload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const resData = response;
+        if (resData?.respCode === 0) {
+          toast.success(resData?.respMsg);
+          setData((prev) => ({
+            ...prev,
+            refId: resData?.respData?.ref_id || prev.refId,
+          }));
+
+        } else {
+          if (typeof resData?.respData === "object") {
+            Object.values(resData.respData).forEach((msg) => { toast.error(msg); });
+          } else {
+            toast.error(resData?.respMsg);
+          }
+        }
+      } catch (error) {
+        toast.error(error);
+      }
     };
+  const inputClass =
+    "w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-400 bg-white";
 
-    /* ── Reusable read-only field (matches the reference card design) ── */
-    const ViewField = ({ label, value, required }) => (
-        <div>
-            <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                {label} {required && <span className="text-red-500">*</span>}
-            </label>
-            <div className="w-full min-h-[42px] border border-gray-200 rounded-lg bg-white px-3 py-2 flex items-center text-[13px] sm:text-sm text-gray-800 shadow-sm">
-                {value || "-"}
-            </div>
-        </div>
-    );
+  const labelClass = "block text-sm text-gray-700 mb-1";
+  const req = <span className="text-red-500 ml-1">*</span>;
 
-    /* ── Section wrapper card ── */
-    const SectionCard = ({ title, children, className = "" }) => (
-        <div
-            className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`}
-        >
-            <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                {title}
+  return (
+    <>
+      <div>
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+              <BadgeIndianRupee size={18} />
+            </span>
+            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+              Edit MSF / Convenience Fee
             </h2>
-            <div className="border-t border-gray-200 mt-3 mb-5" />
-            {children}
+          </div>
+          <p className="ml-12 text-sm text-slate-700 -mt-3">
+            Edit Configure and update the applicable MSF and convenience fee settings.
+          </p>
         </div>
-    );
 
-    return (
-        <div className="overflow-y-auto hide-scrollbar  sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
-            {/* ───────────── Header ───────────── */}
-            <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[40px]">
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500">
-                    <div className="flex items-center justify-between w-full px-6 py-4">
-                        {/* Company Documents - LEFT */}
-                        <div>
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf3f9]">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-6 w-6 text-blue-700"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M7 3h8l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M15 3v5h5M9 13h6M9 17h6"
-                                        />
-                                    </svg>
-                                </div>
-
-                                <div>
-                                    <h2 className="text-xl sm:text-xl font-semibold text-blue-900">
-                                        Edit Company Documents
-                                    </h2>
-                                    <p className="text-[11px] font-medium text-slate-400">
-                                        Upload and manage your company verification documents
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Document Status - RIGHT */}
-                        <div className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2">
-                            <span className="h-2 w-2 rounded-full bg-blue-600"></span>
-                            <span className="text-xs font-semibold text-blue-700">
-                                DOCUMENT VERIFICATION
-                            </span>
-                        </div>
-                    </div>
-                </div>
+        {/* ALL FIELDS */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-3">
+          <div>
+            <div className="bg-[#fec931] text-black px-4 py-3 rounded-md mb-6 flex items-center gap-3">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black">
+                <QrCode size={16} />
+              </span>
+              <h2 className="text-lg font-semibold">{activeTab}</h2>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-3">
+              {/* Acquirer Bank */}
+              <div>
+                <label className={labelClass}>Acquirer Bank {req}</label>
+                <select
+                  className={inputClass}
+                  value={form.acquirerBank}
+                  onChange={(e) => {
+                    const value = e.target.value;
 
-            {/* Status */}
-            <SectionCard title="Documents Details">
-                {/* Upload Documents Details */}
-                <div className="w-full">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {documentList.map((document, index) => {
-                            const existingDocument = documents[document.documentType];//AOA
-                            const hasDocument = !!existingDocument;
-
-                            return (
-                                <div
-                                    key={index}
-                                    className={`relative flex h-[125px] flex-col items-center justify-center rounded-lg px-3 text-center ${hasDocument
-                                        ? "border-2 border-green-500 bg-[#f9fbfd]"
-                                        : "border border-dashed border-[#d9e2ef] bg-[#f9fbfd]"
-                                        }`}
-                                >
-
-                                    {/* Green Tick */}
-                                    {hasDocument && (
-                                        <div className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-3 w-3 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                strokeWidth="3"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M5 13l4 4L19 7"
-                                                />
-                                            </svg>
-                                        </div>
-                                    )}
-
-                                    {/* Hidden File Input */}
-                                    {/* <input
-                                        id={`document-${index}`}
-                                        type="file"
-                                        accept=".pdf,.jpg,.jpeg,.png,.jfif"
-                                        className="hidden"
-                                        onChange={(e) => {
-                                            const file =
-                                                e.target.files?.[0];
-
-                                            if (!file) return;
-
-                                            if (
-                                                file.size >
-                                                5 * 1024 * 1024
-                                            ) {
-                                                toast.error(
-                                                    "File size must be less than 5 MB"
-                                                );
-
-                                                e.target.value = "";
-                                                return;
-                                            }
-
-                                            // For now only UI update
-                                            setDocuments((prev) => ({
-                                                ...prev,
-                                                [document.documentType]: {
-                                                    id: null,
-                                                    originalFileName:
-                                                        file.name,
-                                                    downloadUrl: null,
-                                                    file: file,
-                                                },
-                                            }));
-                                        }}
-                                    /> */}
-
-                                    {/* Document Name */}
-                                    <p className="mt-2 text-xs font-medium leading-4 text-[#475569]">
-                                        {document.title}
-                                        <span className="text-red-500">
-                                            *
-                                        </span>
-                                    </p>
-
-                                    {/* Existing File Name */}
-                                    {hasDocument ? (
-                                        <p
-                                            className="mt-1 max-w-[150px] truncate text-[10px] font-medium text-green-600"
-                                            title={
-                                                existingDocument.fileName
-                                            }
-                                        >
-                                            {existingDocument.fileName}
-                                        </p>
-                                    ) : (
-                                        <p className="mt-1 text-[9px] text-[#94a3b8]">
-                                            PDF / JPG / PNG - max 5 MB
-                                        </p>
-                                    )}
-
-                                    {/* Icons */}
-                                    <div className="mt-2 flex items-center gap-3">
-                                        {/* Eye Icon - First */}
-                                        {hasDocument && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    viewFile(
-                                                        existingDocument.fileName
-                                                    )
-                                                }
-                                                title="View document"
-                                                className="cursor-pointer"
-                                            >
-                                                <Eye
-                                                    className="h-5 w-5 text-blue-500"
-                                                    strokeWidth={1.8}
-                                                />
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </SectionCard>
-
-
-            {/* BACK & NEXT BUTTONS */}
-            <div className="flex justify-between items-center gap-4 mt-10">
-                <button
-                    type="button"
-                    onClick={handleBack}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+                    u("acquirerBank", value);
+                    fetchMIDList(value);
+                  }}
                 >
-                    Back
-                </button>
-                <div className="flex justify-center">
-                    <button
-                        type="button"
-                        onClick={handleSaveEditCompany}
-                        className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
-                    >
-                        Update
-                    </button>
-                </div>
-                <button
-                    type="button"
-                    onClick={handleNext}
-                    className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                  <option value="">-- Select --</option>
+                  {data?.selectedAcquirer && (
+                    <option value={data.selectedAcquirer}>
+                      {data.selectedAcquirer}
+                    </option>
+                  )}
+                </select>
+              </div>
+
+              {/* Processor MID */}
+              <div>
+                <label className={labelClass}>Processor MID{req}</label>
+                <select
+                  className={inputClass}
+                  value={form.processorMID}
+                  onChange={(e) =>
+                    u("processorMID", e.target.value)
+                  }
                 >
-                    Next
-                </button>
+                  <option value="">-- Select --</option>
+                  {midList.map((item, index) => (
+                    <option key={index} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Slab Upto */}
+              <div>
+                <label className={labelClass}>Slab Upto {req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.slabUpto}
+                  maxLength={8}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("slabUpto", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Effective From */}
+              <div>
+                <label className={labelClass}>Effective From{req}</label>
+                <input
+                  type="date"
+                  max={today}
+                  className={inputClass}
+                  value={form.effectiveFrom}
+                  onChange={(e) =>
+                    u("effectiveFrom", e.target.value)
+                  }
+                />
+              </div>
+
+              {/* Effective To */}
+              <div>
+                <label className={labelClass}>Effective To{req}</label>
+                <input
+                  type="date"
+                  max={today}
+                  className={inputClass}
+                  value={form.effectiveTo}
+                  onChange={(e) =>
+                    u("effectiveTo", e.target.value)
+                  }
+                />
+              </div>
+
+              {/* International Fixed */}
+              <div>
+                <label className={labelClass}>International Fixed{req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  maxLength={3}
+                  value={form.internationalFixed}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("internationalFixed", value.replace(/\D/g, "").slice(0));
+                    }
+                  }}
+                />
+              </div>
+
+              {/* International Per */}
+              <div>
+                <label className={labelClass}>International Per(%){req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.internationalPer}
+                  maxLength={6}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("internationalPer", value);
+                      return;
+                    }
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num <= 100) {
+                      u("internationalPer", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Onus Fixed */}
+              <div>
+                <label className={labelClass}>Domestic Onus Fixed{req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  maxLength={3}
+                  value={form.domesticOnusFixed}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("domesticOnusFixed", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Onus Per */}
+              <div>
+                <label className={labelClass}>
+                  Domestic Onus Per (%){req}
+                </label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.domesticOnusPer}
+                  maxLength={6}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("domesticOnusPer", value);
+                      return;
+                    }
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num <= 100) {
+                      u("domesticOnusPer", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Offus Fixed */}
+              <div>
+                <label className={labelClass}>
+                  Domestic Offus Fixed{req}
+                </label>
+
+                <input
+                  type="text"
+                  className={inputClass}
+                  maxLength={3}
+                  value={form.domesticOffusFixed}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      u("domesticOffusFixed", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Domestic Offus Per */}
+              <div>
+                <label className={labelClass}>Domestic Offus Per (%){req}</label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.domesticOffusPer}
+                  maxLength={6}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("domesticOffusPer", value);
+                      return;
+                    }
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num <= 100) {
+                      u("domesticOffusPer", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Charge Type */}
+              <div>
+                <label className={labelClass}>Charge Type</label>
+                <select
+                  className={inputClass}
+                  value={form.chargeType}
+                  onChange={(e) =>
+                    u("chargeType", e.target.value)
+                  }
+                >
+                  <option value="Both">Both</option>
+                  <option value="Whichever Higher"> Whichever Higher</option>
+                  <option value="Whichever Lower">Whichever Lower</option>
+                </select>
+              </div>
+
+              {/* GST */}
+              <div>
+                <label className={labelClass}>
+                  Enter GST in Percentage(%){req}
+                </label>
+
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={form.enterGST}
+                  maxLength={3}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("enterGST", value);
+                      return;
+                    }
+                    const num = Number(value);
+                    if (num <= 100) {
+                      u("enterGST", value);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Fee Type */}
+              <div>
+                <label className={labelClass}>
+                  Fee Type{req}
+                </label>
+                <select
+                  className={inputClass}
+                  value={form.feeType}
+                  onChange={(e) =>
+                    u("feeType", e.target.value)
+                  }
+                >
+                  <option value="MSF">MSF</option>
+                  <option value="Convenience">Convenience</option>
+                </select>
+              </div>
+              {/* Reseller Commission */}
+              <div>
+                <label className={labelClass}>
+                  Enter Reseller Commi in Per(%){req}
+                </label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  placeholder="0.20"
+                  value={form.resellerCommission}
+                  maxLength={4}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (!/^\d*\.?\d*$/.test(value)) return;
+                    if (value === "") {
+                      u("resellerCommission", value);
+                      return;
+                    }
+                    const num = Number(value);
+                    if (num <= 100) {
+                      u("resellerCommission", value);
+                    }
+                  }}
+                />
+              </div>
             </div>
+          </div>
         </div>
-    );
+      </div>
+
+      {showAddError && (
+        <div className="flex justify-center mb-4 mt-5 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded text-sm">
+          <div className="text-center w-fit">
+            Please fill the missing details in the above fields
+            <br />
+            --- OR ---
+            <br />
+            Fill in the correct details
+          </div>
+        </div>
+      )}
+
+      {/* ADD ROW BUTTON */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-5">
+        <div className="flex justify-center mb-4">
+          <button
+            type="button"
+            onClick={handleAddRow}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Add Row
+          </button>
+        </div>
+
+        {/* TABLE */}
+        <div className="mt-4 overflow-auto">
+          <table className="min-w-full border border-gray-300 text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border p-2 whitespace-nowrap">Acquirer Bank</th>
+                <th className="border p-2 whitespace-nowrap">Processor MID</th>
+                <th className="border p-2 whitespace-nowrap">Slab Upto</th>
+                <th className="border p-2 whitespace-nowrap">Effective From</th>
+                <th className="border p-2 whitespace-nowrap">Effective To</th>
+                <th className="border p-2 whitespace-nowrap">International Fixed</th>
+                <th className="border p-2 whitespace-nowrap">International Per</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Onus Fixed</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Onus Per</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Offus Fixed</th>
+                <th className="border p-2 whitespace-nowrap">Domestic Offus Per</th>
+                <th className="border p-2 whitespace-nowrap">Charge Type</th>
+                <th className="border p-2 whitespace-nowrap">GST %</th>
+                <th className="border p-2 whitespace-nowrap">Fee Type</th>
+                <th className="border p-2 whitespace-nowrap">Reseller Commission %</th>
+                <th className="border p-2 ">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.length >
+                0 ? (
+                tableData.map(
+                  (row, index) => (
+                    <tr key={index}>
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={
+                            row.acquirerBank
+                          }
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "acquirerBank",
+                              e.target.value.replace(/[^a-zA-Z\s]/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.processorMID}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "processorMID",
+                              e.target.value
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.slabUpto}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "slabUpto",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="date"
+                          max={today}
+                          value={row.effectiveFrom || ""}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "effectiveFrom",
+                              e.target.value
+                            )
+                          }
+                          onClick={(e) => {
+                            e.currentTarget.showPicker?.();
+                          }}
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="date"
+                          max={today}
+                          value={row.effectiveTo || ""}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "effectiveTo",
+                              e.target.value
+                            )
+                          }
+                          onClick={(e) => {
+                            e.currentTarget.showPicker?.();
+                          }}
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2 text-center">
+                        <input
+                          type="text"
+                          value={row.internationalFixed}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "internationalFixed",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.internationalPer}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "internationalPer",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.domesticOnusFixed}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOnusFixed",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.domesticOnusPer}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOnusPer",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.domesticOffusFixed}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOffusFixed",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.domesticOffusPer}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "domesticOffusPer",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2">
+                        <select
+                          value={row.chargeType}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(index, "chargeType", e.target.value)
+                          }
+                          className="w-full outline-none bg-white"
+                        >
+                          <option value="">Select Charge Type</option>
+                          <option value="Both">Both</option>
+                          <option value="Whichever Higher">Whichever Higher</option>
+                          <option value="Whichever Lower">Whichever Lower</option>
+                        </select>
+                      </td>
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          value={row.enterGST}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "enterGST",
+                              e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2 ">
+                        <select
+                          value={row.feeType}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(index, "feeType", e.target.value)
+                          }
+                          className="w-full outline-none bg-white"
+                        >
+                          <option value="">Select Fee Type</option>
+                          <option value="MSF">MSF</option>
+                          <option value="Convenience">Convenience</option>
+                        </select>
+                      </td>
+
+
+                      <td className="border p-2 text-center">
+                        <input
+                          type="text"
+                          value={row.resellerCommission}
+                          maxLength={10}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "resellerCommission",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full outline-none"
+                        />
+                      </td>
+
+                      <td className="border p-2 text-center">
+                        <button
+                          type="button"
+                          maxLength={10}
+                          onClick={() =>
+                            handleDeleteRow(
+                              index
+                            )
+                          }
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )
+              ) : (
+                <tr>
+                  <td colSpan="15" className="text-center py-4 text-gray-400">
+                    No Records Added
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* BACK & NEXT BUTTON */}
+      <div className="flex gap-4 mt-10 justify-between items-center">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full">
+          <ArrowLeft size={16} />
+          Back
+        </button>
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={handleSaveAndNext}
+            className="bg-green-500 hover:bg-green-500 text-white px-6 py-2 rounded"
+          >
+            Update
+          </button>
+        </div>
+
+        {/* SAVE BUTTON */}
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleNext}
+            className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition">
+            Next
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </>
+  );
 }

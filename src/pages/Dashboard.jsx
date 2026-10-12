@@ -4,26 +4,11 @@ import {
   TrendingUp,
   Clock,
   XCircle,
-  Wallet,
-  FileText,
-  CheckCircle2,
-  Gift,
-  MoreVertical,
-  ChevronDown,
+  Wallet
 } from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+
 import axiosInstance from "../api/axios";
 
-// 🔹 DEMO DATA — used only as a fallback so the UI has something to show
-// before the backend sends chart_data / recent_transactions.
 // Remove this once your API returns real values for these fields.
 const DEMO_CHART_DATA = [
   { time: "00:00", success: 0, pending: 0, failed: 0 },
@@ -54,7 +39,6 @@ const DEMO_RECENT_TRANSACTIONS = [
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-
   const today = new Date().toISOString().split("T")[0];
 
   const [fromDate, setFromDate] = useState(today);
@@ -71,35 +55,12 @@ export default function Dashboard() {
         fromDate: formatDate(fromDate),
         toDate: formatDate(toDate),
       };
-
       const res = await axiosInstance.post("/ReportsDashboard", payload);
       setData(res.respData);
     } catch (err) {
-      console.error(err);
+      toast.error(err);
     }
   };
-
-  useEffect(() => {
-    const main = document.querySelector("main");
-    if (!main) return;
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        // Laptop / Desktop
-        main.style.overflowY = "hidden";
-      } else {
-        // Mobile
-        main.style.overflowY = "auto";
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      // Other pages ke liye Layout ka default restore
-      main.style.overflowY = "auto";
-    };
-  }, []);
 
   // 🔹 Convert YYYY-MM-DD → DD/MM/YYYY HH:mm:ss
   const formatDate = (date) => {
@@ -150,7 +111,7 @@ export default function Dashboard() {
             Welcome back, {user.userName || "Administrator"}{" "}
             <span className="inline-block">👋</span>
           </h1>
-          <p className="text-[#5B6478] text-sm sm:text-base xl:text-xs mt-1 xl:mt-0.5">
+          <p className="text-slate-800 text-sm sm:text-base xl:text-xs mt-1 xl:mt-0.5">
             HelloPe Payment Gateway is running at Good performance. Here's your
             real-time financial overview for today.
           </p>
@@ -168,6 +129,7 @@ export default function Dashboard() {
               <input
                 type="text"
                 value={fromDate ? fromDate.split("-").reverse().join("/") : ""}
+                max={today}
                 readOnly
                 className="px-3 xl:px-2 text-sm xl:text-xs outline-none bg-transparent cursor-pointer w-[100px] sm:w-[110px] xl:w-[85px]"
                 style={{ height: "100%" }}
@@ -175,10 +137,12 @@ export default function Dashboard() {
               <input
                 type="date"
                 value={fromDate}
+                max={today}
                 onChange={(e) => setFromDate(e.target.value)}
                 className="absolute opacity-0 w-0 h-0"
                 id="fromPicker"
               />
+
               <div
                 className="bg-white w-9 xl:w-7 flex items-center justify-center flex-shrink-0 cursor-pointer border-l border-gray-200"
                 onClick={() => document.getElementById("fromPicker").showPicker()}
@@ -205,11 +169,12 @@ export default function Dashboard() {
 
           {/* TO */}
           <div className="flex items-center gap-2 xl:gap-1.5">
-            <span className="text-sm xl:text-xs text-gray-600 font-medium">To:</span>
+            <span className="text-sm xl:text-xs text-gray-600 font-medium">
+              To:
+            </span>
             <div
               className="flex items-stretch border border-gray-200 rounded-lg overflow-hidden bg-white relative shadow-sm xl:!h-[30px]"
-              style={{ height: "38px" }}
-            >
+              style={{ height: "38px" }}>
               <input
                 type="text"
                 value={toDate ? toDate.split("-").reverse().join("/") : ""}
@@ -217,13 +182,17 @@ export default function Dashboard() {
                 className="px-3 xl:px-2 text-sm xl:text-xs outline-none bg-transparent cursor-pointer w-[100px] sm:w-[110px] xl:w-[85px]"
                 style={{ height: "100%" }}
               />
+
+              {/* ONLY ONE DATE INPUT */}
               <input
                 type="date"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
+                max={today}
                 className="absolute opacity-0 w-0 h-0"
                 id="toPicker"
               />
+
               <div
                 className="bg-white w-9 xl:w-7 flex items-center justify-center flex-shrink-0 cursor-pointer border-l border-gray-200"
                 onClick={() => document.getElementById("toPicker").showPicker()}
@@ -239,7 +208,7 @@ export default function Dashboard() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
                   <line x1="16" y1="2" x2="16" y2="6" />
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="3" y1="10" x2="21" y2="10" />
@@ -251,11 +220,11 @@ export default function Dashboard() {
           {/* SEARCH */}
           <button
             onClick={fetchDashboard}
-            className="flex items-center gap-2 xl:gap-1.5 bg-[#F5B933] hover:bg-[#e5ab27] text-[#1A2233] px-4 xl:px-3 rounded-lg transition-all duration-200 active:scale-95 font-semibold shadow-sm xl:!h-[30px]"
+            className="flex items-center gap-2 xl:gap-1.5 bg-[#fec931] text-black px-4 xl:px-3 rounded-lg transition-all duration-200 active:scale-95 font-semibold shadow-sm xl:!h-[30px]"
             style={{ height: "38px" }}
           >
             <Search size={15} />
-            <span className="text-sm xl:text-xs">Search</span>
+            <span className="text-sm xl:text-xs font-medium">Search</span>
           </button>
         </div>
       </div>
@@ -278,7 +247,7 @@ export default function Dashboard() {
           count={data.pending_count}
           trend={data.pending_trend}
           icon={<Clock size={20} />}
-          iconBg="bg-[#F59E0B]"
+          iconBg="bg-[#fec931]"
           cardBg="bg-[#FEF6E9]"
           badgeColor="text-[#B45309] bg-[#FEF3C7]"
         />
@@ -298,14 +267,14 @@ export default function Dashboard() {
           count={data.total_count}
           trend={data.total_trend}
           icon={<Wallet size={20} />}
-          iconBg="bg-[#4C6FFF]"
+          iconBg="bg-[#1F1F1F]"
           cardBg="bg-[#EEF3FD]"
           badgeColor="text-[#3B4CC0] bg-[#E0E7FF]"
         />
       </div>
 
       {/* CHART + SUMMARY */}
-      
+
       {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 xl:gap-2.5 xl:pt-4">
        
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-4 sm:p-6 xl:p-3">

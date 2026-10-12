@@ -283,7 +283,7 @@ export default function EChecklist({
     "h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-[14px] text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
   const labelClass =
     "mb-1 block text-[15px] font-medium text-gray-700";
-  const req = <span className="text-red-500">*</span>
+  const req = <span className="text-red-500 ml-1">*</span>
 
   return (
 

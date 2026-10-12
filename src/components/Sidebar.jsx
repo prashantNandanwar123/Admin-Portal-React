@@ -7,6 +7,7 @@ import { IoIosLink } from "react-icons/io";
 import { useLocation } from "react-router-dom";
 import balcklogo from "../assets/img-1.jpeg";
 import whitelogo from "../assets/logo-copy.png";
+import { TbCoinBitcoin } from "react-icons/tb";
 
 import {
   LayoutDashboard,
@@ -15,7 +16,6 @@ import {
   ShieldCheck,
   Key,
   BarChart2,
-  Menu,
   Shield,
   LogOut,
   ChevronDown,
@@ -47,6 +47,7 @@ export default function Sidebar({ open, onClose, isMobile }) {
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [activeMenu, setActiveMenu] = useState("");
+  const [cryptoOpen, setCryptoOpen] = useState(false);
 
   const userData = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -113,6 +114,11 @@ export default function Sidebar({ open, onClose, isMobile }) {
       path: "/app/reports",
       icon: BarChart2,
     },
+    // {
+    //   title: "Reports Crepto",
+    //   path: "/app/reports-crepto",
+    //   icon: BarChart2,
+    // },
   ];
 
   const otherMenuActive =
@@ -244,11 +250,10 @@ export default function Sidebar({ open, onClose, isMobile }) {
             }`}
         >
           <div className="flex items-center ml-2 gap-0 h-10 cursor-pointer"
-          onClick={() => navigate("dashboard")}>
+            onClick={() => navigate("dashboard")}>
             <div className="w-9 h-9 bg-yellow-400 text-xl rounded-full flex items-center justify-center font-bold text-[#1a1d2e] shrink-0">
               H
             </div>
-
             {open && (
               <div className="flex items-center h-10 overflow-visible">
                 <img
@@ -273,6 +278,7 @@ export default function Sidebar({ open, onClose, isMobile }) {
               MAIN MENU
             </div>
           )}
+
           <div className="space-y-1 mb-5 ml-3">
             {menuConfig
               .filter((menu) => roleFunctions.includes(menu.title))
@@ -303,6 +309,77 @@ export default function Sidebar({ open, onClose, isMobile }) {
                   </NavLink>
                 );
               })}
+
+            {/* CRYPTO MANAGEMENT */}
+            {roleFunctions.includes("Crypto Management") && (
+              <div>
+                <button
+                  onClick={() => {
+                    setCryptoOpen(!cryptoOpen);
+                    setMasterOpen(false);
+                    setUserMgmtOpen(false);
+                    setActiveMenu("crypto-management");
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition
+                  ${activeMenu === "crypto-management"
+                      ? isLightSidebar
+                        ? "bg-yellow-400 text-white"
+                        : "bg-white text-black"
+                      : isLightSidebar
+                        ? "text-black hover:bg-black/10"
+                        : "text-white/60 hover:bg-white/10"
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <TbCoinBitcoin size={18} />
+                    {open && <span>Crypto Management</span>}
+                  </div>
+
+                  {open &&
+                    (cryptoOpen ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    ))}
+                </button>
+
+                {/* Crypto DROPDOWN ITEMS */}
+                {cryptoOpen && open && (
+                  <div className="ml-8 mt-1 space-y-1">
+                    {/* DASHBOARD */}
+                    <NavLink
+                      to="/app/crypto-dashboard"
+                      onClick={() => {
+                        setActiveMenu("crypto-dashboard");
+                        if (isMobile) {
+                          onClose();
+                        }
+                      }}
+                      className={getMenuClass("crypto-dashboard")}
+                    >
+                      <LayoutDashboard size={16} />
+                      <span>Dashboard</span>
+                    </NavLink>
+
+                    {/* REPORTS */}
+                    <NavLink
+                      to="/app/reports-crepto"
+                      onClick={() => {
+                        setActiveMenu("crypto-reports");
+                        if (isMobile) {
+                          onClose();
+                        }
+                      }}
+                      className={getMenuClass("crypto-reports")}
+                    >
+                      <BarChart2 size={16} />
+                      <span>Reports</span>
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+            )}
+
 
             {/* OTHER */}
             {open && showOtherSection && (
@@ -351,9 +428,13 @@ export default function Sidebar({ open, onClose, isMobile }) {
                   <div className="ml-8 mt-1 space-y-1">
                     <NavLink
                       to="/app/upi-payment-processor"
-                      onClick={() => setActiveMenu("upi")}
-                      className={getMenuClass("upi")}
-                    >
+                      onClick={() => {
+                        setActiveMenu("upi");
+                        if (isMobile) {
+                          onClose();
+                        }
+                      }}
+                      className={getMenuClass("upi")}>
                       <Cpu size={16} />
                       <span>UPI Payment Processor</span>
                     </NavLink>
@@ -403,7 +484,12 @@ export default function Sidebar({ open, onClose, isMobile }) {
                         <>
                           <NavLink
                             to="/app/users"
-                            onClick={() => setActiveMenu("all-user")}
+                            onClick={() => {
+                              setActiveMenu("all-user")
+                              if (isMobile) {
+                                onClose();
+                              }
+                            }}
                             className={getMenuClass("all-user")}
                           >
                             <User size={16} />
@@ -412,7 +498,12 @@ export default function Sidebar({ open, onClose, isMobile }) {
 
                           <NavLink
                             to="/app/roles"
-                            onClick={() => setActiveMenu("role-access")}
+                            onClick={() => {
+                              setActiveMenu("role-access")
+                              if (isMobile) {
+                                onClose();
+                              }
+                            }}
                             className={getMenuClass("role-access")}
                           >
                             <UserCog size={16} />
@@ -430,10 +521,7 @@ export default function Sidebar({ open, onClose, isMobile }) {
 
         {/* SETTINGS + LOGOUT SECTION */}
         <div
-          className={`border-t ${isLightSidebar ? "border-black/10" : "border-white/10"
-            }`}
-        >
-          {/* Buttons Row */}
+          className={`border-t ${isLightSidebar ? "border-black/10" : "border-white/10"}`}>
           <div className="flex items-center gap-2 p-3">
             <div>
               {/* LOGOUT BUTTON */}
@@ -446,7 +534,6 @@ export default function Sidebar({ open, onClose, isMobile }) {
               </button>
             </div>
 
-
             {/* SETTINGS BUTTON */}
             <button
               onClick={() => setShowSettings(!showSettings)}
@@ -457,8 +544,8 @@ export default function Sidebar({ open, onClose, isMobile }) {
             >
               <Settings size={18} />
             </button>
-
           </div>
+
           {/* SETTINGS PANEL */}
           {showSettings && open && (
             <div
@@ -473,7 +560,6 @@ export default function Sidebar({ open, onClose, isMobile }) {
                     {darkMode ? "Dark Mode" : "Light Mode"}
                   </span>
                 </div>
-
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className="px-3 py-1 rounded-md bg-yellow-400 text-black text-xs font-semibold"
@@ -514,7 +600,7 @@ export default function Sidebar({ open, onClose, isMobile }) {
             </div>
           )}
         </div>
-      </aside>
+      </aside >
 
       {isMobile && open && (
         <div

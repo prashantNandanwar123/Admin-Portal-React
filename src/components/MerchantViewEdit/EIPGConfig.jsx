@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Settings2, Link } from "lucide-react";
+import { ShieldCheck, Link, ArrowLeft } from "lucide-react";
 
 export default function EIPGConfig({
   refId,
@@ -31,10 +31,9 @@ export default function EIPGConfig({
     requestURL2: "",
     requestURL3: "",
     requestURL4: "",
-    requestURL5: "",    
+    requestURL5: "",
     posTidCount: "",
   });
-  const [isRiskEnabled, setIsRiskEnabled] = useState(false);
   const [apiData, setApiData] = useState({});
 
   // ================= HANDLE CHANGE =================
@@ -61,47 +60,23 @@ export default function EIPGConfig({
 
           // FORM AUTO FILL
           setForm({
-            IPG_ECIValueVisa:
-              res.IPG_ECIValueVisa || "",
-
-            IPG_ECIValueMaster:
-              res.IPG_ECIValueMaster || "",
-
-            IPG_ECIValueMaestro:
-              res.IPG_ECIValueMaestro || "",
-
-            IPG_IntegrationApproach:
-              res.IPG_IntegrationApproach || "",
-
-            IPG_PCIDSSCertificateNumber:
-              res.IPG_PCIDSSCertificateNumber || "",
-
-            IPG_PCIDSSExpiryDate:
-              res.IPG_PCIDSSExpiryDate || "",
-
-            IPG_MerchantEmail:
-              res.IPG_MerchantEmail || "",
-
-            IPG_CustomerEmail:
-              res.IPG_CustomerEmail || "",
-
-            IPG_MerchantSMS:
-              res.IPG_MerchantSMS || "",
-
-            IPG_CustomerSMS:
-              res.IPG_CustomerSMS || "",
-
-            IPG_ServertoServerCall:
-              res.IPG_ServertoServerCall || false,
-
+            IPG_ECIValueVisa: res.IPG_ECIValueVisa || "",
+            IPG_ECIValueMaster: res.IPG_ECIValueMaster || "",
+            IPG_ECIValueMaestro: res.IPG_ECIValueMaestro || "",
+            IPG_IntegrationApproach: res.IPG_IntegrationApproach || "",
+            IPG_PCIDSSCertificateNumber: res.IPG_PCIDSSCertificateNumber || "",
+            IPG_PCIDSSExpiryDate: res.IPG_PCIDSSExpiryDate || "",
+            IPG_MerchantEmail: res.IPG_MerchantEmail || "",
+            IPG_CustomerEmail: res.IPG_CustomerEmail || "",
+            IPG_MerchantSMS: res.IPG_MerchantSMS || "",
+            IPG_CustomerSMS: res.IPG_CustomerSMS || "",
+            IPG_ServertoServerCall: res.IPG_ServertoServerCall || false,
             requestURL1: res.requestURL1 || "",
             requestURL2: res.requestURL2 || "",
             requestURL3: res.requestURL3 || "",
             requestURL4: res.requestURL4 || "",
             requestURL5: res.requestURL5 || "",
-           
-            posTidCount:
-              res.posTidCount || "",
+            posTidCount: res.posTidCount || "",
           });
         }
       } catch (error) {
@@ -138,7 +113,7 @@ export default function EIPGConfig({
         requestURL2: form.requestURL2,
         requestURL3: form.requestURL3,
         requestURL4: form.requestURL4,
-        requestURL5: form.requestURL5,       
+        requestURL5: form.requestURL5,
         posTidCount: form.posTidCount,
       };
 
@@ -175,21 +150,24 @@ export default function EIPGConfig({
     "h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-[14px] text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
   const labelClass =
     "mb-1 block text-[15px] font-medium text-gray-700";
-  const req = <span className="text-red-500">*</span>;
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
     <div className="p-6">
-      <div className="flex items-center gap-3 pt-3">
-        <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
-          <Settings2 className="w-5 h-5 text-yellow-600" />
+      <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <ShieldCheck size={16} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+            Edit IPG Configuration
+          </h2>
         </div>
-      <h2 className="text-xl text-blue-900 font-semibold">
-          Edit IPG Configuration
-        </h2>
+        <p className="ml-12 text-sm text-slate-700 -mt-3">
+          View and Edit the Internet Payment Gateway configuration and setup details.
+        </p>
       </div>
-        <p className="ml-12 pb-1 text-sm text-blue-900">
-        IPG (Internet Payment Gateway) Configuration enables secure online payment processing by connecting merchants with banks and payment systems. It supports digital payments like cards, UPI, and net banking while ensuring safe, fast, and reliable transactions with proper security compliance.
-      </p>
 
       {/* ================= TOP SECTION (NO DESIGN CHANGE) ================= */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
@@ -443,11 +421,10 @@ export default function EIPGConfig({
       {/* ================= REQUEST URLS ================= */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center shrink-0">
             <Link className="w-5 h-5 text-yellow-600" />
           </div>
-
-          <h2 className="text-2xl font-light text-gray-700 uppercase">
+          <h2 className="text-[20px] text-gray-700 font-semibold uppercase">
             Request URL's
           </h2>
         </div>
@@ -495,8 +472,9 @@ export default function EIPGConfig({
         <button
           type="button"
           onClick={handleBack}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+          className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
         >
+          <ArrowLeft size={16} />
           Back
         </button>
         {/* Center Update Button */}

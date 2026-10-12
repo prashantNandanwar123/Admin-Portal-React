@@ -7,14 +7,13 @@ import {
     X,
     Info,
     CheckCircle2,
-    FileCheck2,
     ListChecks,
+    ArrowLeft
 } from "lucide-react";
 
 export default function CompanyDocuments({
     data,
     setData,
-    errors,
     handleNext,
     handleBack,
 }) {
@@ -109,17 +108,16 @@ export default function CompanyDocuments({
     return (
         <>
             <div className="overflow-y-auto hide-scrollbar p-4">
-                {/* ──── Header ───*/}
                 <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[40px]">
-                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#fec931]">
                         <div className="flex items-center justify-between w-full px-6 py-4">
                             {/* Company Documents - LEFT */}
                             <div>
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf3f9]">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fec931]">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            className="h-6 w-6 text-blue-700"
+                                            className="h-6 w-6"
                                             fill="none"
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
@@ -139,10 +137,10 @@ export default function CompanyDocuments({
                                     </div>
 
                                     <div>
-                                        <h2 className="text-xl sm:text-xl font-semibold text-blue-900">
+                                        <h2 className="text-xl sm:text-xl text-slate-800 font-medium">
                                             Company Documents
                                         </h2>
-                                        <p className="text-xs text-slate-400">
+                                        <p className="text-sm text-slate-700 -mt-1">
                                             Upload and manage your company verification documents
                                         </p>
                                     </div>
@@ -150,9 +148,9 @@ export default function CompanyDocuments({
                             </div>
 
                             {/* Document Status*/}
-                            <div className="flex items-center gap-2 rounded-full border-none bg-yellow-100 px-4 py-2">
-                                <span className="h-2 w-2 rounded-full bg-green-600"></span>
-                                <span className="text-xs font-semibold text-green-700">
+                            <div className="flex items-center gap-2 rounded-full border-none bg-[#fec931] px-4 py-2">
+                                <span className="h-2 w-2 rounded-full bg-[#fec931]"></span>
+                                <span className="text-xs font-medium text-black">
                                     DOCUMENT VERIFICATION
                                 </span>
                             </div>
@@ -167,20 +165,20 @@ export default function CompanyDocuments({
                         <div className="flex items-center justify-between gap-4">
                             {/* Left Section - Not Clickable */}
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#fec931] text-black flex items-center justify-center shrink-0">
                                     <FileText size={18} />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-semibold text-blue-900">
+                                    <h2 className="text-xl sm:text-xl text-slate-800 font-medium">
                                         Documents Requirements
                                     </h2>
-                                    <p className="text-xs text-slate-400">
+                                    <p className="text-sm text-slate-700">
                                         View upload guidelines & LOB checklist
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Right Arrow - Only this is clickable */}
+                            {/* Right Arrow*/}
                             <button
                                 type="button"
                                 onClick={() => setShowDocumentRequirements(true)}
@@ -198,16 +196,16 @@ export default function CompanyDocuments({
                         >
                             <div
                                 className="w-full max-w-[395px] max-h-[90vh] overflow-hidden rounded-xl bg-white shadow-2xl"
-                                onClick={(e) => e.stopPropagation()}
-                            >
+                                onClick={(e) => e.stopPropagation()}>
+
                                 {/* Popup Header */}
                                 <div className="flex items-start justify-between px-4 py-3 border-b border-slate-100">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                        <div className="w-9 h-9 rounded-lg bg-blue-100 text-slate-900 flex items-center justify-center">
                                             <FileText size={18} />
                                         </div>
                                         <div>
-                                            <h2 className="text-[13px] font-semibold text-blue-900">
+                                            <h2 className="text-[13px] font-semibold text-slate-900">
                                                 Document Requirements
                                             </h2>
                                             <p className="text-[9px] text-slate-400">
@@ -246,7 +244,7 @@ export default function CompanyDocuments({
                                             <div className="w-6 h-6 rounded-md bg-green-100 text-green-600 flex items-center justify-center">
                                                 <CheckCircle2 size={13} />
                                             </div>
-                                            <span className="text-[10px] font-semibold text-blue-900">
+                                            <span className="text-[10px] font-semibold text-slate-900">
                                                 Accepted File Formats
                                             </span>
                                         </div>
@@ -264,14 +262,13 @@ export default function CompanyDocuments({
                                         </div>
                                     </div>
 
-
                                     {/* LOB Requirements */}
                                     <div className="mx-2 mb-2 rounded-lg border border-slate-200 overflow-hidden">
                                         <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 border-b border-slate-200">
                                             <div className="w-6 h-6 rounded-md bg-indigo-100 text-indigo-600 flex items-center justify-center">
                                                 <ListChecks size={13} />
                                             </div>
-                                            <span className="text-[10px] font-semibold text-blue-900">
+                                            <span className="text-[10px] font-semibold text-slate-900">
                                                 Document Requirements
                                             </span>
                                         </div>
@@ -322,7 +319,7 @@ export default function CompanyDocuments({
                                     <button
                                         type="button"
                                         onClick={() => setShowDocumentRequirements(false)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-semibold shadow-sm transition"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#fec931] text-black text-[9px] font-semibold shadow-sm transition"
                                     >
                                         <CheckCircle2 size={12} />
                                         Got it
@@ -391,7 +388,7 @@ export default function CompanyDocuments({
                                     setState: setOfficeShopPhoto2,
                                     icon: "office",
                                 },
-                                
+
                             ].map((document, index) => (
 
                                 <div
@@ -404,7 +401,7 @@ export default function CompanyDocuments({
                                     transition-all duration-200
                                     ${document.state
                                             ? "border-green-200 bg-green-50/50"
-                                            : "border-slate-200 bg-slate-50/70 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-md"
+                                            : "border-slate-200 bg-slate-50/70 hover:border-[#fec931] hover:bg-blue-50/40 hover:shadow-md"
                                         }
                                 `}
                                 >
@@ -418,7 +415,7 @@ export default function CompanyDocuments({
                                             rounded-2xl transition-all duration-200
                                             ${document.state
                                                 ? "bg-green-100 text-green-600"
-                                                : "bg-blue-50 text-blue-600 shadow-sm group-hover:bg-blue-100"
+                                                : "bg-[#fec931] text-black shadow-sm"
                                             }
                                             `}
                                     >
@@ -706,31 +703,9 @@ export default function CompanyDocuments({
                             <button
                                 type="button"
                                 onClick={handleBack}
-                                className="
-                                inline-flex w-full items-center
-                                justify-center gap-2 rounded-xl
-                                border border-slate-300 bg-white
-                                px-6 py-2.5 text-sm font-semibold
-                                text-slate-600 shadow-sm
-                                transition-all duration-200
-                                hover:border-slate-400 hover:bg-slate-100
-                                sm:w-auto
-                                "
+                                className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15 19l-7-7 7-7"
-                                    />
-                                </svg>
+                                <ArrowLeft size={16} />
                                 Back
                             </button>
 
@@ -738,35 +713,10 @@ export default function CompanyDocuments({
                             <button
                                 type="button"
                                 onClick={saveCompanyDocuments}
-                                className="
-                                inline-flex w-full items-center
-                                justify-center gap-2 rounded-xl
-                                bg-amber-400 px-7 py-2.5
-                                text-sm font-bold text-slate-900
-                                shadow-sm
-                                transition-all duration-200
-                                hover:bg-amber-500
-                                hover:shadow-md
-                                active:scale-[0.98]
-                                sm:w-auto
-                            "
+                                className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition"
                             >
                                 Save & Next
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M9 5l7 7-7 7"
-                                    />
-                                </svg>
+                                <ArrowRight size={16} />
                             </button>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Eye, Upload } from "lucide-react";
+import { Eye, Upload, ArrowRight, ArrowLeft, FileText } from "lucide-react";
 export default function ECompanyDocs({ refId, handleNext, handleBack }) {
 
     const [documents, setDocuments] = useState({
@@ -84,7 +84,6 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
     // Get logged-in user
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-
         if (storedUser) {
             try {
                 setUserData(JSON.parse(storedUser));
@@ -99,79 +98,49 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
         try {
             const formData = new FormData();
             formData.append("refId", refId);
-            formData.append(
-                "updatedBy",
-                userData?.userName || ""
-            );
+            formData.append("updatedBy", userData?.userName || "");
 
             if (documents.COMPANY_PAN?.file) {
-                formData.append(
-                    "companyPan",
-                    documents.COMPANY_PAN.file
-                );
+                formData.append("companyPan", documents.COMPANY_PAN.file);
             }
 
             if (documents.AOA?.file) {
-                formData.append(
-                    "aoa",
-                    documents.AOA.file
-                );
+                formData.append("aoa", documents.AOA.file);
             }
 
             if (documents.MOA?.file) {
-                formData.append(
-                    "moa",
-                    documents.MOA.file
-                );
+                formData.append("moa", documents.MOA.file);
             }
 
             if (documents.GST?.file) {
-                formData.append(
-                    "gst",
-                    documents.GST.file
-                );
+                formData.append("gst", documents.GST.file);
             }
 
             if (documents.COI?.file) {
-                formData.append(
-                    "coi",
-                    documents.COI.file
-                );
+                formData.append("coi", documents.COI.file);
             }
 
             if (documents.CANCELLED_CHEQUE?.file) {
-                formData.append(
-                    "cancelledCheque",
-                    documents.CANCELLED_CHEQUE.file
-                );
+                formData.append("cancelledCheque", documents.CANCELLED_CHEQUE.file);
             }
 
             if (documents.SIGNAGE?.file) {
-                formData.append(
-                    "signage",
-                    documents.SIGNAGE.file
-                );
+                formData.append("signage", documents.SIGNAGE.file);
             }
 
             if (documents.OFFICE_SHOP_PHOTO_1?.file) {
-                formData.append(
-                    "officeShopPhoto1",
-                    documents.OFFICE_SHOP_PHOTO_1.file
-                );
+                formData.append("officeShopPhoto1", documents.OFFICE_SHOP_PHOTO_1.file);
             }
 
             if (documents.OFFICE_SHOP_PHOTO_2?.file) {
-                formData.append(
-                    "officeShopPhoto2",
-                    documents.OFFICE_SHOP_PHOTO_2.file
-                );
+                formData.append("officeShopPhoto2", documents.OFFICE_SHOP_PHOTO_2.file);
             }
 
             // Check payload
             for (const [key, value] of formData.entries()) {
-                console.log(key, value);
+                // console.log(key, value);
             }
-            
+
             const response = await axiosInstance.post(
                 "/merchant/kyc/edit/companyDocs",
                 formData,
@@ -270,7 +239,7 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
     const ViewField = ({ label, value, required }) => (
         <div>
             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                {label} {required && <span className="text-red-500">*</span>}
+                {label} {required && <span className="text-red-500 ml-1">*</span>}
             </label>
             <div className="w-full min-h-[42px] border border-gray-200 rounded-lg bg-white px-3 py-2 flex items-center text-[13px] sm:text-sm text-gray-800 shadow-sm">
                 {value || "-"}
@@ -279,31 +248,35 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
     );
 
     /* ── Section wrapper card ── */
-    const SectionCard = ({ title, children, className = "" }) => (
+    const SectionCard = ({ title, icon: Icon, children, className = "" }) => (
         <div
-            className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`}
-        >
-            <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                {title}
-            </h2>
-            <div className="border-t border-gray-200 mt-3 mb-5" />
+            className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7 ${className}`} >
+            <div className="flex items-center gap-2 pb-5">
+                {Icon && (
+                    <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center">
+                        <Icon size={17} className="text-gray-800" />
+                    </div>
+                )}
+                <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                    {title}
+                </h2>
+            </div>            
             {children}
         </div>
     );
 
     return (
         <div className="overflow-y-auto hide-scrollbar  sm:p-6 xl:p-8 space-y-5 sm:space-y-6">
-            {/* ───────────── Header ───────────── */}
             <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[40px]">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500">
                     <div className="flex items-center justify-between w-full px-6 py-4">
                         {/* Company Documents - LEFT */}
                         <div>
                             <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf3f9]">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fec931]">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="h-6 w-6 text-blue-700"
+                                        className="h-6 w-6"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -321,12 +294,11 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
                                         />
                                     </svg>
                                 </div>
-
                                 <div>
-                                    <h2 className="text-xl sm:text-xl font-semibold text-blue-900">
+                                    <h2 className="text-xl sm:text-xl text-slate-800 font-semibold">
                                         Edit Company Documents
                                     </h2>
-                                    <p className="text-[11px] font-medium text-slate-400">
+                                    <p className="text-sm text-slate-700">
                                         Upload and manage your company verification documents
                                     </p>
                                 </div>
@@ -334,9 +306,9 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
                         </div>
 
                         {/* Document Status - RIGHT */}
-                        <div className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2">
-                            <span className="h-2 w-2 rounded-full bg-blue-600"></span>
-                            <span className="text-xs font-semibold text-blue-700">
+                        <div className="flex items-center gap-2 rounded-full border-none border-blue-100 bg-[#fec931] px-4 py-2">
+                            <span className="h-2 w-2 rounded-full bg-[#fec931]"></span>
+                            <span className="text-xs font-semibold text-black">
                                 DOCUMENT VERIFICATION
                             </span>
                         </div>
@@ -345,7 +317,7 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
             </div>
 
             {/* Status */}
-            <SectionCard title="Documents Details">
+            <SectionCard title="Documents Details" icon={FileText}>
                 {/* Upload Documents Details */}
                 <div className="w-full">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -467,8 +439,9 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
                 <button
                     type="button"
                     onClick={handleBack}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+                    className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
                 >
+                    <ArrowLeft size={16} />
                     Back
                 </button>
                 <div className="flex justify-center">
@@ -483,9 +456,10 @@ export default function ECompanyDocs({ refId, handleNext, handleBack }) {
                 <button
                     type="button"
                     onClick={handleNext}
-                    className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                    className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
                 >
                     Next
+                    <ArrowRight size={16} />
                 </button>
             </div>
         </div>

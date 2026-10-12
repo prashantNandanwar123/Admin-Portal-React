@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { CreditCard, QrCode } from "lucide-react";
-
+import { QrCode, ArrowRight, ArrowLeft } from "lucide-react";
 
 const initForm = {
   processor: "",
@@ -23,12 +22,12 @@ export default function PaymentType({
   const [activeTab] = useState("UPI");
   const [form, setForm] = useState(initForm);
   const [tableData, setTableData] = useState([]);
-
   const [showAddError, setShowAddError] = useState(false);
   const [showSaveError, setShowSaveError] = useState(false);
   const [acquirerList, setAcquirerList] = useState([]);
   const [merchantName, setMerchantList] = useState([]);
-
+  
+  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd for input[type=date]
 
   //  Auto hide Add error
   useEffect(() => {
@@ -68,13 +67,9 @@ export default function PaymentType({
       const apiData =
         response?.respData || response?.respData || {};
       setAcquirerList(apiData?.upiName || []);
-
     }
     catch (error) {
-      console.error(
-        "[BasicDetails] fetchDetailsCollection → API Error:",
-        error
-      );
+      toast.error(error);
     }
   };
 
@@ -83,16 +78,14 @@ export default function PaymentType({
       const response = await axiosInstance.post(
         `/getMSFUpiMerchantName/${AcqBankName}`
       );
-
       const apiData =
         response?.respData || response?.respData || {};
       setMerchantList(apiData?.merchantList || []);
     } catch (error) {
-      console.error(error);
+      toast.error(error);
       setMerchantList([]);
     }
   };
-
 
   //  Add row
   const handleAdd = () => {
@@ -110,7 +103,6 @@ export default function PaymentType({
     }
     setShowAddError(false);
     setShowSaveError(false);
-
     setTableData((prev) => [...prev, form]);
     setForm(initForm);
   };
@@ -128,7 +120,6 @@ export default function PaymentType({
         setShowSaveError(true);
         return;
       }
-
       setShowSaveError(false);
       const firstRow = tableData[0];
 
@@ -174,34 +165,36 @@ export default function PaymentType({
   const inputClass =
     "w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white";
   const labelClass = "block text-sm text-gray-700 mb-1";
-  const req = <span className="text-red-500">*</span>;
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
-    // Add this import wherever your other imports live:
 
     <div>
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
-          <QrCode size={18} />
-        </span>
- <h2 className="text-xl text-blue-900 font-semibold">
-          Payment Type Form (UPI)
-        </h2>
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+            <QrCode size={18} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+            Payment Type Form (UPI)
+          </h2>
+        </div>
+        <p className="ml-12 text-sm text-slate-700 -mt-3">
+          Payment Type Form collects transaction method details for setup.
+        </p>
       </div>
-     <p className="ml-12 pb-1 text-sm text-blue-900">
-        Payment Type Form collects transaction method details for setup.
-      </p>
 
       <div className="py-6">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          {/* UPI header */}
-          <div className="bg-blue-500 text-white px-4 py-3 rounded-md mb-6 flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 text-white">
-              <CreditCard size={16} />
+          <div className="bg-[#fec931] text-black px-4 py-3 rounded-md mb-6 flex items-center gap-3">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black">
+              <QrCode size={16} />
             </span>
             <h2 className="text-lg font-semibold">UPI</h2>
           </div>
+
           {/* Form */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
@@ -209,27 +202,21 @@ export default function PaymentType({
               <select
                 className={inputClass}
                 value={form.processor}
-                onChange={(e) => updateField("processor", e.target.value)}
-              >
+                onChange={(e) => updateField("processor", e.target.value)}>             
                 <option value="">-- Select --</option>
                 <option value="TP">Payments Solutions</option>
               </select>
             </div>
 
             <div>
-              <label className={labelClass}>Acquirer </label>
+              <label className={labelClass}>Acquirer {req}</label>
               <select
                 className={inputClass}
                 value={form.acquirer}
                 onChange={(e) => {
                   const value = e.target.value;
-
                   updateField("acquirer", value);
-
-                  // ✅ AUTO CALL API
                   fetchMerchantName(value);
-
-                  // optional reset
                   updateField("merchantName", "");
                 }}
               >
@@ -245,8 +232,7 @@ export default function PaymentType({
               <select
                 className={inputClass}
                 value={form.merchantName}
-                onChange={(e) => updateField("merchantName", e.target.value)}
-              >
+                onChange={(e) => updateField("merchantName", e.target.value)}>              
                 <option value="">-- Select --</option>
                 {merchantName.map((item, index) => (
                   <option key={index} value={item}>{item}</option>
@@ -258,6 +244,7 @@ export default function PaymentType({
               <label className={labelClass}>Effective Date {req}</label>
               <input
                 type="date"
+                min={today}               
                 className={inputClass}
                 value={form.effectiveDate}
                 onChange={(e) => updateField("effectiveDate", e.target.value)}
@@ -269,8 +256,7 @@ export default function PaymentType({
               <select
                 className={inputClass}
                 value={form.status}
-                onChange={(e) => updateField("status", e.target.value)}
-              >
+                onChange={(e) => updateField("status", e.target.value)}>              
                 <option value="">-- Select --</option>
                 <option value="Active">Active</option>
                 <option value="Deactive">Deactive</option>
@@ -379,17 +365,20 @@ export default function PaymentType({
           {/* Buttons */}
           <div className="flex justify-between mt-10">
             <button
+              type="button"
               onClick={handleBack}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+              className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
             >
+              <ArrowLeft size={16} />
               Back
             </button>
 
             <button
               onClick={savePaymentType}
-              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+              className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition"
             >
               Save & Next
+              <ArrowRight size={16} />
             </button>
           </div>
         </div>

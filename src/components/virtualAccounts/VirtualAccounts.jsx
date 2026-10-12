@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, RefreshCw, ArrowUpDown, Filter, Search } from "lucide-react";
+import { Plus, Filter, Search } from "lucide-react";
 import CreateVirtualAccountModal from "./CreateVirtualAccountModal";
 
 const DEMO_ACCOUNTS = [
@@ -85,152 +85,144 @@ export default function VirtualAccount() {
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-10 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 px-6 py-5">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Virtual Accounts
           </h1>
-
-          <p className="text-sm text-blue-900">
+          <p className="text-sm text-slate-800">
             Create and manage virtual accounts for seamless collections, secure payments, and efficient transaction tracking.
           </p>
         </div>
-
         <div className="flex items-center gap-2">
           <button
             onClick={() => setOpenModal(true)}
-            className="flex items-center gap-1.5 bg-yellow-500  text-black text-sm font-normal px-4 py-2.5 rounded-lg transition-colors"
-          >
-            <Plus size={16} strokeWidth={2.5} />
+            className="flex items-center gap-1.5 bg-[#fec931] text-black text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
+            <Plus size={16} strokeWidth={2} />
             New Virtual Account
-          </button>        
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-6 px-6 border-b border-gray-100">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-          >
-            {tab}
           </button>
-        ))}
-      </div>
-
-      {/* Filters */}
-      <div className="flex items-center gap-3 px-6 py-4 bg-gray-50/60">
-        <button className="p-2.5 border border-gray-200 rounded-lg text-gray-400 bg-white">
-          <Filter size={16} />
-        </button>
-        <div className="relative flex-1 max-w-xs">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Virtual Account ID or Account# or Reference#"
-            className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-          />
-        </div>
-        <div className="flex items-center gap-2 border border-gray-200 rounded-lg bg-gray-100 px-3 py-2.5">
-          <span className="text-sm font-medium text-gray-500">Date</span>
-          <select className="text-sm bg-transparent text-gray-400 focus:outline-none">
-            <option>Select</option>
-            <option>Today</option>
-            <option>Last 7 days</option>
-            <option>Last 30 days</option>
-          </select>
-        </div>
-        <div className="flex items-center gap-2 border border-gray-200 rounded-lg bg-gray-100 px-3 py-2.5">
-          <span className="text-sm font-medium text-gray-500">Status</span>
-          <select className="text-sm bg-transparent text-gray-700 focus:outline-none">
-            <option>All</option>
-            <option>Active</option>
-            <option>Closed</option>
-          </select>
-        </div>
-        <div className="relative max-w-[180px]">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Customer ID"
-            className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-          />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th className="text-left font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Virtual Account ID
-              </th>
-              <th className="text-left font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Created on ↓
-              </th>
-              <th className="text-right font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Amount
-              </th>
-              <th className="text-left font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Status
-              </th>
-              <th className="text-left font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Expiry date
-              </th>
-              <th className="text-left font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Description
-              </th>
-              <th className="text-left font-medium text-gray-400 uppercase text-xs tracking-wide px-6 py-3">
-                Reference
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAccounts.map((acc) => (
-              <tr
-                key={acc.id}
-                className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
-              >
-                <td className="px-6 py-4 text-blue-600 font-medium">
-                  {acc.id}
-                </td>
-                <td className="px-6 py-4 text-gray-600">{acc.createdOn}</td>
-                <td className="px-6 py-4 text-right text-gray-900">
-                  ₹
-                  {acc.amount.toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                  })}
-                </td>
-                <td className="px-6 py-4">
-                  <StatusBadge status={acc.status} />
-                </td>
-                <td className="px-6 py-4 text-gray-600">{acc.expiryDate}</td>
-                <td className="px-6 py-4 text-gray-600">
-                  {acc.description}
-                </td>
-                <td className="px-6 py-4 text-gray-600">{acc.reference}</td>
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 m-5">
+        <div className="flex items-center gap-6">
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab
+                ? "border-black text-slate-900"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-3 py-4 bg-gray-50/60">
+          <div className="relative flex-1 max-w-xs">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Virtual Account ID or Account# or Reference#"
+              className="w-full border border-slate-200  pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#fec931] focus:bg-white transition-all"
+            />
+          </div>
+          <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2.5">
+            <span className="text-sm font-medium text-gray-600">Date</span>
+            <select className="text-sm bg-transparent text-gray-400 focus:outline-none">
+              <option>Select</option>
+              <option>Today</option>
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2.5">
+            <span className="text-sm font-medium text-gray-500">Status</span>
+            <select className="text-sm bg-transparent text-gray-700 focus:outline-none">
+              <option>All</option>
+              <option>Active</option>
+              <option>Closed</option>
+            </select>
+          </div>
+          <div className="relative max-w-[180px]">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Customer ID"
+              className="w-full border border-slate-200  pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#fec931] focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#fec931] text-black">
+                <th className="text-left font-medium uppercase text-xs tracking-wide px-4 py-3">
+                  Virtual Account ID
+                </th>
+                <th className="text-left font-medium  uppercase text-xs tracking-wide px-6 py-3">
+                  Created on ↓
+                </th>
+                <th className="text-right font-medium  uppercase text-xs tracking-wide px-6 py-3">
+                  Amount
+                </th>
+                <th className="text-left font-medium uppercase text-xs tracking-wide px-6 py-3">
+                  Status
+                </th>
+                <th className="text-left font-medium uppercase text-xs tracking-wide px-6 py-3">
+                  Expiry date
+                </th>
+                <th className="text-left font-medium uppercase text-xs tracking-wide px-6 py-3">
+                  Description
+                </th>
+                <th className="text-left font-medium uppercase text-xs tracking-wide px-6 py-3">
+                  Reference
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredAccounts.map((acc) => (
+                <tr
+                  key={acc.id}
+                  className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
+                >
+                  <td className="px-6 py-4 text-slate-900 font-medium">
+                    {acc.id}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{acc.createdOn}</td>
+                  <td className="px-6 py-4 text-right text-gray-900">
+                    ₹
+                    {acc.amount.toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </td>
+                  <td className="px-6 py-4">
+                    <StatusBadge status={acc.status} />
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{acc.expiryDate}</td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {acc.description}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{acc.reference}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <CreateVirtualAccountModal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
       />
-    </div>
+
+    </div >
   );
 }

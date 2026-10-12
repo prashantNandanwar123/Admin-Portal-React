@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axios";
 import { X, Menu } from "lucide-react";
 import { CgProfile } from "react-icons/cg";
 import { toast } from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 import {
   FaUser,
   FaIdBadge,
@@ -15,7 +16,33 @@ import {
 } from "react-icons/fa";
 
 export default function Navbar({ toggleSidebar }) {
-  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const getPageTitle = (pathname) => {
+    const pageTitles = {
+      "/app/dashboard": "Dashboard",
+      "/app/merchants": "Merchants View Edit",
+      "/app/register-merchant": "Merchant Registration",
+      "/app/risk-approval": "Risk Approval",
+      "/app/merchant-credential": "Merchant Credential",
+      "/app/merchant-webhook": "Merchant Webhook",
+      "/app/reports": "Report",
+      "/app/reports-crepto": "Crypto Reports",
+      "/app/crypto-dashboard": "Crypto Dashboard",
+      "/app/upi-payment-processor": "UPI Payment Processor",
+      "/app/users": "All Users",
+      "/app/roles": "Role & Access",
+      "/app/reseller": "Reseller",
+      "/app/reseller-basic-details": "Reseller Basic Details",
+      "/app/reseller-view-details": "View Reseller",
+      "/app/reseller-edit-details": "Edit Reseller",
+      "/app/reseller-approvedit-details": "Approve Reseller",
+      "/app/virtual-accounts": "Virtual Accounts",
+    };
+    return pageTitles[pathname] || "Admin Portal";
+  };
+  const pageTitle = getPageTitle(location.pathname);
 
   // Profile Modal
   const [profileOpen, setProfileOpen] = useState(false);
@@ -69,42 +96,37 @@ export default function Navbar({ toggleSidebar }) {
         className="flex items-center justify-between bg-white border-b border-gray-100
         px-5 py-2 sticky top-0 z-50 shadow-sm"
       >
-        {/* LEFT SIDE ============ */}
-        <div className="flex items-center">
-          {/* Sidebar Toggle */}
+        <div className="flex items-center gap-4">
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-lg hover:bg-gray-100 transition"
           >
             <Menu size={22} className="text-gray-700" />
           </button>
+          <h1 className="text-lg font-semibold text-gray-800">
+            {pageTitle}
+          </h1>
         </div>
 
         {/* RIGHT SIDE=========== */}
         <div className="flex items-center gap-2">
-          {/* NOTIFICATION ========== */}
           <div className="relative">
-            {/* Notification Button */}
             <button
               onClick={handleNotificationClick}
-              className="relative p-2 rounded-full hover:bg-gray-100 transition"
-            >
+              className="relative p-2 rounded-full hover:bg-gray-100 transition">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-6 h-6 text-gray-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth={2}
-              >
+                strokeWidth={2}>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0h6z"
                 />
               </svg>
-
-              {/* Notification Dot */}
               <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
             </button>
 
@@ -134,7 +156,6 @@ export default function Navbar({ toggleSidebar }) {
                       Congratulations! You are now a member of HelloPe.
                     </p>
                   </div>
-
                   <button
                     onClick={() => setShowNotification(false)}
                     className="text-gray-400 hover:text-gray-700"
@@ -148,19 +169,12 @@ export default function Navbar({ toggleSidebar }) {
 
           {/*  PROFILE SECTION =========== */}
           <div className="relative">
-            {/* PROFILE HEADER */}
             <div
               className="flex items-center gap-3 px-2 py-1.5 rounded-lg
-              hover:bg-gray-50 transition"
-            >
-              {/* Avatar */}
+              hover:bg-gray-50 transition">
               <div
-                className="w-9 h-9 rounded-full flex items-center justify-center
-                text-white font-semibold text-sm shadow-sm"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #facc15, #eab308)",
-                }}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-[#fec931]
+                text-black font-semibold text-sm shadow-sm"
               >
                 {initials}
               </div>
@@ -205,19 +219,14 @@ export default function Navbar({ toggleSidebar }) {
             {/* DROPDOWN ============== */}
             {dropdownOpen && (
               <>
-                {/* Transparent Overlay */}
                 <div
                   className="fixed inset-0 z-50"
                   onClick={() => setDropdownOpen(false)}
                 />
-
-                {/* Dropdown */}
                 <div
                   className="absolute right-0 top-full mt-2 w-52
                   bg-white rounded-xl shadow-lg
-                  border border-gray-100 p-2 z-[60]"
-                >
-                  {/* Profile Button */}
+                  border border-gray-100 p-2 z-[60]">
                   <button
                     type="button"
                     onClick={handleProfileClick}
@@ -249,7 +258,7 @@ export default function Navbar({ toggleSidebar }) {
         </div>
       </header>
 
-      {/* PROFILE MODAL ========================= */}
+      {/* PROFILE MODAL ================ */}
       {profileOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           onClick={() => setProfileOpen(false)}>
@@ -258,8 +267,8 @@ export default function Navbar({ toggleSidebar }) {
 
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full border-[4px] border-yellow-400 flex items-center justify-center bg-yellow-50">
-                  <CgProfile className="text-yellow-500 text-2xl" />
+                <div className="w-12 h-12 rounded-full border-[4px] border-[#fec931] flex items-center justify-center bg-[#fec931]">
+                  <CgProfile className="text-black text-2xl" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-slate-800">User Profile</h2>
@@ -268,7 +277,7 @@ export default function Navbar({ toggleSidebar }) {
               </div>
               <button
                 onClick={() => setProfileOpen(false)}
-                className="w-9 h-9 rounded-xl border bg-white hover:bg-red-50 hover:text-red-500 transition"
+                className="w-9 h-9 rounded-xl border bg-white hover:bg-[#fec931] transition"
               >
                 <X size={18} className="mx-auto" />
               </button>
@@ -303,7 +312,7 @@ export default function Navbar({ toggleSidebar }) {
                   <div className="flex justify-end mt-4">
                     <button
                       onClick={() => setProfileOpen(false)}
-                      className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition"
+                      className="bg-black text-white px-6 py-2.5 rounded-xl text-sm font-medium transition"
                     >
                       Close
                     </button>
@@ -351,7 +360,7 @@ export default function Navbar({ toggleSidebar }) {
         hover:border-yellow-200 hover:shadow-sm
         transition"
       >
-        <div className="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-yellow-500 flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#fec931] flex items-center justify-center text-black flex-shrink-0">
           {icon}
         </div>
         <div className="min-w-0">

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../api/axios";
-import { FaPlus, FaEdit, FaSave, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { Plus } from "lucide-react";
 import { toast } from "react-toastify";
 import {
   FaSearch,
@@ -38,6 +39,7 @@ const FORM_FIELDS = [
       "Merchant Crediential",
       "Merchant Webhook",
       "Report",
+      "Crypto Management",
       "Master",
       "User Management",
       "Reseller",
@@ -51,7 +53,6 @@ const FORM_FIELDS = [
     type: "text",
     required: true,
   },
-
 ];
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
@@ -71,14 +72,11 @@ function ProcessorModal({
     <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4 overflow-hide">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-700 rounded-t-2xl">
-          <h2 className="text-white font-bold text-lg uppercase tracking-wide">
+        <div className="flex items-center justify-between px-6 py-2 bg-[#fec931] rounded-t-2xl">
+          <h2 className="text-black font-semibold text-lg uppercase tracking-wide">
             {isEdit ? "Edit User" : "Add Role"}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-white hover:text-blue-200 transition text-xl"
-          >
+          <button onClick={onClose} className="text-black transition text-xl">
             <FaTimes />
           </button>
         </div>
@@ -136,7 +134,7 @@ function ProcessorModal({
                     <select
                       value={form[name] || ""}
                       onChange={(e) => onChange(name, e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#fec931] transition"
                     >
                       <option value="">Select {label}</option>
                       {userList.map((user, index) => (
@@ -153,7 +151,7 @@ function ProcessorModal({
                       value={form[name]}
                       onChange={(e) => onChange(name, e.target.value)}
                       placeholder={`Enter ${label}`}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm outline-none focus:ring-1 focus:ring-[#fec931] transition"
                     />
                     <button
                       type="button"
@@ -178,7 +176,7 @@ function ProcessorModal({
           <button
             onClick={onSubmit}
             disabled={loading} //false
-            className="bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
+            className="bg-[#fec931] disabled:bg-slate-400 text-black px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
           >
             <FaSave />
             {loading ? "Saving..." : isEdit ? "Update" : "Save"}
@@ -221,7 +219,6 @@ export default function Role() {
         ? item.roleFunction
         : (item.roleFunction || "").split(","))
     ];
-
     return valuesToCheck.some((val) =>
       String(val).toLowerCase().includes(search)
     );
@@ -231,7 +228,7 @@ export default function Role() {
     fetchProcessors();
   }, []);
 
-  // ─── Fetch List ─────────────────────────────────────────────────────────────
+  // ─── Fetch List ───────────────────────────────
   const fetchProcessors = async () => {
     try {
       setLoading(true);
@@ -246,7 +243,6 @@ export default function Role() {
               ? item.roleFunction.split(",").map(v => v.trim())
               : []
         }));
-
         setData(normalizedData);
       } else {
         setData([]);
@@ -281,7 +277,6 @@ export default function Role() {
 
   // ─── Open Edit Modal ─────────────────────────────────────────────────────────
   const openEdit = (item) => {
-
     setForm({
       userName: item.userName || "",
       roleFunction: Array.isArray(item.roleFunction)
@@ -363,7 +358,6 @@ export default function Role() {
         status: item.status === "A" ? "D" : "A",
         userName: item.userName,
       };
-
       const response = await axiosInstance.post(
         "/updateLoginStatus",
         payload
@@ -391,7 +385,6 @@ export default function Role() {
     "ACTION",
   ];
 
-
   // Bottom Pagination
   const indexOfLast = currentPage * entriesPerPage;
   const indexOfFirst = indexOfLast - entriesPerPage;
@@ -406,23 +399,21 @@ export default function Role() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             Role & Access
           </h1>
-          <p className="pb-3 text-sm text-blue-900">
+          <p className="pb-3 text-sm text-slate-700">
             Create and manage user roles with customized permissions, access controls, and authorization settings securely.
           </p>
         </div>
-
         <button
           onClick={openAdd}
-          className="bg-yellow-500 text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto"
-        >
-          <FaPlus />
-          Add Role
+          className="bg-[#fec931] text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto">
+          <Plus size={16} strokeWidth={2} />
+          <span>Add Role</span>
         </button>
       </div>
 
       {/* ── Table ── */}
-      <div>
-        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-b border-slate-300">
+      <div className="min-h-0 overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-slate-100">
           {/* Entries */}
           <div className="flex items-center gap-3 text-sm">
             <span className="text-slate-600 font-medium">Show</span>
@@ -432,7 +423,7 @@ export default function Role() {
                 setEntriesPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#fec931]"
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
@@ -440,27 +431,28 @@ export default function Role() {
             </select>
             <span className="text-slate-600 font-medium">entries</span>
           </div>
+
           {/* Serach Button  */}
-          <div className="relative w-80">
+          <div className="relative">
             <FaSearch className="absolute top-4 left-3 text-slate-400 text-sm" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="w-full border border-slate-300 pl-10 pr-4 py-3 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+              className="w-56 border border-slate-300 pl-10 pr-4 py-2 rounded-xl outline-none focus:ring-slate-500" />
           </div>
         </div>
 
         <div className="w-full overflow-x-auto overflow-hidden">
           <table className="min-w-[1200px] w-full text-xs break-words">
             <thead>
-              <tr className="bg-orange-600 text-white">
+              <tr className="bg-[#fec931] text-black">
                 {TABLE_COLS.map((col) => (
-                  <th key={col} className="px-3 py-3 text-left font-semibold tracking-wide">
+                  <th key={col} className="px-3 py-3 text-center font-semibold tracking-wide">
                     {col}
                   </th>
                 ))}
@@ -472,7 +464,7 @@ export default function Role() {
                 <tr>
                   <td colSpan={TABLE_COLS.length} className="text-center py-14">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="h-9 w-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      <div className="h-9 w-9 border-4 border-gray-600 border-t-transparent rounded-full animate-spin" />
                       <span className="text-gray-500 text-sm">
                         Loading roles...
                       </span>
@@ -483,7 +475,7 @@ export default function Role() {
                 filteredData.map((item, index) => (
                   <tr
                     key={item.id ?? index}
-                    className={`border-b hover:bg-blue-50 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    className={`border-b border-gray-200 transition ${index % 2 === 0 ? "bg-white" : ""
                       }`}
                   >
                     {/* ID */}
@@ -492,12 +484,12 @@ export default function Role() {
                     </td>
 
                     {/* USER NAME */}
-                    <td className="px-3 py-3  text-blue-700">
+                    <td className="px-3 py-3 text-slate-900 ">
                       {item.userName || "-"}
                     </td>
 
                     {/* ROLE FUNCTION */}
-                    <td className="px-3 py-3  text-gray-700">
+                    <td className="px-3 py-3  text-gray-700 text-center">
                       {(item.roleFunction || []).join(", ")}
                     </td>
 
@@ -529,7 +521,7 @@ export default function Role() {
                     <td className="px-3 py-3">
                       <button
                         onClick={() => openEdit(item)}
-                        className="bg-green-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-semibold shadow transition"
+                        className="bg-[#fec931] text-black px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-normal shadow transition"
                       >
                         <FaEdit />
                         Edit
@@ -549,67 +541,67 @@ export default function Role() {
               )}
             </tbody>
           </table>
-          {/* Bottom */}
-          <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5 border-t border-slate-300">
-            {/* Showing */}
-            <div className="text-sm text-slate-600">
-              Showing{" "}
-              <span className="font-semibold">
-                {filteredData.length === 0 ? 0 : indexOfFirst + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-semibold">
-                {Math.min(indexOfLast, filteredData.length)}
-              </span>{" "}
-              of{" "}
-              <span className="font-semibold">
-                {filteredData.length}
-              </span>{" "}
-              entries
-            </div>
-            {/* Pagination */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Prev */}
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${currentPage === 1
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  : "bg-white hover:bg-slate-100"
-                  }`}
-              >
-                <FaChevronLeft size={12} />
-                Prev
-              </button>
-              {/* Numbers */}
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentPage(index + 1)}
-                  className={`w-10 h-10 rounded-xl font-medium transition-all ${currentPage === index + 1
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
-                    : "bg-white border hover:bg-slate-100"
-                    }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+        </div>
 
-              {/* Next */}
+        {/* Pagination */}
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 p-5">
+          {/* Showing */}
+          <div className="text-sm text-slate-600">
+            Showing{" "}
+            <span className="font-semibold">
+              {filteredData.length === 0 ? 0 : indexOfFirst + 1}
+            </span>{" "}
+            to{" "}
+            <span className="font-semibold">
+              {Math.min(indexOfLast, filteredData.length)}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold">
+              {filteredData.length}
+            </span>{" "}
+            entries
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Prev */}
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${currentPage === 1
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-white hover:bg-slate-100"
+                }`}
+            >
+              <FaChevronLeft size={12} />
+              Prev
+            </button>
+            {/* Numbers */}
+            {[...Array(totalPages)].map((_, index) => (
               <button
-                disabled={
-                  currentPage === totalPages || totalPages === 0
-                }
-                onClick={() => setCurrentPage(currentPage + 1)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 transition-all ${currentPage === totalPages || totalPages === 0
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  : "bg-white hover:bg-slate-100"
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`w-10 h-10 rounded-xl font-medium transition-all ${currentPage === index + 1
+                  ? "bg-yellow-400 to-indigo-600 text-black shadow-lg"
+                  : "bg-white border hover:bg-slate-100"
                   }`}
               >
-                Next
-                <FaChevronRight size={12} />
+                {index + 1}
               </button>
-            </div>
+            ))}
+
+            {/* Next */}
+            <button
+              disabled={
+                currentPage === totalPages || totalPages === 0
+              }
+              onClick={() => setCurrentPage(currentPage + 1)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 transition-all ${currentPage === totalPages || totalPages === 0
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-white hover:bg-slate-100"
+                }`}
+            >
+              Next
+              <FaChevronRight size={12} />
+            </button>
           </div>
         </div>
       </div>

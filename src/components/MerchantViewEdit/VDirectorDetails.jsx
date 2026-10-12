@@ -9,7 +9,7 @@ import {
     FileText,
     CreditCard,
     ShieldCheck,
-    Eye
+    Eye, ArrowRight, ArrowLeft
 } from "lucide-react";
 
 export default function VDirectorDetails({ refId,
@@ -324,19 +324,19 @@ export default function VDirectorDetails({ refId,
     // MAIN UI
     return (
         <div className="bg-white">
-            <div className="max-w-screen mx-auto px-4 sm:px-6 py-5">
-                {/* HEADER */}
-                <div className="flex items-center justify-between pb-5">
+            <div>
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#eef5f9]">
-                            <UserRound className="w-4 h-4 text-[#126aa8]" />
+                        <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+                            <UserRound className="w-5 h-5 text-yellow-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-[#173875]">
+                            <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-1">
                                 View Director Details
                             </h2>
-                            <p className="mt-0.5 text-sm text-gray-500">
-                                Director information
+                            <p className="ml-1 text-sm text-slate-700">
+                                View Director information
                             </p>
                         </div>
                     </div>
@@ -345,28 +345,28 @@ export default function VDirectorDetails({ refId,
                 {/* DIRECTORS */}
                 <div className="mt-3 space-y-3">
                     {renderDirector(1)}
-
                     {directorCount >= 2 && (
                         renderDirector(2)
                     )}
                 </div>
 
-
                 {/* BACK & NEXT BUTTONS */}
-                <div className="flex justify-between items-center gap-4 mt-10">
+                <div className="flex justify-between items-center gap-4 mt-5 mb-6">
                     <button
                         type="button"
                         onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+                        className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
                     >
+                        <ArrowLeft size={16} />
                         Back
                     </button>
                     <button
                         type="button"
                         onClick={handleNext}
-                        className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                        className="inline-flex items-center gap-2 bg-[#fec931] text-black font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
                     >
                         Next
+                        <ArrowRight size={16} />
                     </button>
                 </div>
             </div>

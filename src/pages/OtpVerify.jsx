@@ -6,15 +6,11 @@ import axiosInstance from "../api/axios";
 export default function VerifyOtp() {
     const navigate = useNavigate();
     const location = useLocation();
-
     const userName = location.state?.userName;
-
     const [otp, setOtp] = useState("");
     const [otpVerified, setOtpVerified] = useState(false);
-
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -35,8 +31,7 @@ export default function VerifyOtp() {
 
         try {
             setLoading(true);
-            const response = await axiosInstance.post(
-                "/verifyForgotPasswordOtp",
+            const response = await axiosInstance.post("/verifyForgotPasswordOtp",
                 {
                     userName,
                     otp,
@@ -44,15 +39,12 @@ export default function VerifyOtp() {
             );
 
             if (response.respCode === 0) {
-                console.log("STEP 1");
                 toast.success(response.respMsg);
-                console.log("STEP 2");
                 setOtpVerified(true);
             } else {
                 toast.error(response.respMsg);
             }
         } catch (error) {
-            console.log("STEP 3");
             toast.error(error);
         } finally {
             setLoading(false);
@@ -113,7 +105,6 @@ export default function VerifyOtp() {
             });
 
             if (response?.respCode === 0) {
-                console.log("rest password Message--->>>", response?.respMsg);
                 toast.success(response?.respMsg);
 
                 setTimeout(() => {

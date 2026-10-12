@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { ShieldCheck, Link2 } from "lucide-react";
-
+import { ShieldCheck, Link2, ArrowLeft } from "lucide-react";
 
 export default function IPGConfigurationForm({
   data,
@@ -30,7 +29,7 @@ export default function IPGConfigurationForm({
     requestURL2: "",
     requestURL3: "",
     requestURL4: "",
-    requestURL5: "",   
+    requestURL5: "",
     posTidCount: "",
   });
   const [isRiskEnabled, setIsRiskEnabled] = useState(false);
@@ -64,7 +63,7 @@ export default function IPGConfigurationForm({
         requestURL2: form.requestURL2,
         requestURL3: form.requestURL3,
         requestURL4: form.requestURL4,
-        requestURL5: form.requestURL5,       
+        requestURL5: form.requestURL5,
         posTidCount: form.posTidCount,
       };
 
@@ -125,22 +124,28 @@ export default function IPGConfigurationForm({
     "w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-gray-200 focus:ring-0";
   const labelClass =
     "mb-1 block text-[15px] font-medium text-gray-700";
-  const req = <span className="text-red-500">*</span>;
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
-
     <div className="p-4 sm:p-6">
-      <div className="flex items-center gap-3 pb-2">
-        <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-100 text-blue-600 shrink-0">
-          <ShieldCheck size={16} />
-        </span>
-        <h2 className="text-xl text-blue-900 font-semibold">
-          IPG Configuration
-        </h2>
+      <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <ShieldCheck size={16} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+            IPG Configuration
+          </h2>
+        </div>
+        <p className="ml-13 text-sm text-slate-700 -mt-3">
+          IPG (Internet Payment Gateway) Configuration enables secure online payment
+          processing by connecting merchants with banks and payment systems. It
+          supports digital payments like cards, UPI, and net banking while ensuring
+          safe, fast, and reliable transactions with proper security compliance.
+        </p>
       </div>
-            <p className="ml-12 pb-1 text-sm text-blue-900">
-        IPG (Internet Payment Gateway) Configuration enables secure online payment processing by connecting merchants with banks and payment systems. It supports digital payments like cards, UPI, and net banking while ensuring safe, fast, and reliable transactions with proper security compliance.
-      </p>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -391,7 +396,7 @@ export default function IPGConfigurationForm({
         <div className="my-10"></div>
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-100 text-purple-600 shrink-0">
+            <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
               <Link2 size={14} />
             </span>
             <h2 className="text-xl sm:text-xl uppercase font-light text-gray-700">
@@ -433,19 +438,19 @@ export default function IPGConfigurationForm({
           </div>
         </div>
 
-        {/* ================= BUTTONS ================= */}
+        {/* ======= BUTTONS ========= */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 text-white px-6 py-1 rounded-full w-full sm:w-auto" >
+            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full">
+            <ArrowLeft size={16} />
             Back
           </button>
-
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2 rounded-full shadow-sm transition">
+              className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition">
               Save
             </button>
             <button

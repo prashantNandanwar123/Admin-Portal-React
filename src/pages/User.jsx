@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../api/axios";
 import { FaPlus, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -147,7 +147,6 @@ export default function User() {
         toast.error(response?.respMsg);
       }
     } catch (error) {
-      console.error(error);
       toast.error(error);
     }
   };
@@ -196,13 +195,13 @@ export default function User() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
             All User
           </h1>
-          <p className="text-sm text-blue-900">
+          <p className="text-sm text-slate-800">
             Manage user accounts, access permissions, profile details, activity status, and authentication settings efficiently.
           </p>
         </div>
         <button
           onClick={openAdd}
-          className="flex-shrink-0 bg-yellow-500 text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto"
+          className="flex-shrink-0 bg-[#fec931] text-black px-5 py-2.5 rounded-lg flex items-center gap-2 font-normal text-sm shadow transition self-start md:self-auto"
         >
           <FaPlus />
           Add User
@@ -214,7 +213,7 @@ export default function User() {
         className="min-h-0 overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white"
         style={{ display: "flex", flexDirection: "column", height: "fit-content", maxHeight: "100%" }}
       >
-        {/* ── ROW 1: Search bar — auto height ── */}
+        {/* ── ROW 1: Search bar ── */}
         <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 px-5 py-4 border-b border-slate-200 bg-white">
           <div className="flex items-center gap-3 text-sm">
             <span className="text-slate-600 font-medium">Show</span>
@@ -224,7 +223,7 @@ export default function User() {
                 setEntriesPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="border border-slate-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
@@ -232,14 +231,15 @@ export default function User() {
             </select>
             <span className="text-slate-600 font-medium">entries</span>
           </div>
-          <div className="relative w-80">
+
+          <div className="relative">
             <FaSearch className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 text-sm" />
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full border border-slate-300 pl-10 pr-4 py-2.5 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm"
+              className="w-56 border border-slate-300 pl-10 pr-4 py-2.5 rounded-xl outline-none focus:border-yellow-500 focus:ring-1 focus:ring-blue-500 text-sm"
             />
           </div>
         </div>
@@ -252,7 +252,7 @@ export default function User() {
                 {TABLE_COLS.map((col) => (
                   <th
                     key={col}
-                    className="sticky top-0 z-10 bg-orange-600 text-white px-3 py-3 text-left font-semibold"
+                    className="sticky top-0 z-10 bg-[#fec931] text-black px-3 py-3 text-left font-semibold"
                   >
                     {col}
                   </th>
@@ -273,24 +273,24 @@ export default function User() {
                 currentData.map((item, index) => (
                   <tr
                     key={item.id}
-                    className={`border-b border-gray-200 hover:bg-blue-50 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    className={`border-b border-gray-200 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
                       }`}
                   >
                     <td className="px-3 py-3 text-gray-500 font-medium">
                       {(currentPage - 1) * entriesPerPage + index + 1}
                     </td>
-                    <td className="px-3 py-3 font-bold text-blue-700">{item.userName || "-"}</td>
+                    <td className="px-3 py-3 font-medium text-slate-800">{item.userName || "-"}</td>
                     <td className="px-3 py-3">{item.userId || "-"}</td>
                     <td className="px-3 py-3 font-semibold text-gray-700">{item.fullName || "-"}</td>
                     <td className="px-3 py-3 font-mono text-gray-600">{item.designation || "-"}</td>
                     <td className="px-3 py-3 font-mono text-gray-600">{item.employeeCode || "-"}</td>
                     <td className="px-3 py-3">
-                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
+                      <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-semibold">
                         {item.mobileNo || "-"}
                       </span>
                     </td>
                     <td className="px-3 py-3">
-                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
+                      <span className="bg-slate-100 text-slate-900 px-2 py-0.5 rounded font-semibold">
                         {item.emailId || "-"}
                       </span>
                     </td>
@@ -312,7 +312,7 @@ export default function User() {
                     <td className="px-3 py-3">
                       <button
                         onClick={() => openEdit(item)}
-                        className="bg-green-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-semibold shadow transition"
+                        className="bg-[#fec931] text-black px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-normal shadow transition"
                       >
                         <FaEdit />
                         Edit
@@ -368,7 +368,7 @@ export default function User() {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-9 h-9 rounded-lg text-sm font-medium transition border ${currentPage === page
-                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                    ? "bg-[#fec931] text-black border-none shadow-sm"
                     : "bg-white hover:bg-blue-50 border-slate-300 text-slate-700"
                     }`}
                 >
@@ -412,7 +412,7 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-2 bg-yellow-500 rounded-t-2xl">
+        <div className="flex items-center justify-between px-6 py-2 bg-[#fec931] rounded-t-2xl">
           <h2 className="text-black font-semibold text-lg uppercase tracking-wide">
             {isEdit ? "Edit User" : "Add User"}
           </h2>
@@ -434,20 +434,38 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
                   value={form[name] || ""}
                   onChange={(e) => {
                     let value = e.target.value;
-                    if (name === "fullName") value = value.replace(/[^A-Za-z ]/g, "");
-                    if (name === "mobileNo") value = value.replace(/\D/g, "").slice(0, 10);
-                    if (name === "emailId") value = value.replace(/\s/g, "");
+                    if (name === "userName") {
+                      value = value.replace(/[^A-Za-z ]/g, "");
+                    }
+
+                    if (name === "fullName") {
+                      value = value.replace(/[^A-Za-z ]/g, "");
+                    }
+
+                    if (name === "mobileNo") {
+                      value = value.replace(/\D/g, "").slice(0, 10);
+                    }
+                    if (name === "designation") {
+                      value = value.replace(/[^A-Za-z ]/g, "");
+                    }
+                    if (name === "employeeCode") {
+                      value = value.replace(/\D/g, "").slice(0, 10);
+                    }
+
+                    if (name === "emailId") {
+                      value = value.replace(/\s/g, "");
+                    }
                     onChange(name, value);
                   }}
                   placeholder={`Enter ${label}`}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blyellow-500 transition"
                 />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 px-6 py-4 border-t">
+        <div className="flex justify-end gap-3 px-6 py-4">
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 text-sm font-semibold transition"
@@ -457,7 +475,7 @@ function ProcessorModal({ mode, form, onChange, onClose, onSubmit, loading }) {
           <button
             onClick={onSubmit}
             disabled={loading}
-            className="bg-yellow-500 text-black px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
+            className="bg-[#fec931] text-black px-6 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold shadow transition"
           >
             <FaSave />
             {loading ? "Saving..." : isEdit ? "Update" : "Save"}

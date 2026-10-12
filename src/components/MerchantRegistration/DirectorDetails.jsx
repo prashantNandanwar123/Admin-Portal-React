@@ -12,6 +12,8 @@ import {
     FileText,
     CreditCard,
     ShieldCheck,
+    ArrowRight,
+    ArrowLeft
 } from "lucide-react";
 
 const EMPTY_DIRECTOR = {
@@ -45,7 +47,7 @@ export default function DirectorDetails({ data, setData, handleNext,
             }
         }
     }, []);
-    
+
     const [error, setError] = useState("");
     // ACCORDION
     const toggleDirector = (directorNumber) => {
@@ -79,7 +81,7 @@ export default function DirectorDetails({ data, setData, handleNext,
                     ...EMPTY_DIRECTOR,
                 },
             }));
-            
+
         } catch (error) {
             toast.error(error);
         }
@@ -115,7 +117,7 @@ export default function DirectorDetails({ data, setData, handleNext,
             const formData = new FormData();
             formData.append("refId", data?.refId);
             formData.append("uploadedBy", userData?.userName || ""),
-            formData.append("director1Name", directors[1].name);
+                formData.append("director1Name", directors[1].name);
             formData.append("director1Designation", directors[1].designation);
             formData.append("director1AadharNo", directors[1].aadhaarNo);
             formData.append("director1Selfie", directors[1].photograph);
@@ -435,18 +437,17 @@ export default function DirectorDetails({ data, setData, handleNext,
     // MAIN UI
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5">
-                {/* HEADER */}
-                <div className="flex items-center justify-between pb-5 border-b border-gray-200">
+            <div>
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#eef5f9]">
-                            <UserRound className="w-4 h-4 text-[#126aa8]" />
+                        <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+                            <UserRound className="w-4 h-4 text-yellow-600" />
                         </div>
                         <div>
-                              <h2 className="text-xl text-blue-900 font-semibold">
-                                Add Director Details
+                            <h2 className="text-base font-semibold text-gray-900 uppercase">                                Add Director Details
                             </h2>
-                            <p className="ml-12 pb-1 text-sm text-blue-900">
+                            <p className="text-sm text-slate-700">
                                 Director information
                             </p>
                         </div>
@@ -480,16 +481,18 @@ export default function DirectorDetails({ data, setData, handleNext,
                     <button
                         type="button"
                         onClick={handleBack}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+                        className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
                     >
+                        <ArrowLeft size={16} />
                         Back
                     </button>
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+                        className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition"
                     >
                         Save & Next
+                        <ArrowRight size={16} />
                     </button>
                 </div>
             </div>

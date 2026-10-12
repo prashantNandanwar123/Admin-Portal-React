@@ -1,11 +1,26 @@
-import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+
+  const location = useLocation();
+  const mainRef = useRef(null);
+
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant",
+      });
+    }
+  }, [location.pathname]);
 
 
   useEffect(() => {
@@ -75,7 +90,10 @@ export default function Layout() {
 
         {/* Page Content */}
         <main
-           className="
+          ref={mainRef}
+          className="
+           px-3
+           lg:px-0
            pt-16
            h-screen
            overflow-y-auto

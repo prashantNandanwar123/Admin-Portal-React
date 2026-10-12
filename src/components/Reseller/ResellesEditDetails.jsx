@@ -5,7 +5,7 @@ import statecity from "../../utils/statecity.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
 import { Eye, Upload, User, CalendarDays } from "lucide-react";
-import { UserPlus } from "lucide-react";
+import { UserPlus, UserRound, MapPin, Landmark, CreditCard } from "lucide-react";
 
 
 export default function ResellerEditDetails() {
@@ -183,7 +183,7 @@ export default function ResellerEditDetails() {
         },
     ];
 
-    // ─── Reseller Update Save Api ─────────────────────────────────────────────────────────────
+    // ─── Reseller Update Save Api ───────── //
     const resellerAdminUpdate = async () => {
         if (!resellerId) {
             toast.error("Reseller ID is missing");
@@ -207,48 +207,20 @@ export default function ResellerEditDetails() {
             // ONLY NEWLY UPLOADED FILES WILL BE SENT
             // =====================================================
 
-            if (
-                documents?.PASSPORT_PHOTO?.isNew &&
-                documents?.PASSPORT_PHOTO?.file
-            ) {
-
-                formData.append(
-                    "passportPhoto",
-                    documents.PASSPORT_PHOTO.file
-                );
+            if (documents?.PASSPORT_PHOTO?.isNew && documents?.PASSPORT_PHOTO?.file) {
+                formData.append("passportPhoto", documents.PASSPORT_PHOTO.file);
             }
 
-            if (
-                documents?.AADHAAR_CARD?.isNew &&
-                documents?.AADHAAR_CARD?.file
-            ) {
-
-                formData.append(
-                    "aadharCard",
-                    documents.AADHAAR_CARD.file
-                );
+            if (documents?.AADHAAR_CARD?.isNew && documents?.AADHAAR_CARD?.file) {
+                formData.append("aadharCard", documents.AADHAAR_CARD.file);
             }
 
-            if (
-                documents?.PAN_CARD?.isNew &&
-                documents?.PAN_CARD?.file
-            ) {
-
-                formData.append(
-                    "panCard",
-                    documents.PAN_CARD.file
-                );
+            if (documents?.PAN_CARD?.isNew && documents?.PAN_CARD?.file) {
+                formData.append("panCard", documents.PAN_CARD.file);
             }
 
-            if (
-                documents?.ADDRESS_PROOF?.isNew &&
-                documents?.ADDRESS_PROOF?.file
-            ) {
-
-                formData.append(
-                    "addressProof",
-                    documents.ADDRESS_PROOF.file
-                );
+            if (documents?.ADDRESS_PROOF?.isNew && documents?.ADDRESS_PROOF?.file) {
+                formData.append("addressProof", documents.ADDRESS_PROOF.file);
             }
 
             // =====================================================
@@ -256,7 +228,6 @@ export default function ResellerEditDetails() {
             // =====================================================
 
             const resellerPayload = {
-
                 approvedBy: userData?.userName,
                 firstName: data?.firstName,
                 lastName: data?.lastName,
@@ -285,28 +256,15 @@ export default function ResellerEditDetails() {
             };
 
 
-            formData.append(
-                "reseller",
+            formData.append("reseller",
                 new Blob(
                     [
-                        JSON.stringify(
-                            resellerPayload
-                        ),
+                        JSON.stringify(resellerPayload),
                     ],
                     {
                         type: "application/json",
                     }
                 )
-            );
-
-
-            // =====================================================
-            // Debug FormData
-            // =====================================================
-
-            console.log(
-                "RESELLER PAYLOAD --->>>",
-                resellerPayload
             );
 
             const response = await axiosInstance.post(
@@ -318,19 +276,11 @@ export default function ResellerEditDetails() {
             }
             );
 
-            console.log(
-                "UPDATE API RESPONSE --->>>",
-                response
-            );
-
             if (response?.respCode === 0) {
-                const resData =
-                    response?.respData || {};
+                const resData = response?.respData || {};
 
                 if (status === "REJECTED") {
-                    toast.success(
-                        response?.respMsg ||
-                        "Reseller rejected successfully"
+                    toast.success(response?.respMsg || "Reseller rejected successfully"
                     );
 
                     setTimeout(() => {
@@ -341,41 +291,22 @@ export default function ResellerEditDetails() {
                 }
 
                 if (status === "APPROVED") {
-
-                    console.log(
-                        "Reseller approved successfully",
-                        resData
-                    );
                     setResponsePopup({
                         show: true,
-                        message:
-                            response?.respMsg ||
-                            "Reseller approved successfully",
-
+                        message: response?.respMsg || "Reseller approved successfully",
                         success: true,
-
-                        resellerId:
-                            resData?.resellerId ||
-                            resellerId,
-
-                        firstName:
-                            resData?.firstName ||
-                            data?.firstName,
-
-                        lastName:
-                            resData?.lastName ||
-                            data?.lastName,
+                        resellerId: resData?.resellerId || resellerId,
+                        firstName: resData?.firstName || data?.firstName,
+                        lastName: resData?.lastName || data?.lastName,
                     });
                     return;
                 }
             }
             toast.error(response?.respMsg);
             if (
-                response?.respData &&
-                typeof response.respData === "object"
+                response?.respData && typeof response.respData === "object"
             ) {
-                Object.values(
-                    response.respData
+                Object.values(response.respData
                 ).forEach((msg) => {
                     if (msg) {
                         toast.error(msg);
@@ -398,39 +329,37 @@ export default function ResellerEditDetails() {
                         <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
                             <UserPlus size={18} />
                         </span>
-                        <h2 className="text-xl text-blue-900 font-semibold">
-                          Review & Approve or Reject Reseller
+                        <h2 className="text-xl text-slate-800 font-semibold">
+                            Review & Approve or Reject Reseller
                         </h2>
                     </div>
-                    <p className="ml-12 pb-1 text-sm text-blue-900">
+                    <p className="ml-12 pb-1 text-sm text-slate-700">
                         Edit and update reseller details securely, including profile
                         information, business data, and account settings with
                         controlled validation.
                     </p>
-
                 </div>
 
-                {/* ── Status ─────────────────────────────────────────────────── */}
-                <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#F3E3B0] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
+                {/* ── Status ───── */}
+                <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#fec931] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
                     <div className="flex items-center gap-3">
-                        <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
-                            <User className="w-4 h-4 text-[#8a6d1a]" />
+                        <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                            <User className="w-4 h-4 text-black" />
                         </span>
                         <div>
-                            <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
-                                Created By
-                            </p>
+                            <p className="text-lg sm:text-xs text-slate-900 font-medium">Created By</p>
                             <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
                                 {data?.createdBy}
                             </p>
                         </div>
                     </div>
+
                     <div className="flex items-center gap-3">
-                        <span className="w-9 h-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
-                            <CalendarDays className="w-4 h-4 text-[#8a6d1a]" />
+                        <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                            <CalendarDays className="w-4 h-4 text-black" />
                         </span>
                         <div>
-                            <p className="text-[11px] sm:text-xs text-[#8a6d1a] font-medium">
+                            <p className="text-[11px] sm:text-xs text-slate-900 font-medium">
                                 Created Date
                             </p>
                             <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
@@ -442,17 +371,21 @@ export default function ResellerEditDetails() {
 
                 {/* ── Basic Reseller Details ────────────────────────────────── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7">
-                    <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                        Basic Reseller Details
-                    </h2>
-                    <div className="border-t border-gray-200 mt-3 mb-5" />
+                    <div className="flex items-center gap-3 mb-5">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <UserRound size={15} />
+                        </span>
+                        <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                            Basic Reseller Details
+                        </h2>
+                    </div>
 
                     {/* Row-1 */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                         {/* First Name */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                First Name <span className="text-red-500">*</span>
+                                First Name <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -472,7 +405,7 @@ export default function ResellerEditDetails() {
                         {/* Last Name */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Last Name <span className="text-red-500">*</span>
+                                Last Name <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -493,7 +426,7 @@ export default function ResellerEditDetails() {
                         {/* Email */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Email Id<span className="text-red-500">*</span>
+                                Email Id<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="email"
@@ -514,7 +447,7 @@ export default function ResellerEditDetails() {
                         {/* Mobile */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Mobile<span className="text-red-500">*</span>
+                                Mobile<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -534,7 +467,7 @@ export default function ResellerEditDetails() {
                         {/* Company Name */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Comapny Name <span className="text-red-500">*</span>
+                                Comapny Name <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -558,7 +491,7 @@ export default function ResellerEditDetails() {
                         {/* Aadhar No */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Aadhar No.<span className="text-red-500">*</span>
+                                Aadhar No.<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -581,7 +514,7 @@ export default function ResellerEditDetails() {
                         {/* GSTN No */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                GSTN No.<span className="text-red-500">*</span>
+                                GSTN No.<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -627,7 +560,7 @@ export default function ResellerEditDetails() {
                         {/* Pan No */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Pan No<span className="text-red-500">*</span>
+                                Pan No<span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -674,16 +607,19 @@ export default function ResellerEditDetails() {
 
                 {/* ── Address Details ───────────────────────────────────────── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7">
-                    <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                        Address Details
-                    </h2>
-                    <div className="border-t border-gray-200 mt-3 mb-5" />
-
+                    <div className="flex items-center gap-3 mb-5">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <MapPin size={15} />
+                        </span>
+                        <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                            Address Details
+                        </h2>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7">
                         {/* Address */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Address <span className="text-red-500">*</span>
+                                Address <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -699,7 +635,7 @@ export default function ResellerEditDetails() {
                         {/* Country */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Country <span className="text-red-500">*</span>
+                                Country <span className="text-red-500 ml-1">*</span>
                             </label>
                             <Select
                                 options={countryList.map((country) => ({
@@ -727,7 +663,7 @@ export default function ResellerEditDetails() {
                         {/* State */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                State <span className="text-red-500">*</span>
+                                State <span className="text-red-500 ml-1">*</span>
                             </label>
                             <Select
                                 options={stateList.map((item) => ({
@@ -754,7 +690,7 @@ export default function ResellerEditDetails() {
                         {/* City */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                City <span className="text-red-500">*</span>
+                                City <span className="text-red-500 ml-1">*</span>
                             </label>
                             <Select
                                 options={cityList.map((city) => ({
@@ -780,7 +716,7 @@ export default function ResellerEditDetails() {
                         {/* Zip Code */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-medium text-gray-600 mb-1.5">
-                                Zip Code <span className="text-red-500">*</span>
+                                Zip Code <span className="text-red-500 ml-1">*</span>
                             </label>
                             <input
                                 type="text"
@@ -801,15 +737,18 @@ export default function ResellerEditDetails() {
 
                 {/* ── Settlement Setup ──────────────────────────────────────── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7">
-                    <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                        Settlement Setup
-                    </h2>
-                    <div className="border-t border-gray-200 mt-3 mb-5" />
-
+                    <div className="flex items-center gap-3 mb-5">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <Landmark size={15} />
+                        </span>
+                        <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                            Settlement Setup
+                        </h2>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-6 xl:gap-x-7 gap-y-5">
                         <div>
                             <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
-                                Settlement Type <span className="text-red-500">*</span>
+                                Settlement Type <span className="text-red-500 ml-1">*</span>
                             </label>
                             <div className="flex items-center gap-5 mt-2">
                                 {["Manual", "Automatic"].map((type) => (
@@ -853,7 +792,7 @@ export default function ResellerEditDetails() {
                         ].map(({ label, field, options }) => (
                             <div key={field}>
                                 <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
-                                    {label} <span className="text-red-500">*</span>
+                                    {label} <span className="text-red-500 ml-1">*</span>
                                 </label>
                                 <select
                                     value={data?.[field] || ""}
@@ -875,11 +814,15 @@ export default function ResellerEditDetails() {
 
                 {/* ── Beneficiary Account Details ──────────────────────────── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6 xl:p-7">
-                    <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
-                        Beneficiary Account Details
-                    </h2>
-                    <div className="border-t border-gray-200 mt-3 mb-5" />
+                    <div className="flex items-center gap-3 mb-5">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                            <CreditCard size={15} />
+                        </span>
 
+                        <h2 className="text-[17px] sm:text-lg xl:text-xl font-semibold text-gray-800">
+                            Beneficiary Account Details
+                        </h2>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6">
                         {[
                             {
@@ -968,26 +911,23 @@ export default function ResellerEditDetails() {
                 </div>
 
                 {/* Upload Documents Details */}
-                {/* Upload Documents Details */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm sm:p-6 overflow-y-auto hide-scrollbar bg-[#F7F7F8] p-4 sm:p-6 space-y-5 sm:space-y-6">
                     <div className="w-full">
-                        <h2 className="text-[20px] text-gray-700 pb-2">
-                            Upload Documents Details
-                        </h2>
-
-                        <p className="border-t border-gray-300 py-3"></p>
-
+                        <div className="flex items-center gap-3 mb-5">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600">
+                                <Upload size={15} />
+                            </span>
+                            <h2 className="text-[20px] text-gray-700 pb-2">
+                                Upload Documents Details
+                            </h2>
+                        </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                             {documentList.map((document, index) => {
-
                                 const existingDocument =
                                     documents?.[document.documentType];
-
                                 const hasDocument = !!existingDocument;
-
                                 const isNewDocument =
                                     existingDocument?.isNew === true;
-
                                 const canView =
                                     hasDocument &&
                                     !isNewDocument &&
@@ -1151,7 +1091,7 @@ export default function ResellerEditDetails() {
                         {/* Approve / Reject */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
-                                Risk Status <span className="text-red-500">*</span>
+                                Risk Status <span className="text-red-500 ml-1">*</span>
                             </label>
                             <div className="flex items-center gap-6 mt-2">
                                 {[
@@ -1179,7 +1119,7 @@ export default function ResellerEditDetails() {
                         {/* Remark */}
                         <div>
                             <label className="block text-[13px] sm:text-sm font-semibold text-gray-600 mb-2">
-                                Remark <span className="text-red-500">*</span>
+                                Remark <span className="text-red-500 ml-1">*</span>
                             </label>
                             <textarea
                                 name="RSS_Remark"
@@ -1193,15 +1133,15 @@ export default function ResellerEditDetails() {
                     </div>
                 </div>
 
-                {/* ── Submit ───────────────────────────────────────────────── */}
+                {/* ── Submit ───── */}
                 <div className="flex justify-center pt-2">
                     <button
                         onClick={resellerAdminUpdate}
                         type="button"
                         disabled={submitLoading}
-                        className={`bg-green-600 text-white px-8 py-2.5 rounded-lg font-medium transition ${submitLoading
+                        className={`bg-[#fec931] text-black px-8 py-2.5 rounded-lg font-medium transition ${submitLoading
                             ? "opacity-60 cursor-not-allowed"
-                            : "hover:bg-green-700 cursor-pointer"
+                            : "cursor-pointer"
                             }`}
                     >
                         {submitLoading ? "Submitting..." : "Submit"}
@@ -1265,7 +1205,6 @@ export default function ResellerEditDetails() {
                     </div>
                 </div>
             )}
-
         </>
     );
 }

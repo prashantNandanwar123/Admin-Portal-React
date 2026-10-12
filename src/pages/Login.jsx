@@ -5,6 +5,7 @@ import Forgot from "./ForgotPassword";
 import { toast } from "react-toastify";
 import logo1 from "../assets/img-1.jpeg";
 import bgImage from "../assets/leftimg.png";
+import mblogo from "../assets/logo-copy.png";
 import {
   FaBolt,
   FaShieldAlt,
@@ -42,7 +43,7 @@ export default function Login() {
           "user",
           JSON.stringify({ userName, role_function }),
         );
-        
+
         setTimeout(() => {
           toast.success(res.respMsg);
           navigate("/app/dashboard");
@@ -78,7 +79,6 @@ export default function Login() {
           {/* Left Section */}
           <div className="bg-[#05070B] text-white relative overflow-hidden cursor-default">
             <div className="px-10 py-6 xl:px-6 xl:py-4 h-full flex flex-col relative">
-              {/* Logo */}
               <img
                 src={logo1}
                 alt="HelloPe"
@@ -264,7 +264,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-16 xl:h-11 rounded-xl bg-[#FFC400] hover:bg-[#FEC803] transition font-semibold cursor-pointer text-xl xl:text-base text-black shadow-md"
+                  className="w-full h-16 xl:h-11 rounded-xl bg-[#fec931] transition font-medium cursor-pointer text-xl xl:text-base text-black shadow-md"
                 >
                   {loading ? "Signing in..." : "Access Dashboard →"}
                 </button>
@@ -282,7 +282,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => navigate("/forgot")}
-                    className="text-[#FEC803] hover:underline text-lg xl:text-sm font-medium cursor-pointer"
+                    className="text-[#fec931] hover:underline text-lg xl:text-sm font-medium cursor-pointer"
                   >
                     Forgot your password?
                   </button>
@@ -292,18 +292,15 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Mobile — UNCHANGED, same as before */}
         {/* Mobile */}
         <div className="lg:hidden">
           {/* Top Black Section */}
           <div className="bg-[#0b0b0b] text-white px-6 pt-8 pb-20 relative overflow-hidden">
             <div className="flex justify-center">
-              {/* Logo */}
               <img
                 src={logo1}
                 alt="HelloPe"
-                className="h-32 object-contain"
-                style={{ marginLeft: "-151px" }}
+                className="h-32 object-contain ml-0 md:ml-[-151px]"
               />
             </div>
             <h2 className="text-xl font-bold leading-tight text-center">
@@ -385,8 +382,13 @@ export default function Login() {
 
           {/* Login Card */}
           <div className="-mt-8 relative z-30 bg-white rounded-t-[38px] px-6 pt-8 pb-8 shadow-xl">
-            {/* Yellow Top Line */}
-            <div className="w-20 h-1.5 rounded-full bg-[#FFC400] mx-auto mb-6"></div>
+            <div className="flex justify-center">
+              <img
+                src={mblogo}
+                alt="HelloPe"
+                className="h-24 w-auto max-w-full object-contain"
+              />
+            </div>
             <h2 className="text-2xl font-bold text-center">Welcome Back</h2>
             <p className="text-center text-gray-500 mt-2 text-sm">
               Login to access the Pay-In Admin Dashboard
@@ -437,7 +439,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-14 rounded-xl bg-[#FFC400] font-bold text-base"
+                className="w-full h-14 rounded-xl bg-[#fec931] font-bold text-base"
               >
                 {loading ? "Signing in..." : "Access Dashboard →"}
               </button>

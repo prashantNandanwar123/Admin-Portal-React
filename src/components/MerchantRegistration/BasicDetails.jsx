@@ -4,8 +4,9 @@ import { toast } from "react-toastify";
 import statecity from "../../utils/statecity.json";
 import Select from "react-select";
 import { useRef } from "react";
-import { User, Calendar, Clock, ArrowRight, UserRound, FileText, UserPlus } from "lucide-react";
-
+import {
+  User, ReceiptText, Upload, MapPin, Calendar, Clock, ArrowRight, UserRound, FileText, UserPlus, Building2, Handshake, BriefcaseBusiness
+} from "lucide-react";
 
 export default function BasicDetails({
   data,
@@ -58,13 +59,12 @@ export default function BasicDetails({
   const selectedCountry = statecity.find(
     (item) => item.country === data?.addCountry
   );
-
   const stateList = selectedCountry?.states || [];
+
   // Selected State
   const selectedState = stateList.find(
     (item) => item.state === data?.addState
   );
-  // Cities of selected state
   const cityList = selectedState?.cities || [];
 
   // Billing Country
@@ -83,7 +83,6 @@ export default function BasicDetails({
   // Billing Cities
   const billingCityList = selectedBillingState?.cities || [];
 
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -100,17 +99,15 @@ export default function BasicDetails({
 
   const fetchDetailsCollection = async () => {
     try {
-      const response = await axiosInstance.post("/getDetailsCollection");
+      const response = await axiosInstance.post("/");
       const apiData = response?.respData || {};
-      setlegalVehicalNameList(apiData?.legalVehicalNameList || []);
-
+      setlegalVehicalNameList(apiData?.legalVehicalNameList || []); getDetailsCollection
       const formattedMcc = Object.entries(apiData?.mccList || {}).map(
         ([code, name]) => ({
           code,
           name,
         })
       );
-
       setMccList(formattedMcc);
       setRefId(apiData?.ref_id);
 
@@ -120,10 +117,7 @@ export default function BasicDetails({
       }
 
     } catch (error) {
-      console.error(
-        "[BasicDetails] fetchDetailsCollection → API Error:",
-        error
-      );
+      toast.error(error);
     }
   };
 
@@ -153,6 +147,8 @@ export default function BasicDetails({
       partnerLogoCheck: data?.partnerLogoCheck,
       storeDbaName: data?.storeDbaName,
       storeLegalName: data?.storeLegalName,
+      companyType: data?.companyType,
+
       bddDocument: data?.bddDocuments,
       bddGst: data?.bddGst,
       bddSez: data?.bddSez,
@@ -240,55 +236,59 @@ export default function BasicDetails({
       }}
       className="space-y-4"
     >
-      <div>
+      <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
         <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full  bg-yellow-100 text-yellow-600">
             <UserPlus size={18} />
           </span>
-          <h2 className="text-xl text-blue-900 font-semibold">
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold">
             Merchant Onboarding
           </h2>
         </div>
-        <p className="ml-12 pb-1 text-sm text-blue-900">
-          Basic Merchant Information including business details, contact information and required documentation.</p>
+        <p className="ml-12 pb-1 text-sm text-slate-700">
+          Basic Merchant Information including business details, contact
+          information and required documentation.
+        </p>
       </div>
 
       {/* ── Store Onboarding Status ─── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
+      <div className="w-full rounded-xl bg-[#FEF6E0] border border-[#fec931] px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           {/* Created By / Date / Time strip */}
-          <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-amber-50 rounded-xl px-5 py-4">
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <User size={16} className="text-gray-600" />
+          <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                <User className="w-4 h-4 text-black" />
               </span>
               <div className="leading-tight">
-                <p className="text-[11px] text-gray-500">Created By</p>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-lg sm:text-xs text-slate-900 font-medium">
+                  Created By</p>
+                <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
                   {userData?.userName}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <Calendar size={16} className="text-gray-600" />
+              <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                <Calendar size={16} className="text-black" />
               </span>
               <div className="leading-tight">
-                <p className="text-[11px] text-gray-500">Created Date</p>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-lg sm:text-xs text-slate-900 font-medium">Created Date</p>
+                <p className="text-sm sm:text-[15px] font-semibold text-gray-800">
                   {new Date().toLocaleDateString()}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <Clock size={16} className="text-gray-600" />
+              <span className="w-9 h-9 rounded-full bg-[#fec931] flex items-center justify-center shrink-0">
+                <Clock size={16} />
               </span>
               <div className="leading-tight">
-                <p className="text-[11px] text-gray-500">Created Time</p>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-lg sm:text-xs font-medium">Created Date</p>
+                <p className="text-sm font-semibold text-black">
                   {new Date().toLocaleTimeString()}
                 </p>
               </div>
@@ -297,10 +297,10 @@ export default function BasicDetails({
         </div>
       </div>
 
-      {/* ── Contact Person Details ──────────────────────────────────── */}
+      {/* ── Contact Person Details ─── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full  bg-yellow-100 text-yellow-600 flex items-center justify-center">
             <UserRound className="w-4 h-4 text-yellow-500" />
           </div>
           <h2 className="text-base font-semibold text-gray-900 uppercase">
@@ -312,14 +312,14 @@ export default function BasicDetails({
           {/* Full Name with prefix */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Full Name<span className="text-red-500">*</span>
+              Full Name<span className="text-red-500 ml-1">*</span>
             </label>
             <div className="flex">
               <select
                 className="border border-gray-200 rounded-l-lg px-3 h-[44px] bg-white w-24 text-sm outline-none focus:border-amber-400"
+                required
                 value={data?.cpdNamePrefix || ""}
-                onChange={(e) => handleChange("cpdNamePrefix", e.target.value)}
-              >
+                onChange={(e) => handleChange("cpdNamePrefix", e.target.value)}>
                 <option value="">Title</option>
                 {["Mr", "Ms", "Mrs", "Miss", "Dr"].map((p) => (
                   <option key={p} value={p}>
@@ -359,7 +359,7 @@ export default function BasicDetails({
           {/* Mobile */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Mobile No<span className="text-red-500">*</span>
+              Mobile No<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -379,7 +379,7 @@ export default function BasicDetails({
           {/* Primary Email */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Primary Email Id<span className="text-red-500">*</span>
+              Primary Email Id<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="email"
@@ -413,13 +413,13 @@ export default function BasicDetails({
           {/* Reseller Partner */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Reseller Partner<span className="text-red-500">*</span>
+              Reseller Partner<span className="text-red-500 ml-1">*</span>
             </label>
             <select
               className="w-full h-[44px] border border-gray-200 rounded-lg px-3 text-sm bg-white shadow-sm outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+              required
               value={data?.basicSrcChannel || ""}
-              onChange={(e) => handleChange("basicSrcChannel", e.target.value)}
-            >
+              onChange={(e) => handleChange("basicSrcChannel", e.target.value)}>
               <option value="">Select reseller partner</option>
               {legalVehicalNameList?.map((item, index) => (
                 <option key={index} value={item}>
@@ -434,7 +434,7 @@ export default function BasicDetails({
       {/* ── Basic Document Details ──────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
             <FileText className="w-4 h-4 text-yellow-500" />
           </div>
           <h2 className="text-base font-semibold text-gray-900 uppercase">
@@ -469,7 +469,7 @@ export default function BasicDetails({
           {/* Aadhar No */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Aadhar No.<span className="text-red-500">*</span>
+              Aadhar No.<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -537,7 +537,7 @@ export default function BasicDetails({
           {/* GSTN No */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              GSTN No.<span className="text-red-500">*</span>
+              GSTN No.<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -578,7 +578,7 @@ export default function BasicDetails({
           {/* Pan No */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Pan No<span className="text-red-500">*</span>
+              Pan No<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -618,7 +618,7 @@ export default function BasicDetails({
           {/* Risk Check */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Risk Check<span className="text-red-500">*</span>
+              Risk Check<span className="text-red-500 ml-1">*</span>
             </label>
             <select
               className="w-full h-[44px] border border-gray-200 rounded-lg px-3 text-sm bg-white outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
@@ -668,7 +668,7 @@ export default function BasicDetails({
           {/* MCC */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              MCC<span className="text-red-500">*</span>
+              MCC<span className="text-red-500 ml-1">*</span>
             </label>
             <select
               className="w-full h-[44px] border border-gray-200 rounded-lg px-3 text-sm bg-white outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
@@ -703,36 +703,6 @@ export default function BasicDetails({
               <option value=">1<3Y">&gt;1&lt;3Y</option>
               <option value=">3<5Y">&gt;3&lt;5Y</option>
               <option value=">5Y">&gt;5Y</option>
-            </select>
-          </div>
-
-          {/* Merchant Business Type */}
-          <div>
-            <label className="block text-sm text-gray-700 font-medium mb-2">
-              Merchant Business Type
-            </label>
-            <select
-              className="w-full h-[44px] border border-gray-200 rounded-lg px-3 text-sm bg-white outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-              value={data?.merchantBusinessType || ""}
-              onChange={(e) =>
-                handleChange("merchantBusinessType", e.target.value)
-              }
-            >
-              <option value="">-- Select --</option>
-              {[
-                "Companies Registered Act",
-                "Govt, Govt Undertakings",
-                "Individuals/Proprietor",
-                "Individuals/Professionals",
-                "LLPS",
-                "Pertnership",
-                "Proprietor",
-                "Regd Trusts",
-              ].map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
             </select>
           </div>
 
@@ -779,24 +749,66 @@ export default function BasicDetails({
 
           {/* Partner Logo */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            {/* Label */}
+            <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
               Partner Logo
               <span className="text-xs text-gray-500 font-normal ml-1">
                 (jpg or png)
               </span>
             </label>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              disabled={data?.partnerLogoCheck !== "Yes"}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                setPartnerLogo(file);
-                handleChange("partnerLogoFile", file);
-              }}
-              className="block w-full h-[44px] text-sm text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer file:h-full file:mr-3 file:px-4 file:border-0 file:border-r file:border-gray-200 file:bg-gray-50 file:text-gray-700 file:text-sm file:font-medium hover:file:bg-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            />
+
+            {/* Custom File Upload */}
+            <div className="relative w-full h-[44px] flex items-center justify-between px-3 border border-gray-200 rounded-lg bg-white">
+
+              {/* File Name */}
+              <div className="flex items-center gap-2 min-w-0">
+                <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+
+                <span className="text-sm text-gray-500 truncate">
+                  {partnerLogo
+                    ? partnerLogo.name
+                    : "Upload Partner Logo"}
+                </span>
+              </div>
+
+              {/* Upload Icon - ONLY THIS IS CLICKABLE */}
+              <button
+                type="button"
+                disabled={data?.partnerLogoCheck !== "Yes"}
+                onClick={() => fileRef.current?.click()}
+                className={`
+      flex items-center justify-center
+      w-7 h-7 rounded-md
+      border border-[#9cc9ee]
+      bg-[#f7fbff]
+      shrink-0
+      ${data?.partnerLogoCheck === "Yes"
+                    ? "cursor-pointer hover:bg-blue-50"
+                    : "cursor-not-allowed opacity-50"
+                  }
+    `}
+              >
+                <Upload className="w-3.5 h-3.5 text-[#1677c8]" />
+              </button>
+
+              {/* Hidden File Input */}
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                disabled={data?.partnerLogoCheck !== "Yes"}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+
+                  if (file) {
+                    setPartnerLogo(file);
+                    handleChange("partnerLogoFile", file);
+                  }
+                }}
+                className="hidden"
+              />
+
+            </div>
           </div>
 
           {/* Store Name */}
@@ -806,6 +818,7 @@ export default function BasicDetails({
             </label>
             <input
               type="text"
+              required
               className="w-full h-[44px] bg-white border border-gray-200 rounded-lg px-3 text-sm text-gray-700 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
               value={data?.storeDbaName || ""}
               placeholder="Enter store name"
@@ -841,24 +854,263 @@ export default function BasicDetails({
         </div>
       </div>
 
+      {/* ── Selected Business Type ──── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+            <Building2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-gray-900 uppercase">
+              Select Business Type
+            </h2>
+          </div>
+        </div>
+
+        {/* ───────── Business Entity Type ──────── */}
+        <div className="mb-6">
+          <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
+            Business Entity Type
+            <span className="text-red-500 ml-1">*</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              {
+                value: "Company",
+                subtitle: "Pvt Ltd / OPC / LLC",
+                icon: Building2,
+              },
+              {
+                value: "LLP",
+                subtitle: "Limited Liability",
+                icon: Handshake,
+              },
+              {
+                value: "Firm",
+                subtitle: "Partnership",
+                icon: BriefcaseBusiness,
+              },
+              {
+                value: "Proprietor",
+                subtitle: "Individual",
+                icon: UserRound,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              const selected =
+                data?.merchantBusinessType === item.value;
+              return (
+                <button
+                  type="button"
+                  key={item.value}
+                  onClick={() =>
+                    handleChange("merchantBusinessType", item.value)
+                  }
+                  className={`
+                  relative h-[84px] rounded-xl border text-center
+                  transition-all duration-200
+                  flex flex-col items-center justify-center
+                  ${selected
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-gray-200 bg-white hover:border-blue-300 hover:bg-gray-50"
+                    }
+                `}
+                >
+
+                  {/* Radio / Selected Indicator */}
+                  <div
+                    className={`
+                    absolute top-2 right-2
+                    w-4 h-4 rounded-full border
+                    flex items-center justify-center
+                    ${selected
+                        ? "border-blue-600"
+                        : "border-gray-300"
+                      }
+                  `}
+                  >
+                    {selected && (
+                      <div className="w-2 h-2 rounded-full bg-blue-600" />
+                    )}
+                  </div>
+
+                  {/* Icon */}
+                  <div
+                    className={`
+                        w-8 h-8 rounded-lg flex items-center justify-center mb-1
+                          ${selected
+                        ? "bg-blue-600 text-white"
+                        : "bg-blue-50 text-blue-300"
+                      }
+              `}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </div>
+
+                  {/* Title */}
+                  <span
+                    className={`
+                text-xs font-semibold
+                ${selected
+                        ? "text-blue-700"
+                        : "text-gray-600"
+                      }
+              `}
+                  >
+                    {item.value}
+                  </span>
+
+                  {/* Subtitle */}
+                  <span className="text-[9px] text-gray-400 mt-0.5">
+                    {item.subtitle}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {errors?.merchantBusinessType && (
+            <p className="text-red-500 text-xs mt-2">
+              {errors.merchantBusinessType}
+            </p>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-100 mb-6" />
+        <div>
+          <label className="block text-xs font-semibold text-gray-800 uppercase mb-3">
+            Company Type
+            <span className="text-red-500 ml-1">*</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              {
+                value: "Private Limited",
+                short: "Private Limited",
+                icon: Building2,
+              },
+              {
+                value: "One Person Company",
+                short: "One Person Company",
+                icon: UserRound,
+              },
+              {
+                value: "Public Limited",
+                short: "Public Limited",
+                icon: Building2,
+              },
+              {
+                value: "LLC",
+                short: "LLC",
+                icon: Building2,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              const selected =
+                data?.companyType === item.value;
+
+              return (
+                <button
+                  type="button"
+                  key={item.value}
+                  onClick={() =>
+                    handleChange("companyType", item.value)
+                  }
+                  className={`
+                    relative h-[72px] rounded-xl border
+                    transition-all duration-200
+                    flex items-center gap-3 px-3
+                    ${selected
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-gray-200 bg-white hover:border-blue-300 hover:bg-gray-50"
+                    }
+            `}
+                >
+
+                  {/* Radio */}
+                  <div
+                    className={`
+                w-4 h-4 rounded-full border shrink-0
+                flex items-center justify-center
+                ${selected
+                        ? "border-blue-600"
+                        : "border-gray-300"
+                      }
+              `}
+                  >
+                    {selected && (
+                      <div className="w-2 h-2 rounded-full bg-blue-600" />
+                    )}
+                  </div>
+
+                  {/* Icon */}
+                  <Icon
+                    className={`
+                w-4 h-4
+                ${selected
+                        ? "text-blue-600"
+                        : "text-gray-400"
+                      }
+              `}
+                  />
+
+                  {/* Text */}
+                  <div className="text-left">
+                    <p
+                      className={`
+                  text-xs font-semibold
+                  ${selected
+                          ? "text-blue-700"
+                          : "text-gray-600"
+                        }
+                `}
+                    >
+                      {item.short}
+                    </p>
+
+                    {item.value !== item.short && (
+                      <p className="text-[9px] text-gray-400 mt-0.5">
+                        {item.value}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {errors?.companyType && (
+            <p className="text-red-500 text-xs mt-2">
+              {errors.companyType}
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* ── Store Address ───────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-6 uppercase">
+        <h2 className="text-[18px] sm:text-base text-gray-900 font-semibold pb-3 flex items-center gap-2 uppercase">
+          <span className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+            <MapPin className="w-4 h-4" />
+          </span>
           Company Address
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             { label: "Address 1", field: "addStoreAddress1", required: true },
-            { label: "Address 2", field: "addStoreAddress2" },
-            { label: "Address 3", field: "addStoreAddress3" },
+            { label: "Address 2", field: "addStoreAddress2", required: false },
+            { label: "Address 3", field: "addStoreAddress3", required: false },
           ].map(({ label, field, required }) => (
             <div key={field}>
               <label className="block text-sm text-gray-700 font-medium mb-2">
                 {label}
-                {required && <span className="text-red-500">*</span>}
+                {required && <span className="text-red-500 ml-1">*</span>}
               </label>
               <input
                 type="text"
+                required={required}
                 className="w-full h-[44px] border border-gray-200 rounded-lg px-3 text-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
                 value={data?.[field] || ""}
                 onChange={(e) => handleChange(field, e.target.value)}
@@ -872,7 +1124,7 @@ export default function BasicDetails({
           {/* Country */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Country<span className="text-red-500">*</span>
+              Country<span className="text-red-500 ml-1">*</span>
             </label>
             <Select
               options={countryList.map((country) => ({
@@ -900,7 +1152,7 @@ export default function BasicDetails({
           {/* State */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              State<span className="text-red-500">*</span>
+              State<span className="text-red-500 ml-1">*</span>
             </label>
             <Select
               options={stateList.map((item) => ({
@@ -927,7 +1179,7 @@ export default function BasicDetails({
           {/* City */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              City<span className="text-red-500">*</span>
+              City<span className="text-red-500 ml-1">*</span>
             </label>
             <Select
               options={cityList.map((city) => ({ value: city, label: city }))}
@@ -944,13 +1196,14 @@ export default function BasicDetails({
           {/* Zip Code */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Zip Code<span className="text-red-500">*</span>
+              Zip Code<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
               maxLength={6}
               inputMode="numeric"
               pattern="[0-9]*"
+              required
               className="w-full h-[44px] border border-gray-200 rounded-lg px-3 text-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
               value={data?.addZipcode || ""}
               onChange={(e) => {
@@ -962,12 +1215,14 @@ export default function BasicDetails({
         </div>
       </div>
 
-      {/* ── Billing Address ─────────────────────────────────────────── */}
+      {/* ── Billing Address ─────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-2">
-          Billing Address
-        </h2>
-
+        <div className="flex items-center gap-3 mb-5 pb-3">
+          <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center shrink-0">
+            <ReceiptText className="w-4 h-4" />
+          </div>
+          <h2 className="text-base font-semibold text-gray-900 uppercase"> Billing Address</h2>
+        </div>
         <div className="mb-5">
           <label className="flex items-center gap-2 text-sm text-gray-600 italic">
             <input
@@ -1005,7 +1260,7 @@ export default function BasicDetails({
             <div key={field}>
               <label className="block text-sm text-gray-700 font-medium mb-2">
                 {label}
-                {required && <span className="text-red-500">*</span>}
+                {required && <span className="text-red-500 ml-1">*</span>}
               </label>
               <input
                 type="text"
@@ -1020,7 +1275,7 @@ export default function BasicDetails({
           {/* Country */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Country<span className="text-red-500">*</span>
+              Country<span className="text-red-500 ml-1">*</span>
             </label>
             <Select
               styles={disabledSelectStyles}
@@ -1048,7 +1303,7 @@ export default function BasicDetails({
           {/* State */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              State<span className="text-red-500">*</span>
+              State<span className="text-red-500 ml-1">*</span>
             </label>
             <Select
               styles={disabledSelectStyles}
@@ -1075,7 +1330,7 @@ export default function BasicDetails({
           {/* City */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              City<span className="text-red-500">*</span>
+              City<span className="text-red-500 ml-1">*</span>
             </label>
             <Select
               styles={disabledSelectStyles}
@@ -1101,7 +1356,7 @@ export default function BasicDetails({
           {/* Zip Code */}
           <div>
             <label className="block text-sm text-gray-700 font-medium mb-2">
-              Zip Code<span className="text-red-500">*</span>
+              Zip Code<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -1123,7 +1378,7 @@ export default function BasicDetails({
         <div className="flex justify-end mt-10">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 bg-amber-400 text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+            className="inline-flex items-center gap-2 font-medium text-black bg-[#fec931] px-6 py-2.5 rounded-full shadow-sm transition"
           >
             Save & Next
             <ArrowRight size={16} />

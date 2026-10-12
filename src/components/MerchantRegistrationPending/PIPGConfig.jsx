@@ -1,52 +1,39 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { ShieldCheck, Link, ArrowLeft } from "lucide-react";
 
 export default function PIPGConfig({
   refId,
   data,
   setData,
-  errors,
-  handleNext,
-  handleBack
+  handleBack,
 }) {
 
-  const [apiData, setApiData] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [actionType, setActionType] = useState("");
-  const [modalData, setModalData] = useState({
-    respMsg: "",
-    user_id: "",
-    mid_created: "",
-  });
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!refId) return;
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.post(
-          `rMerchantIpg/${refId}`
-        );
-        console.log("API RESPONSE:", response);
-        if (response?.respCode === 0) {
-          const res = response?.respData;
-          setApiData(res || {});
-        }
-      } catch (err) {
-        console.error("API ERROR:", err);
-      }
-    };
-
-    fetchData();
-  }, [refId]);
-
+  // ================= STATE =================
   const [form, setForm] = useState({
-    UserName: "",
-    rremark: "",
-    rstatus: "",
+
+    IPG_ECIValueVisa: "",
+    IPG_ECIValueMaster: "",
+    IPG_ECIValueMaestro: "",
+    IPG_IntegrationApproach: "",
+    IPG_PCIDSSCertificateNumber: "",
+    IPG_PCIDSSExpiryDate: "",
+    IPG_MerchantEmail: "",
+    IPG_CustomerEmail: "",
+    IPG_MerchantSMS: "",
+    IPG_CustomerSMS: "",
+    IPG_ServertoServerCall: false,
+    requestURL1: "",
+    requestURL2: "",
+    requestURL3: "",
+    requestURL4: "",
+    requestURL5: "",
+    posTidCount: "",
   });
+  const [apiData, setApiData] = useState({});
 
   // ================= HANDLE CHANGE =================
   const handleChange = (field, value) => {
@@ -56,371 +43,452 @@ export default function PIPGConfig({
     }));
   };
 
+  // ================= Fetch API (saveMerchantIPG) =================
 
-  const submitRiskAprRject = async (status) => {
+  useEffect(() => {
+    if (!refId) return;
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.post(
+          `rMerchantIpg/${refId}`
+        );
+        if (response?.respCode === 0) {
+          const res = response?.respData || {};
+          // OLD DATA STORE
+          setApiData(res);
+
+          // FORM AUTO FILL
+          setForm({
+            IPG_ECIValueVisa: res.IPG_ECIValueVisa || "",
+            IPG_ECIValueMaster: res.IPG_ECIValueMaster || "",
+            IPG_ECIValueMaestro: res.IPG_ECIValueMaestro || "",
+            IPG_IntegrationApproach: res.IPG_IntegrationApproach || "",
+            IPG_PCIDSSCertificateNumber: res.IPG_PCIDSSCertificateNumber || "",
+            IPG_PCIDSSExpiryDate: res.IPG_PCIDSSExpiryDate || "",
+            IPG_MerchantEmail: res.IPG_MerchantEmail || "",
+            IPG_CustomerEmail: res.IPG_CustomerEmail || "",
+            IPG_MerchantSMS: res.IPG_MerchantSMS || "",
+            IPG_CustomerSMS: res.IPG_CustomerSMS || "",
+            IPG_ServertoServerCall: res.IPG_ServertoServerCall || false,
+            requestURL1: res.requestURL1 || "",
+            requestURL2: res.requestURL2 || "",
+            requestURL3: res.requestURL3 || "",
+            requestURL4: res.requestURL4 || "",
+            requestURL5: res.requestURL5 || "",
+            posTidCount: res.posTidCount || "",
+          });
+        }
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+    fetchData();
+  }, [refId]);
+
+
+  // ================= SAVE API (saveMerchantIPG) =================
+  const handleSaveIPG = async () => {
     try {
-
       const payload = {
         ref_id: refId,
-        UserName: "",
-        rremark: form.rremark,
-        rstatus: status,
+        // OLD DATA
+        oldData: apiData,
+
+        // UPDATED DATA
+        updatedData: form,
+
+        IPG_ECIValueVisa: form.IPG_ECIValueVisa,
+        IPG_ECIValueMaster: form.IPG_ECIValueMaster,
+        IPG_ECIValueMaestro: form.IPG_ECIValueMaestro,
+        IPG_IntegrationApproach: form.IPG_IntegrationApproach,
+        IPG_PCIDSSCertificateNumber: form.IPG_PCIDSSCertificateNumber,
+        IPG_PCIDSSExpiryDate: form.IPG_PCIDSSExpiryDate,
+        IPG_MerchantEmail: form.IPG_MerchantEmail,
+        IPG_CustomerEmail: form.IPG_CustomerEmail,
+        IPG_MerchantSMS: form.IPG_MerchantSMS,
+        IPG_CustomerSMS: form.IPG_CustomerSMS,
+        IPG_ServertoServerCall: form.IPG_ServertoServerCall,
+        requestURL1: form.requestURL1,
+        requestURL2: form.requestURL2,
+        requestURL3: form.requestURL3,
+        requestURL4: form.requestURL4,
+        requestURL5: form.requestURL5,
+        posTidCount: form.posTidCount,
       };
 
-      console.log("PAYLOAD----->..", payload);
-      const response = await axiosInstance.post(
-        "submitRiskAprRject",
-        payload
+      const response = await axiosInstance.post("/saveEditMerchantIPG", payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      console.log("RAW RESPONSE:", response);
-      // APPROVE SUCCESS
-      if (response?.respCode === 0) {
+      const resData = response;
+      if (resData?.respCode === 0) {
+        toast.success(resData?.respMsg);
+        setData((prev) => ({
+          ...prev,
+          refId: resData?.respData?.ref_id || prev.refId,
+        }));
 
-        // Success toast
-        toast.success(
-          response?.respMsg || "Approved Successfully"
-        );
-
-        const resData = response?.respData || {};
-
-        // Modal data
-        setModalData({
-          respMsg: response?.respMsg || "",
-          user_id: resData?.user_id || "",
-          mid_created: resData?.mid_created || "",
-        });
-
-        if (status === "Approved") {
-          setShowModal(true);
-        }
+        // redirect page
+        setTimeout(() => {
+          navigate("/app/merchants");
+        }, 1000);
 
       } else {
-        toast.error(response?.respMsg || "Failed");
+        toast.error(resData?.respMsg);
       }
-
-    } catch (err) {
-      console.error("SUBMIT ERROR:", err);
-      const errorData = err?.response?.data || err;
-      // REJECT SUCCESS CASE
-      if (errorData?.respCode === 0) {
-        toast.error(
-          errorData?.respMsg || "Rejected Successfully"
-        );
-
-      } else {
-        toast.error(
-          errorData?.respMsg || "Something went wrong"
-        );
-
-      }
+    } catch (error) {
+      toast.error(error);
     }
   };
-  const handleCloseModal = () => {
-    setShowModal(false);
 
-    // Sidebar Risk Approval route open
-    navigate("/app/risk-approval");
-  };
+  const inputClass =
+    "h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-[14px] text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
+  const labelClass =
+    "mb-1 block text-[15px] font-medium text-gray-700";
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
-    <div className="relative">
-      <h2 className="text-3xl font-light text-gray-700 mb-6 border-b border-gray-300  px-4 py-3">
-        IPG Configuration
-      </h2>
-      {/* ================= TOP SECTION VIEW ONLY ================= */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value (Visa)
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_ECIValueVisa || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
+    <div className="p-6">
+      <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <ShieldCheck size={16} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-2">
+            Pending IPG Configuration
+          </h2>
         </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value (Master)
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_ECIValueMaster || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            ECI Value Maestro
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_ECIValueMaestro || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Integration Approach
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_IntegrationApproach || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PCI DSS Certificate Number
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_PCIDSSCertificateNumber || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            PCI DSS Expiry Date
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_PCIDSSExpiryDate || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Merchant Email Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_MerchantEmail || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Customer Email Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_CustomerEmail || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Merchant SMS Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_MerchantSMS || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Customer SMS Confirmation For Transaction
-          </label>
-
-          <input
-            type="text"
-            value={apiData?.ipg_CustomerSMS || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Server to Server Call
-          </label>
-
-          <input
-            type="text"
-            value={
-              apiData?.ipg_ServertoServerCall === true
-                ? "Yes"
-                : apiData?.ipg_ServertoServerCall === false
-                  ? "No"
-                  : ""
-            }
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
+        <p className="ml-12 text-sm text-slate-700 -mt-1">
+          View and Edit the Internet Payment Gateway configuration and setup details.
+        </p>
       </div>
 
-      {/* ================= REQUEST URLS ================= */}
-      <div className="border-t border-gray-300 my-10"></div>
-      <h2 className="text-3xl font-light text-gray-700 mb-8">
-        Request URL's
-      </h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Array.from({ length: 10 }).map((_, index) => (
-          <div key={index}>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Request URL {index + 1}
-            </label>
-            <input
-              type="text"
-              value={apiData?.[`requestURL${index + 1}`] || ""}
-              readOnly
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-            />
-          </div>
-        ))}
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            POS TID Count
-          </label>
-          <input
-            type="text"
-            value={apiData?.posTidCount || ""}
-            readOnly
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-          />
-        </div>
-      </div>
-
-      {/* ================= ACTION SECTION ================= */}
-      <form
-        className="mt-10 border-t border-gray-200 pt-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitRiskAprRject(actionType);
-        }}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-          {/* Remark */}
+      {/* ================= TOP SECTION (NO DESIGN CHANGE) ================= */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Remark <span className="text-red-500">*</span>
+              ECI Value (Visa) {req}
             </label>
-
             <input
               type="text"
-              value={form.rremark}
-              onChange={(e) => handleChange("rremark", e.target.value)}
+              value={form.IPG_ECIValueVisa}
               required
-              placeholder="Enter remark"
+              maxLength={3}
+              placeholder="000"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!/^\d*$/.test(value)) return;
+                handleChange("IPG_ECIValueVisa", value);
+              }}
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             />
           </div>
 
-          {/* Approve Reject Buttons */}
-          <div className="flex gap-4 md:justify-end">
-            {/* Approve */}
-            <button
-              type="submit"
-              onClick={() => setActionType("Approved")}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded"
-            >
-              Approve
-            </button>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              ECI Value (Master) {req}
+            </label>
+            <input
+              type="text"
+              value={form.IPG_ECIValueMaster}
+              required
+              maxLength={3}
+              placeholder="000"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!/^\d*$/.test(value)) return;
+                handleChange("IPG_ECIValueMaster", value);
+              }}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
 
-            {/* Reject */}
-            <button
-              type="submit"
-              onClick={() => setActionType("Rejected")}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded"
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              ECIValueMaestro {req}
+            </label>
+
+            <input
+              type="text"
+              value={form.IPG_ECIValueMaestro}
+              required
+              maxLength={3}
+              placeholder="000"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!/^\d*$/.test(value)) return;
+                handleChange("IPG_ECIValueMaestro", value);
+              }}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Integration Approach {req}
+            </label>
+            <select
+              value={form.IPG_IntegrationApproach}
+              required
+              onChange={(e) =>
+                handleChange("IPG_IntegrationApproach", e.target.value)
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-white"
             >
-              Reject
-            </button>
+              <option value="">-- Select --</option>
+              <option value="SSL">SSL</option>
+              <option value="MOTO">MOTO</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              PCI DSS Certificate Number
+            </label>
+            <input
+              type="text"
+              value={form.IPG_PCIDSSCertificateNumber}
+              onChange={(e) =>
+                handleChange(
+                  "IPG_PCIDSSCertificateNumber",
+                  e.target.value
+                )
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              PCI DSS Expiry Date
+            </label>
+            <input
+              type="date"
+              value={form.IPG_PCIDSSExpiryDate}
+              onChange={(e) =>
+                handleChange("IPG_PCIDSSExpiryDate", e.target.value)
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+
+          {/* EMAIL / SMS */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Merchant Email Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="merchantEmail"
+                  checked={form.IPG_MerchantEmail === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantEmail", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="merchantEmail"
+                  checked={form.IPG_MerchantEmail === "No"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantEmail", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Customer Email Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="customerEmail"
+                  checked={form.IPG_CustomerEmail === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerEmail", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="customerEmail"
+                  checked={form.IPG_CustomerEmail === "No"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerEmail", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Merchant SMS Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="merchantSMS"
+                  checked={form.IPG_MerchantSMS === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantSMS", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="merchantSMS"
+                  checked={form.IPG_MerchantSMS === "No"}
+                  onChange={() =>
+                    handleChange("IPG_MerchantSMS", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Customer SMS Confirmation For Transaction {req}
+            </label>
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  name="customerSMS"
+                  checked={form.IPG_CustomerSMS === "Yes"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerSMS", "Yes")
+                  }
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="customerSMS"
+                  checked={form.IPG_CustomerSMS === "No"}
+                  onChange={() =>
+                    handleChange("IPG_CustomerSMS", "No")
+                  }
+                />{" "}
+                No
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.IPG_ServertoServerCall}
+                onChange={(e) =>
+                  handleChange(
+                    "IPG_ServertoServerCall",
+                    e.target.checked
+                  )
+                }
+              />
+              Server to Server Call
+            </label>
           </div>
         </div>
+      </div>
 
-        {/* Back Button */}
-        <div className="mt-8">
+      {/* ================= REQUEST URLS ================= */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-9 h-9 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center shrink-0">
+            <Link className="w-5 h-5 text-yellow-600" />
+          </div>
+          <h2 className="text-[20px] text-gray-700 font-semibold uppercase">
+            Request URL's
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index}>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Request URL {index + 1}
+              </label>
+              <input
+                type="text"
+                value={form[`requestURL${index + 1}`]}
+                placeholder="www.example.com"
+                onChange={(e) =>
+                  handleChange(
+                    `requestURL${index + 1}`,
+                    e.target.value
+                  )
+                }
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+            </div>
+          ))}
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              POS TID Count
+            </label>
+            <input
+              type="text"
+              value={form.posTidCount}
+              onChange={(e) =>
+                handleChange("posTidCount", e.target.value)
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ================= BUTTONS ================= */}
+      <div className="flex justify-between items-center mt-10">
+
+        {/* Left Side Back Button */}
+        <button
+          type="button"
+          onClick={handleBack}
+          className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </button>
+        {/* Center Update Button */}
+        <div className="flex-1 flex justify-center">
           <button
-            type="button"
-            onClick={handleBack}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
+            type="submit"
+            onClick={handleSaveIPG}
+            className="bg-green-500 hover:bg-green-300 text-white px-6 py-2 rounded"
           >
-            Back
+            Update
           </button>
         </div>
-      </form>
-
-      {/* ================= SUCCESS MODAL ================= */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 box-content size-105">
-            {/* Success Icon */}
-            <div className="flex justify-center mb-2">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                <span className="text-3xl text-green-600">✓</span>
-              </div>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-              Onboarding Completed
-            </h2>
-            {/* Content */}
-            <div className="space-y-2">
-              <div className="p-3">
-                <p className="text-xl font-medium text-gray-800 mb-1">
-                  User ID : {modalData.user_id}
-                </p>
-              </div>
-              <div className="p-3">
-                <p className="text-xl font-medium text-gray-800 mb-1">
-                  Merchant ID : {modalData.mid_created}
-                </p>
-              </div>
-
-              <div className="p-3">
-                <p className="font-medium text-xl text-green-800 break-words">
-                  {modalData.respMsg}
-                </p>
-              </div>
-            </div>
-
-            {/* Button */}
-            <div className="mt-8 flex justify-center">
-              <button
-                onClick={handleCloseModal}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-medium transition"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        {/* Empty div for balance */}
+        <div className="w-[88px]"></div>
+      </div>
     </div>
   );
 }

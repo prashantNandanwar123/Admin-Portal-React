@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { FileCheck2, ClipboardList, ListChecks } from "lucide-react";
 
@@ -6,9 +6,6 @@ import { FileCheck2, ClipboardList, ListChecks } from "lucide-react";
 
 export default function VChecklist({
   refId,
-  data,
-  setData,
-  errors,
   handleNext,
   handleBack
 }) {

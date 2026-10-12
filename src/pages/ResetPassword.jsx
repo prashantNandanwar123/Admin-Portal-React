@@ -92,7 +92,7 @@ export default function ResetPassword() {
         }
     };
 
-    const req = <span className="text-red-500">*</span>;
+    const req = <span className="text-red-500 ml-1">*</span>;
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">

@@ -70,118 +70,48 @@ export default function Checklist({
         ref_id: data?.refId,
 
         //Check List Input 
-        CL_NameOfTheMerchant:
-          checklistData.NameOfTheMerchant,
-
-        CL_Address:
-          checklistData.Address,
-
-        CL_MerchantBusinessType:
-          checklistData.MerchantBusinessType,
-
-        CL_ExistingNewRelationship:
-          checklistData.ExistingNewRelationship,
-
-        CL_PaymentHoldOver:
-          checklistData.PaymentHoldOver,
-
-        CL_MSF:
-          checklistData.MSF,
-
-        CL_CrossBorderTransactions:
-          checklistData.CrossBorderTransactions,
-
-        CL_3DSecure:
-          checklistData.DSecure,
-
-        CL_DomesticUserTransactionLimits:
-          checklistData.DomesticUserTransactionLimits,
-
-        CL_SecuredCrossBorderLimit:
-          checklistData.SecuredCrossBorderLimit,
-
-        CL_UnsecuredTransactionsLimit:
-          checklistData.UnsecuredTransactionsLimit,
-
-        CL_ChargeBanksRecover:
-          checklistData.ChargeBanksRecover,
-
+        CL_NameOfTheMerchant: checklistData.NameOfTheMerchant,
+        CL_Address: checklistData.Address,
+        CL_MerchantBusinessType: checklistData.MerchantBusinessType,
+        CL_ExistingNewRelationship: checklistData.ExistingNewRelationship,
+        CL_PaymentHoldOver: checklistData.PaymentHoldOver,
+        CL_MSF: checklistData.MSF,
+        CL_CrossBorderTransactions: checklistData.CrossBorderTransactions,
+        CL_3DSecure: checklistData.DSecure,
+        CL_DomesticUserTransactionLimits: checklistData.DomesticUserTransactionLimits,
+        CL_SecuredCrossBorderLimit: checklistData.SecuredCrossBorderLimit,
+        CL_UnsecuredTransactionsLimit: checklistData.UnsecuredTransactionsLimit,
+        CL_ChargeBanksRecover: checklistData.ChargeBanksRecover,
         //Merchant Check List 
 
-        MCL_VGTRegistration_Status:
-          checklistData.vgtStatus,
-
-        MCL_VGTRegistration_ReSult:
-          checklistData.vgtResult,
-
-        MCL_WCCompleted_Status:
-          checklistData.wcStatus,
-
-        MCL_WCCompleted_Result:
-          checklistData.wcResult,
-
-        MCL_MRUnderwriting_Status:
-          checklistData.underwritingStatus,
-
-        MCL_MRUnderwriting_Result:
-          checklistData.underwritingResult,
-
-        MCL_SInspectionCompleted_Status:
-          checklistData.inspectionStatus,
-
-        MCL_SInspectionCompleted_Result:
-          checklistData.inspectionResult,
-
-        MCL_BApprovals_Status:
-          checklistData.approvalsStatus,
-
-        MCL_BApprovals_Result:
-          checklistData.approvalsResult,
-
-        MCL_MVCChecks_Status:
-          checklistData.mvcStatus,
-
-        MCL_MVCChecks_result:
-          checklistData.mvcResult,
-
-        MCL_KYCConfirmed_Status:
-          checklistData.kycStatus,
-
-        MCL_KYCConfirmed_Result:
-          checklistData.kycResult,
-
+        MCL_VGTRegistration_Status: checklistData.vgtStatus,
+        MCL_VGTRegistration_ReSult: checklistData.vgtResult,
+        MCL_WCCompleted_Status: checklistData.wcStatus,
+        MCL_WCCompleted_Result: checklistData.wcResult,
+        MCL_MRUnderwriting_Status: checklistData.underwritingStatus,
+        MCL_MRUnderwriting_Result: checklistData.underwritingResult,
+        MCL_SInspectionCompleted_Status: checklistData.inspectionStatus,
+        MCL_SInspectionCompleted_Result: checklistData.inspectionResult,
+        MCL_BApprovals_Status: checklistData.approvalsStatus,
+        MCL_BApprovals_Result: checklistData.approvalsResult,
+        MCL_MVCChecks_Status: checklistData.mvcStatus,
+        MCL_MVCChecks_result: checklistData.mvcResult,
+        MCL_KYCConfirmed_Status: checklistData.kycStatus,
+        MCL_KYCConfirmed_Result: checklistData.kycResult,
       };
 
-      console.log(
-        "CHECKLIST PAYLOAD =>",
-        payload
-      );
-
-      const response =
-        await axiosInstance.post(
-          "/saveMerchantCheckList",
-          payload,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          }
-        );
-
-      console.log(
-        "PAYMENT RESPONSE =>",
-        response
+      const response = await axiosInstance.post("/saveMerchantCheckList",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       const resData = response;
-
       if (resData?.respCode === 0) {
-
-        toast.success(
-          resData?.respMsg ||
-          "Saved Successfully"
-        );
+        toast.success(resData?.respMsg || "Saved Successfully");
 
         setData((prev) => ({
           ...prev,
@@ -193,26 +123,11 @@ export default function Checklist({
         handleNext();
 
       } else {
-
-        toast.error(
-          resData?.respMsg ||
-          "Save Failed"
-        );
-
+        toast.error(resData?.respMsg || "Save Failed");
       }
 
     } catch (error) {
-
-      console.error(
-        "CHECKLIST ERROR =>",
-        error
-      );
-
-      toast.error(
-        error?.response?.data?.respMsg ||
-        "Failed to save"
-      );
-
+      toast.error(error);
     }
   };
 
@@ -220,7 +135,7 @@ export default function Checklist({
     "h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-[14px] text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
   const labelClass =
     "mb-1 block text-[15px] font-medium text-gray-700";
-  const req = <span className="text-red-500">*</span>;
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
     <div className="w-full min-h-screen">
@@ -1099,7 +1014,7 @@ export default function Checklist({
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+              className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition"
             >
               Save & Next
             </button>

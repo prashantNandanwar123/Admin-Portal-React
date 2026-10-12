@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { Settings2, Link2 } from "lucide-react";
+import { ShieldCheck, Link2, ArrowLeft } from "lucide-react";
 
 
 export default function VIPGConfig({
@@ -24,7 +24,7 @@ export default function VIPGConfig({
     const fetchData = async () => {
       try {
         const response = await axiosInstance.post(
-          `viewMerchantIpg/${1003}`
+          `viewMerchantIpg/${refId}`
         );
 
         if (response?.respCode === 0) {
@@ -88,24 +88,27 @@ export default function VIPGConfig({
 
   return (
     <div className="relative m-3">
-      <div className="flex items-center gap-3 pb-2">
-        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
-          <Settings2 className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-700" />
+      <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 shrink-0">
+            <ShieldCheck size={16} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+            View  IPG Configuration
+          </h2>
         </div>
-        <h2 className="text-xl sm:text-1xl text-blue-900 font-semibold py-1">
-          View  IPG Configuration
-        </h2>
+        <p className="ml-13 text-sm text-slate-700 -mt-3">
+          view the merchant's IPG gateway settings, certificate details, and notification preferences.
+        </p>
       </div>
-      <p className="text-sm text-blue-900 -mt-3 mb-2 ml-12 sm:ml-14">
-        Review the merchant's IPG gateway settings, certificate details, and notification preferences.
-      </p>
 
       {/* ================= TOP SECTION VIEW ONLY ================= */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              ECI Value (Visa)
+              ECI Value (Visa)<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -117,7 +120,7 @@ export default function VIPGConfig({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              ECI Value (Master)
+              ECI Value (Master)<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -129,7 +132,7 @@ export default function VIPGConfig({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              ECI Value Maestro
+              ECI Value Maestro<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -141,7 +144,7 @@ export default function VIPGConfig({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Integration Approach
+              Integration Approach<span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="text"
@@ -177,69 +180,110 @@ export default function VIPGConfig({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Merchant Email Confirmation For Transaction
+              Merchant Email Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
             </label>
-            <input
-              type="text"
-              value={apiData?.ipg_MerchantEmail || ""}
-              readOnly
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-            />
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantEmail === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantEmail === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Customer Email Confirmation For Transaction
+              Customer Email Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
             </label>
-
-            <input
-              type="text"
-              value={apiData?.ipg_CustomerEmail || ""}
-              readOnly
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-            />
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerEmail === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerEmail === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Merchant SMS Confirmation For Transaction
+              Merchant SMS Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
             </label>
-            <input
-              type="text"
-              value={apiData?.ipg_MerchantSMS || ""}
-              readOnly
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-            />
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantSMS === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_MerchantSMS === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Customer SMS Confirmation For Transaction
+              Customer SMS Confirmation For Transaction<span className="text-red-500 ml-1">*</span>
             </label>
-            <input
-              type="text"
-              value={apiData?.ipg_CustomerSMS || ""}
-              readOnly
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-            />
+
+            <div className="flex gap-4 text-sm">
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerSMS === "Yes"}
+                  readOnly
+                />{" "}
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={apiData?.ipg_CustomerSMS === "No"}
+                  readOnly
+                />{" "}
+                No
+              </label>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={apiData?.ipg_ServertoServerCall}
+                readOnly
+              />
               Server to Server Call
             </label>
-            <input
-              type="text"
-              value={
-                apiData?.ipg_ServertoServerCall === true
-                  ? "Yes"
-                  : apiData?.ipg_ServertoServerCall === false
-                    ? "No"
-                    : ""
-              }
-              readOnly
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
-            />
           </div>
         </div>
       </div>
@@ -250,7 +294,7 @@ export default function VIPGConfig({
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
             <Link2 className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
           </div>
-          <h2 className="text-xl sm:text-lg lg:text-2xl font-light text-gray-700 uppercase">
+          <h2 className="text-base font-semibold text-gray-900 uppercase flex items-center gap-2">
             Request URL's
           </h2>
         </div>
@@ -324,8 +368,9 @@ export default function VIPGConfig({
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full"
+            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
           >
+            <ArrowLeft size={16} />
             Back
           </button>
         </div>

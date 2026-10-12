@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axiosInstance from "../api/axios";
 import { toast } from "react-toastify";
-
-
+import { Search } from "lucide-react";
 import {
-  FaSearch,
   FaSave,
-  FaEye,
   FaCopy,
 } from "react-icons/fa";
 
@@ -16,12 +13,11 @@ export default function MerchantCredential() {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
 
-  // ================= SEARCH API =================
+  // ======== SEARCH API ======== //
   const handleSearch = async () => {
     if (!mid) {
       return;
     }
-
     try {
       setLoading(true);
       const resData = await axiosInstance.post(
@@ -52,7 +48,7 @@ export default function MerchantCredential() {
     }
   };
 
-  // ================= UPDATE API =================
+  // ======= UPDATE API ========
   const handleUpdate = async (item) => {
     try {
       setLoading(true);
@@ -89,7 +85,6 @@ export default function MerchantCredential() {
 
   return (
     <div className="min-h-screen p-4 md:p-6">
-      {/* ================= HEADER ================= */}
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
           Merchant Credential
@@ -98,8 +93,6 @@ export default function MerchantCredential() {
           Manage merchant API credentials, secret keys, authentication details, and integration settings securely.
         </p>
       </div>
-
-      {/* ================= SEARCH BOX ================= */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
         <div className="flex flex-col md:flex-row gap-4 items-end">
           {/* MID */}
@@ -107,71 +100,50 @@ export default function MerchantCredential() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Merchant MID
             </label>
-
             <input
               type="text"
               value={mid}
               onChange={(e) => setMid(e.target.value.replace(/\D/g, ""))}
               placeholder="Enter MID"
               inputMode="numeric"
-              maxLength={15} // Optional
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              maxLength={15}
+              className="w-full border border-slate-200  pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#fec931] focus:bg-white transition-all"
             />
           </div>
-
-          {/* Search Button */}
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="bg-yellow-500 text-black px-6 py-2 rounded-lg flex items-center gap-2 shadow"
+            className="bg-[#fec931] text-black px-6 py-2 rounded-lg flex items-center gap-2 shadow font-medium"
           >
-            <FaSearch />
+            <Search size={15} strokeWidth={2} />
             {loading ? "Searching..." : "Search"}
           </button>
+
         </div>
       </div>
 
-      {/* ================= TABLE ================= */}
+      {/* ======= TABLE ======= */}
       <div className="mt-8">
         <div className="overflow-x-auto shadow-lg">
           <table className="w-full text-sm bg-white border border-gray-300 rounded-xl shadow-lg p-5 sm:p-6 ">
             <thead>
-              <tr className="bg-gray-100 text-black">
-                <th className="px-4 py-4 text-left">
-                  Merchant Name
-                </th>
-                <th className="px-4 py-4 text-left">
-                  MID
-                </th>
-                <th className="px-4 py-4 text-left">
-                  Access Key
-                </th>
-                <th className="px-4 py-4 text-left">
-                  Secret Key
-                </th>
-                <th className="px-4 py-4 text-left">
-                  IP
-                </th>
-                <th className="px-4 py-4 text-left">
-                  IP Check
-                </th>
-                <th className="px-4 py-4 text-center">
-                  Action
-                </th>
+              <tr className="bg-[#fec931] text-black uppercase">
+                <th className="px-4 py-2.5 text-left font-medium">Merchant Name</th>
+                <th className="px-4 py-2.5 text-left font-medium">MID</th>
+                <th className="px-4 py-2.5 text-left font-medium">Access Key</th>
+                <th className="px-4 py-2.5 text-left font-medium">Secret Key</th>
+                <th className="px-4 py-2.5 text-left font-medium">IP</th>
+                <th className="px-4 py-2.5 text-left font-medium">IP Check</th>
+                <th className="px-4 py-2.5 text-center font-medium">Action</th>
               </tr>
             </thead>
-
             <tbody>
               {loading ? (
                 <tr>
-                  <td
-                    colSpan="7"
-                    className="text-center py-10"
-                  >
+                  <td colSpan="7" className="text-center py-10">
                     <div className="flex justify-center">
                       <div className="h-10 w-10 border-4 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
                     </div>
-
                     <p className="mt-3 text-gray-500">
                       Processing...
                     </p>
@@ -184,14 +156,10 @@ export default function MerchantCredential() {
                     className="border-b hover:bg-blue-50 transition"
                   >
                     {/* Merchant Name */}
-                    <td className="px-4 py-4 font-semibold text-gray-700">
-                      {item.merchantName || "-"}
-                    </td>
+                    <td className="px-4 py-4 font-semibold text-gray-700">{item.merchantName || "-"}</td>
 
                     {/* MID */}
-                    <td className="px-4 py-4 text-gray-700">
-                      {item.mid || "-"}
-                    </td>
+                    <td className="px-4 py-4 text-gray-700">{item.mid || "-"}</td>
 
                     {/* Salt Key */}
                     <td className="px-4 py-4">
@@ -303,6 +271,6 @@ export default function MerchantCredential() {
           </table>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

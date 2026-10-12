@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
-import { Layers, BadgeIndianRupee } from "lucide-react";
+import { BadgeIndianRupee, QrCode, ArrowRight, ArrowLeft } from "lucide-react";
 
 const tabs = [
   "UPI"
@@ -25,7 +25,7 @@ const initForm = {
   resellerCommission: "",
 };
 
-export default function NSFFee({
+export default function MSFFee({
   data,
   setData,
   errors,
@@ -37,9 +37,13 @@ export default function NSFFee({
   const [form, setForm] = useState(initForm);
   const [tableData, setTableData] = useState([]);
   const [midList, setMidList] = useState([]);
-  const [showTable, setShowTable] = useState(false);
+  // const [showTable, setShowTable] = useState(false);
   const [showAddError, setShowAddError] = useState(false);
   const [showSaveError, setShowSaveError] = useState(false);
+
+  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd for input[type=date]
+
+
   const fetchMIDList = async (AcqBankName) => {
     try {
       const response = await axiosInstance.post(
@@ -47,7 +51,6 @@ export default function NSFFee({
       );
       const apiData =
         response?.data?.respData || response?.respData || {};
-      // convert object → "key-value" string array
       const list = Object.entries(apiData || {}).map(
         ([key, value]) => `${key}-${value}`
       );
@@ -100,7 +103,6 @@ export default function NSFFee({
       "enterGST",
       "feeType",
       "resellerCommission",
-
     ];
 
     const isInvalid = requiredFields.some((key) => !form[key]);
@@ -142,78 +144,31 @@ export default function NSFFee({
       const payload = {
         ref_id: data?.refId,
 
-        upiAcquirerBankName: tableData
-          .map((row) => row.acquirerBank)
-          .join(","),
-
-        upiMID: tableData
-          .map((row) => row.processorMID)
-          .join(","),
-
-        upiSlabUpto: tableData
-          .map((row) => row.slabUpto)
-          .join(","),
-
-        upiEffectiveFrom: tableData
-          .map((row) => row.effectiveFrom)
-          .join(","),
-
-        upiEffectiveTo: tableData
-          .map((row) => row.effectiveTo)
-          .join(","),
-
-        upiInternationalFixed: tableData
-          .map((row) => row.internationalFixed)
-          .join(","),
-
-        upiInternationalPer: tableData
-          .map((row) => row.internationalPer)
-          .join(","),
-
-        upiDomesticOnusFixed: tableData
-          .map((row) => row.domesticOnusFixed)
-          .join(","),
-
-        upiDomesticOnusper: tableData
-          .map((row) => row.domesticOnusPer)
-          .join(","),
-
-        upiDomesticOffusFixed: tableData
-          .map((row) => row.domesticOffusFixed)
-          .join(","),
-
-        upiDomesticOffusper: tableData
-          .map((row) => row.domesticOffusPer)
-          .join(","),
-
-        upiChargeType: tableData
-          .map((row) => row.chargeType)
-          .join(","),
-
-        upiFeeType: tableData
-          .map((row) => row.feeType)
-          .join(","),
-
-        upiGstper: tableData
-          .map((row) => row.enterGST)
-          .join(","),
-
-        recommission: tableData
-          .map((row) => row.resellerCommission)
-          .join(","),
+        upiAcquirerBankName: tableData.map((row) => row.acquirerBank).join(","),
+        upiMID: tableData.map((row) => row.processorMID).join(","),
+        upiSlabUpto: tableData.map((row) => row.slabUpto).join(","),
+        upiEffectiveFrom: tableData.map((row) => row.effectiveFrom).join(","),
+        upiEffectiveTo: tableData.map((row) => row.effectiveTo).join(","),
+        upiInternationalFixed: tableData.map((row) => row.internationalFixed).join(","),
+        upiInternationalPer: tableData.map((row) => row.internationalPer).join(","),
+        upiDomesticOnusFixed: tableData.map((row) => row.domesticOnusFixed).join(","),
+        upiDomesticOnusper: tableData.map((row) => row.domesticOnusPer).join(","),
+        upiDomesticOffusFixed: tableData.map((row) => row.domesticOffusFixed).join(","),
+        upiDomesticOffusper: tableData.map((row) => row.domesticOffusPer).join(","),
+        upiChargeType: tableData.map((row) => row.chargeType).join(","),
+        upiFeeType: tableData.map((row) => row.feeType).join(","),
+        upiGstper: tableData.map((row) => row.enterGST).join(","),
+        recommission: tableData.map((row) => row.resellerCommission).join(","),
       };
 
-      const response =
-        await axiosInstance.post(
-          "/saveMsfUPI",
-          payload,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          }
-        );
+      const response = await axiosInstance.post("/saveMsfUPI",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const resData = response;
       if (resData?.respCode === 0) {
@@ -247,55 +202,37 @@ export default function NSFFee({
   const inputClass =
     "w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-400 bg-white";
 
-  const labelClass =
-    "block text-sm text-gray-700 mb-1";
-
-  const req =
-    <span className="text-red-500">*</span>;
+  const labelClass = "block text-sm text-gray-700 mb-1";
+  const req = <span className="text-red-500 ml-1">*</span>;
 
   return (
     <div>
-      <div className="flex items-center gap-3">
-        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
-          <BadgeIndianRupee size={18} />
-        </span>
-      <h2 className="text-xl text-blue-900 font-semibold">
-          MSF / Convenience Fee
-        </h2>
-      </div>
-             <p className="ml-12 pb-1 text-sm text-blue-900">
-        MSFFee form is used to configure UPI/MSF fee structure including domestic and international charges,
-        slab-wise configuration, GST, and effective date ranges. You can add multiple fee slabs and save them in a single configuration.
-      </p>
-      {/* Tabs */}
-      <div className="ml-2 flex overflow-x-auto whitespace-nowrap scrollbar-thin">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() =>
-              setActiveTab(tab)
-            }
-            className={`px-4 sm:px-5 py-3 text-sm font-medium transition-colors shrink-0 ${activeTab === tab
-              ? "bg-blue-500 text-white"
-              : "bg-white text-gray-700 hover:bg-gray-50"
-              }`}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="mb-4 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden p-[20px]">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-500"></div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100 text-yellow-600">
+            <BadgeIndianRupee size={18} />
+          </span>
+          <h2 className="text-xl sm:text-xl text-slate-800 font-semibold -mt-3">
+            MSF / Convenience Fee
+          </h2>
+        </div>
+        <p className="ml-12 text-sm text-slate-700 -mt-3">
+          MSFFee form is used to configure UPI/MSF fee structure including domestic
+          and international charges, slab-wise configuration, GST, and effective
+          date ranges. You can add multiple fee slabs and save them in a single
+          configuration.
+        </p>
       </div>
 
       {/* FORM */}
-      <div className="py-6">
+      <div className="pb-6">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-cyan-100 text-cyan-600 shrink-0">
-              <Layers size={14} />
+          <div className="bg-[#fec931] text-black px-4 py-3 rounded-md mb-6 flex items-center gap-3">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black">
+              <QrCode size={16} />
             </span>
-            <h2 className="text-lg sm:text-xl text-gray-700 font-normal">
-              {activeTab}
-            </h2>
+            <h2 className="text-lg font-semibold">{activeTab}</h2>
           </div>
 
           {/* ROW 1 */}
@@ -309,7 +246,6 @@ export default function NSFFee({
                 value={form.acquirerBank}
                 onChange={(e) => {
                   const value = e.target.value;
-
                   u("acquirerBank", value);
                   fetchMIDList(value);
                   u("processorMID", "");
@@ -369,6 +305,7 @@ export default function NSFFee({
               </label>
               <input
                 type="date"
+                max={today}
                 className={inputClass}
                 value={form.effectiveFrom}
                 onChange={(e) =>
@@ -389,6 +326,7 @@ export default function NSFFee({
               </label>
               <input
                 type="date"
+                max={today}
                 className={inputClass}
                 value={form.effectiveTo}
                 onChange={(e) =>
@@ -551,6 +489,7 @@ export default function NSFFee({
                 }}
               />
             </div>
+
             <div>
               <label className={labelClass}>
                 Charge Type
@@ -601,6 +540,7 @@ export default function NSFFee({
                 }}
               />
             </div>
+
             <div>
               <label className={labelClass}>
                 Fee Type {req}
@@ -627,10 +567,9 @@ export default function NSFFee({
               </select>
             </div>
 
-
             <div>
               <label className={labelClass}>
-                Enter Reseller Commission in Per(%) {req}
+                Enter Reseller Commission in Per(%){req}
               </label>
               <input
                 type="text"
@@ -656,6 +595,7 @@ export default function NSFFee({
                 }}
               />
             </div>
+
           </div>
           {showAddError && (
             <div className="flex justify-center mb-4 mt-5 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded text-sm">
@@ -675,7 +615,7 @@ export default function NSFFee({
               <button
                 type="button"
                 onClick={handleAdd}
-                className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-2 rounded w-full sm:w-auto"
+                className="bg-green-500 text-white px-8 py-2 rounded w-full sm:w-auto"
               >
                 ADD
               </button>
@@ -721,16 +661,16 @@ export default function NSFFee({
                         <td className="border p-2">{row.slabUpto}</td>
                         <td className="border p-2">{row.effectiveFrom}</td>
                         <td className="border p-2">{row.effectiveTo}</td>
-                        <td className="border p-2">{row.internationalFixed}</td>
-                        <td className="border p-2">{row.internationalPer}</td>
-                        <td className="border p-2">{row.domesticOnusFixed}</td>
-                        <td className="border p-2">{row.domesticOnusPer}</td>
-                        <td className="border p-2">{row.domesticOffusFixed}</td>
-                        <td className="border p-2">{row.domesticOffusPer}</td>
+                        <td className="border p-2 text-center">{row.internationalFixed}</td>
+                        <td className="border p-2 text-center">{row.internationalPer}</td>
+                        <td className="border p-2 text-center">{row.domesticOnusFixed}</td>
+                        <td className="border p-2 text-center">{row.domesticOnusPer}</td>
+                        <td className="border p-2 text-center">{row.domesticOffusFixed}</td>
+                        <td className="border p-2 text-center">{row.domesticOffusPer}</td>
                         <td className="border p-2">{row.chargeType}</td>
                         <td className="border p-2">{row.enterGST}</td>
                         <td className="border p-2">{row.feeType}</td>
-                        <td className="border p-2">{row.resellerCommission}</td>
+                        <td className="border p-2 text-center">{row.resellerCommission}</td>
                         <td className="border p-2">
                           <button
                             type="button"
@@ -759,16 +699,18 @@ export default function NSFFee({
             <button
               type="button"
               onClick={handleBack}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full w-full sm:w-auto"
+              className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full"
             >
+              <ArrowLeft size={16} />
               Back
             </button>
             <button
               type="button"
               onClick={saveMsfUPI}
-              className="inline-flex items-center gap-2 bg-amber-400  text-gray-900 font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
+              className="inline-flex items-center gap-2 text-black bg-[#fec931] font-medium px-6 py-2.5 rounded-full shadow-sm transition"
             >
               Save & Next
+              <ArrowRight size={16} />
             </button>
           </div>
         </div>
