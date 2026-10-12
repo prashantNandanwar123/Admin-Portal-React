@@ -1,13 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axiosInstance from "../api/axios";
 
 const CryptoDashboard = () => {
     const [activeTab, setActiveTab] = useState("ONRAMP");
-    const [fromDate, setFromDate] = useState("");
-    const [toDate, setToDate] = useState("");
+
+     const todayDate = new Date().toISOString().split("T")[0];
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const currentDate = `${year}- ${month}-${day}`;
+
+    const [fromDate, setFromDate] = useState(currentDate);
+    const [toDate, setToDate] = useState(currentDate);
     const [loading, setLoading] = useState(false);
 
-    const today = new Date().toISOString().split("T")[0];
     const [dashboardData, setDashboardData] = useState({
         total_count: 0,
         success_count: 0,
@@ -19,16 +27,6 @@ const CryptoDashboard = () => {
         failed_amount: 0,
         pending_amount: 0,
     });
-
-    useEffect(() => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
-        const currentDate = `${year}-${month}-${day}`;
-        setFromDate(currentDate);
-        setToDate(currentDate);
-    }, []);
 
     const formatDate = (date) => {
         if (!date) {
@@ -60,7 +58,6 @@ const CryptoDashboard = () => {
         }
         try {
             setLoading(true);
-
             const apiUrl =
                 activeTab === "ONRAMP"
                     ? "/onRampDashboard"
@@ -88,16 +85,6 @@ const CryptoDashboard = () => {
         }
     };
 
-    // CALL API WHEN TAB / DATE CHANGES
-    useEffect(() => {
-        if (fromDate && toDate) {
-            fetchDashboard();
-        }
-    }, [
-        activeTab,
-        fromDate,
-        toDate
-    ]);
 
     // AMOUNT FORMAT
     const formatAmount = (amount) => {
@@ -188,7 +175,7 @@ const CryptoDashboard = () => {
                 </div>
 
                 {/* RIGHT - Date Filters + Search */}
-                <div className="flex flex-col sm:flex-row items-end gap-3">                   
+                <div className="flex flex-col sm:flex-row items-end gap-3">
                     <div className="w-full sm:w-44">
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
                             From Date
@@ -196,7 +183,7 @@ const CryptoDashboard = () => {
                         <input
                             type="date"
                             value={fromDate}
-                            max={today}
+                            max={todayDate}
                             onChange={(e) => setFromDate(e.target.value)}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         />
@@ -210,7 +197,7 @@ const CryptoDashboard = () => {
                         <input
                             type="date"
                             value={toDate}
-                            max={today}
+                            max={todayDate}
                             onChange={(e) => setToDate(e.target.value)}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         />
