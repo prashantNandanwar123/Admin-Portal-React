@@ -283,7 +283,7 @@ export default function Reports() {
       </div>
 
       {/* ── Table ── */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mt-8">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-3 mt-8">
         <div className="w-full">
           <div className="flex justify-end mb-4">
             <div className="w-full flex justify-between items-center">

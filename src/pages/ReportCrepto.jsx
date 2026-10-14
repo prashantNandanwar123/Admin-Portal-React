@@ -63,7 +63,6 @@ export default function ReportCrepto() {
                 setTotalRecords(response.totalRecords || 0);
                 setPage(currentPage);
                 setSearched(true);
-
             } else {
                 setData([]);
                 setTotalPages(0);
@@ -457,14 +456,9 @@ export default function ReportCrepto() {
                     <button
                         type="button"
                         onClick={() => setActiveTab("ONRAMP")}
-                        className={`
-                        relative
-                        px-2
-                        pb-3
-                        text-sm
-                        font-semibold
-                        transition-all
+                        className={`relative px-2 pb-3 text-sm font-semibold transition-all
                         duration-200
+                        cursor-pointer
                         ${activeTab === "ONRAMP"
                                 ? "text-[#fec931]"
                                 : "text-black"
@@ -480,14 +474,8 @@ export default function ReportCrepto() {
                     <button
                         type="button"
                         onClick={() => setActiveTab("OFFRAMP")}
-                        className={`
-                        relative
-                        px-2
-                        pb-3
-                        text-sm
-                        font-semibold
-                        transition-all
-                        duration-200
+                        className={`relative px-2 pb-3 text-sm font-semibold transition-all
+                        duration-200 cursor-pointer
                         ${activeTab === "OFFRAMP"
                                 ? "text-[#fec931]"
                                 : "text-black"

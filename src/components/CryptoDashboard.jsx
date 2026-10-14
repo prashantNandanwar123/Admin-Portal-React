@@ -5,7 +5,6 @@ const CryptoDashboard = () => {
     const [activeTab, setActiveTab] = useState("ONRAMP");
 
     const today = new Date();
-
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
@@ -22,7 +21,6 @@ const CryptoDashboard = () => {
         success_count: 0,
         failed_count: 0,
         pending_count: 0,
-
         total_amount: 0,
         success_amount: 0,
         failed_amount: 0,
@@ -44,7 +42,6 @@ const CryptoDashboard = () => {
             success_count: 0,
             failed_count: 0,
             pending_count: 0,
-
             total_amount: 0,
             success_amount: 0,
             failed_amount: 0,
@@ -68,12 +65,10 @@ const CryptoDashboard = () => {
                 fromDate: formatDate(fromDate),
                 toDate: formatDate(toDate),
             };
-
             const response = await axiosInstance.post(
                 apiUrl,
                 requestBody
             );
-
             if (response?.respCode === 0) {
                 setDashboardData(response.respData || {});
             } else {
@@ -88,7 +83,7 @@ const CryptoDashboard = () => {
 
     useEffect(() => {
         fetchDashboard();
-    }, []);
+    }, [activeTab]);
 
     // AMOUNT FORMAT
     const formatAmount = (amount) => {
@@ -201,7 +196,6 @@ const CryptoDashboard = () => {
                         <input
                             type="date"
                             value={toDate}
-                            min={fromDate}
                             max={todayDate}
                             onChange={(e) => setToDate(e.target.value)}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -212,22 +206,12 @@ const CryptoDashboard = () => {
                     <button
                         onClick={fetchDashboard}
                         disabled={loading}
-                        className={`
-                bg-[#fec931]
-                text-black
-                px-6 py-2.5
-                rounded-lg
-                flex items-center justify-center
-                gap-2
-                text-sm
-                font-medium
-                shadow
-                transition
-                ${loading
+                        className={`bg-[#fec931] text-black px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm
+                                 font-medium shadow transition ${loading
                                 ? "opacity-60 cursor-not-allowed"
                                 : "opacity-100"
                             }
-            `}
+                         `}
                     >
                         {loading ? "Loading..." : "Search"}
                     </button>
