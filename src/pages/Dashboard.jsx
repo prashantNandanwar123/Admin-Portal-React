@@ -103,8 +103,7 @@ export default function Dashboard() {
       : DEMO_RECENT_TRANSACTIONS;
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 xl:py-3 xl:px-6 xl space-y-6 xl:space-y-2.5 hide-scrollbar">
-      {/* HEADER */}
+    <div className="min-h-full p-4 sm:p-6 xl:py-3 xl:px-6 xl space-y-6 xl:space-y-2.5">
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 xl:gap-2">
         <div className="pt-2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
@@ -118,21 +117,19 @@ export default function Dashboard() {
         </div>
 
         {/* FILTERS */}
-        <div className="flex flex-wrap items-center gap-3 sm:gap-4 xl:gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 xl:gap-2 pt-2 w-full">
           {/* FROM */}
-          <div className="flex items-center gap-2 xl:gap-1.5">
+          <div className="flex items-center gap-2 xl:gap-1.5 w-full sm:w-auto">
             <span className="text-sm xl:text-xs text-gray-600 font-medium">From:</span>
             <div
-              className="flex items-stretch border border-gray-200 rounded-lg overflow-hidden bg-white relative shadow-sm xl:!h-[30px]"
               style={{ height: "38px" }}
-            >
+              className="flex items-stretch border border-gray-200 rounded-lg overflow-hidden bg-white relative shadow-sm xl:!h-[30px] w-full sm:w-auto">
               <input
                 type="text"
                 value={fromDate ? fromDate.split("-").reverse().join("/") : ""}
                 max={today}
                 readOnly
-                className="px-3 xl:px-2 text-sm xl:text-xs outline-none bg-transparent cursor-pointer w-[100px] sm:w-[110px] xl:w-[85px]"
-                style={{ height: "100%" }}
+                className="px-3 xl:px-2 text-sm xl:text-xs outline-none bg-transparent cursor-pointer w-full sm:w-[110px] xl:w-[85px]" style={{ height: "100%" }}
               />
               <input
                 type="date"
@@ -168,7 +165,7 @@ export default function Dashboard() {
           </div>
 
           {/* TO */}
-          <div className="flex items-center gap-2 xl:gap-1.5">
+          <div className="flex items-center gap-2 xl:gap-1.5 w-full sm:w-auto">
             <span className="text-sm xl:text-xs text-gray-600 font-medium">
               To:
             </span>
@@ -179,8 +176,7 @@ export default function Dashboard() {
                 type="text"
                 value={toDate ? toDate.split("-").reverse().join("/") : ""}
                 readOnly
-                className="px-3 xl:px-2 text-sm xl:text-xs outline-none bg-transparent cursor-pointer w-[100px] sm:w-[110px] xl:w-[85px]"
-                style={{ height: "100%" }}
+                className="px-3 xl:px-2 text-sm xl:text-xs outline-none bg-transparent cursor-pointer w-full sm:w-[110px] xl:w-[85px]" style={{ height: "100%" }}
               />
 
               {/* ONLY ONE DATE INPUT */}

@@ -8,7 +8,6 @@ const CryptoDashboard = () => {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
-
     const currentDate = `${year}-${month}-${day}`;
     const todayDate = currentDate;
 
@@ -112,25 +111,25 @@ const CryptoDashboard = () => {
         if (activeTab === "ONRAMP") {
             return [
                 {
-                    title: "Total Transactions",
-                    count: dashboardData.total_count,
-                    amount: dashboardData.total_amount,
-                    icon: "↗",
-                    iconClass: "total",
-                },
-                {
-                    title: "Successful Transactions",
+                    title: "Success Orders",
                     count: dashboardData.success_count,
                     amount: dashboardData.success_amount,
                     icon: "✓",
                     iconClass: "success",
                 },
                 {
-                    title: "Pending Transactions",
+                    title: "Pending Orders",
                     count: dashboardData.pending_count,
                     amount: dashboardData.pending_amount,
                     icon: "◷",
                     iconClass: "pending",
+                },
+                {
+                    title: "Total Orders",
+                    count: dashboardData.total_count,
+                    amount: dashboardData.total_amount,
+                    icon: "↗",
+                    iconClass: "total",
                 },
             ];
         }
@@ -138,25 +137,25 @@ const CryptoDashboard = () => {
         // OFFRAMP
         return [
             {
-                title: "Total Transactions",
-                count: dashboardData.total_count,
-                amount: dashboardData.total_amount,
-                icon: "↘",
-                iconClass: "total",
-            },
-            {
-                title: "Successful Transactions",
+                title: "Success Payout",
                 count: dashboardData.success_count,
                 amount: dashboardData.success_amount,
                 icon: "✓",
                 iconClass: "success",
             },
             {
-                title: "Failed Transactions",
-                count: dashboardData.failed_count,
-                amount: dashboardData.failed_amount,
+                title: "Pending Payout",
+                count: dashboardData.pending_count,
+                amount: dashboardData.pending_amount,
                 icon: "×",
                 iconClass: "failed",
+            },
+            {
+                title: "Total Payout",
+                count: dashboardData.total_count,
+                amount: dashboardData.total_amount,
+                icon: "↘",
+                iconClass: "total",
             },
         ];
     };
@@ -169,8 +168,7 @@ const CryptoDashboard = () => {
                         Crypto Order Dashboard
                     </h1>
                     <p className="mt-1 text-sm text-slate-800">
-                        Monitor your business performance with key metrics, transaction insights, payment activity, and real-time updates.
-                    </p>
+                        HelloPe Crypto Gateway is running at Good performance.                  </p>
                 </div>
 
                 {/* RIGHT - Date Filters + Search */}
@@ -254,19 +252,19 @@ const CryptoDashboard = () => {
                 </button>
             </div>
 
-            {/* ========= MAIN CONTENT ======= */}
+            {/* --------- MAIN CONTENT ---------- */}
 
             <div className="px-2 py-[22px]">
                 {/* SECTION HEADER */}
                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4 mb-3">
                     {/* LEFT - Heading */}
                     <div>
-                        <h3 className="m-0 text-[16px] font-semibold text-gray-900">
+                        <h3 className="m-0 text-lg font-semibold text-gray-900">
                             {activeTab === "ONRAMP"
                                 ? "OnRamp Transactions"
                                 : "OffRamp Transactions"}
                         </h3>
-                        <p className="mt-1 mb-0 text-[11px] text-gray-500">
+                        <p className="mb-2 text-xs text-gray-500">
                             {activeTab === "ONRAMP"
                                 ? "Monitor fiat to crypto transactions"
                                 : "Monitor crypto to fiat transactions"}
@@ -274,23 +272,16 @@ const CryptoDashboard = () => {
                     </div>
                 </div>
 
-                {/* =========== CARDS============== */}
+                {/* ------- CARDS ----------*/}
 
                 <div className="grid grid-cols-3 gap-4">
                     {getCards().map((card, index) => (
-                        <div
-                            key={index}
-                            className="
-                                bg-white
-                                border
-                                border-gray-200
-                                rounded-[6px]
-                                p-[18px]
-                                shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+                        <div key={index}
+                            className="bg-white border border-gray-200 rounded-[6px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
 
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <div className="text-[12px] text-gray-500 mb-2">
+                                    <div className="text-md text-gray-900 mb-2 font-semibold">
                                         {card.title}
                                     </div>
                                     <div className="text-[25px] font-semibold text-gray-900">

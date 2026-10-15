@@ -97,7 +97,7 @@ export default function Layout() {
            pt-16
            h-screen
            overflow-y-auto
-           hide-scrollbar
+           
           "
         >
           <Outlet />

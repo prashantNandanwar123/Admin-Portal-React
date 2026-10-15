@@ -360,6 +360,8 @@ export default function ReportCrepto() {
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Sender Wallet Address</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Chain ID</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Fiat Amount</th>
+                                                    <th className="px-3 py-2.5 whitespace-nowrap font-medium">Transaction Fee</th>
+                    <th className="px-3 py-2.5 whitespace-nowrap font-medium">TDS Fee</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Currency</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Payment Mode</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Account Number</th>
@@ -367,6 +369,8 @@ export default function ReportCrepto() {
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Created At</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Response At</th>
                 <th className="px-3 py-2.5 whitespace-nowrap font-medium">Status</th>
+                                <th className="px-3 py-2.5 whitespace-nowrap font-medium">UTR</th>
+                <th className="px-3 py-2.5 whitespace-nowrap font-medium">DESCRIPTION</th>
             </tr>
         );
     };
@@ -414,6 +418,8 @@ export default function ReportCrepto() {
                         <td className="px-3 py-2.5">{getValue("senderWalletAddress")}</td>
                         <td className="px-3 py-2.5">{getValue("chainId")}</td>
                         <td className="px-3 py-2.5">{getValue("fiatAmount")}</td>
+                            <td className="px-3 py-2.5">{getValue("transactionFee")} </td>
+                        <td className="px-3 py-2.5">{getValue("tdsFee")} </td>
                         <td className="px-3 py-2.5">{getValue("fiatCurrency")}</td>
                         <td className="px-3 py-2.5">{getValue("paymentMode")}</td>
                         <td className="px-3 py-2.5">{getValue("bankAccountNumber")}</td>
@@ -425,6 +431,10 @@ export default function ReportCrepto() {
                                 status={item?.status}
                             />
                         </td>
+                         <td className="px-3 py-2.5">{getValue("utr")}</td>
+
+                        <td className="px-3 py-2.5 whitespace-nowrap">{getValue("errorMessage")}</td>
+
                     </>
                 )}
             </tr>
@@ -746,7 +756,7 @@ function StatusBadge({ status }) {
     if (
         normalizedStatus === "SUCCESS" ||
         normalizedStatus === "ORDER_COMPLETED" ||
-        normalizedStatus === "SUCCESSFUL"
+        normalizedStatus === "PAYOUT_SUCCESS"
     ) {
         className =
             "bg-green-100 text-green-700";

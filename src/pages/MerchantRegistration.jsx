@@ -11,10 +11,7 @@ import {
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
 } from "react-icons/fa";
-import { Plus } from "lucide-react";
-
-
-import { User } from "lucide-react";
+import { Plus, User} from "lucide-react";
 
 export default function MerchantRegistration() {
   const [data, setData] = useState([]);
@@ -43,7 +40,7 @@ export default function MerchantRegistration() {
     )
   );
 
-  // Pagination calculations
+  // Pagination calculations Start
   const indexOfLast = currentPage * entriesPerPage;
   const indexOfFirst = indexOfLast - entriesPerPage;
 
@@ -162,7 +159,6 @@ export default function MerchantRegistration() {
 
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-screen hide-scrollbar">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-5">
         <div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-2xl font-semibold text-[#1A2233]">
@@ -173,27 +169,27 @@ export default function MerchantRegistration() {
             their business, contact, banking, KYC, and compliance information.
           </p>
         </div>
+
         <button
           onClick={handleAddClick}
-          className="flex items-center justify-center gap-2 bg-[#fec931] text-black active:scale-[0.98] transition-all duration-150 font-normal px-4 py-2.5 rounded-xl shadow-sm w-full sm:w-auto">
+          className="flex items-center justify-center gap-2 bg-[#fec931] text-black whitespace-nowrap active:scale-[0.98] transition-all duration-150 font-normal px-4 py-2.5 rounded-xl shadow-sm w-full sm:w-auto">
           <Plus size={14} strokeWidth={2} />
           Add Merchant
         </button>
+                
       </div>
 
       {/* Stats Strip */}
       <div className="mb-5">
-        <div className="inline-flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
-          {/* Icon */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#fec931] text-black">
-            <User size={20} strokeWidth={2} />
+        <div className="inline-flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-3 pt-2 pb-1 shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#fec931] text-black -mt-2">
+            <User size={17} strokeWidth={2} />
           </div>
-          {/* Content */}
           <div className="flex flex-col">
             <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
               Total Merchants
             </span>
-            <span className="text-xl font-bold leading-tight text-slate-800">
+            <span className="text-xl font-bold leading-tight text-slate-700">
               {filteredData.length.toLocaleString()}
             </span>
           </div>
@@ -240,25 +236,26 @@ export default function MerchantRegistration() {
           <table className="w-full text-sm min-w-[900px] border-collapse border border-slate-200">
             <thead className="bg-[#fec931] text-black border-t-0">
               <tr className="uppercase">
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-2 py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   ID
                 </th>
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-2               
+                     py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Legal Name
                 </th>
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-5 py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Contact Person
                 </th>
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-5 py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Email
                 </th>
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-5 py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Mobile
                 </th>
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-5 py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Risk Status
                 </th>
-                <th className="px-5 py-3 text-center text-xs font-semibold tracking-wide border border-slate-200">
+                <th className="px-5 py-2 text-center text-xs font-semibold tracking-wide border border-slate-200">
                   Action
                 </th>
               </tr>
@@ -303,8 +300,7 @@ export default function MerchantRegistration() {
                   return (
                     <tr
                       key={index}
-                      className="border-t border-slate-100 hover:bg-slate-50 transition-all duration-150"
-                    >
+                      className="border-t border-slate-100 hover:bg-slate-50 transition-all duration-150">
 
                       {/* ID */}
                       <td className="px-1 py-1 text-center font-medium text-slate-500 border border-slate-200">
@@ -342,16 +338,18 @@ export default function MerchantRegistration() {
                           {statusLabel}
                         </span>
                       </td>
+
                       {/* Action */}
                       <td className="px-2 py-1 text-center">
                         <button
                           type="button"
                           onClick={() => handlePendingClick(item[4])}
-                          className="inline-flex items-center justify-center"
-                        >
+                          className="inline-flex items-center justify-center">
+
                           <LiaEyeSolid className="text-3xl text-green-500" />
                         </button>
                       </td>
+
                       {/* Action */}
                       {/* <td className="px-3 py-2 text-center relative">
                         <button
@@ -372,6 +370,7 @@ export default function MerchantRegistration() {
                           <BsThreeDotsVertical className="text-lg" />
                         </button>
                       </td> */}
+                      
                     </tr>
                   );
                 })
@@ -446,14 +445,11 @@ export default function MerchantRegistration() {
 
             {/* PAGE NUMBERS */}
             {getPageNumbers().map((page, index) => {
-
-              // Dots
               if (page === "...") {
                 return (
                   <span
                     key={`dots-${index}`}
-                    className="px-1 text-slate-400 text-sm"
-                  >
+                    className="px-1 text-slate-400 text-sm">
                     ...
                   </span>
                 );

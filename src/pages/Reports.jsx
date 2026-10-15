@@ -378,7 +378,6 @@ export default function Reports() {
                         <td className="px-3 py-2.5 border border-gray-200">
                           <StatusBadge msg={item.respMessage} />
                         </td>
-
                         <td className="px-3 py-2.5 border border-gray-200">{item.rrn || "-"}</td>
                       </tr>
                     ))
@@ -400,7 +399,7 @@ export default function Reports() {
 
           {/* Pagination */}
           {totalPages > 0 && (
-            <div className="mt-4 flex flex-col md:flex-row justify-between items-center gap-4 px-5 py-3">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-5 py-1">
 
               {/* Showing Information */}
               <div className="text-sm text-gray-600">
